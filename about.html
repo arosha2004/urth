@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — URTH Architecture &amp; Design Studio</title>
+  <meta name="description" content="Learn about URTH, an architecture and design studio crafting human-centered, sustainable, and atmospheric spaces globally." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="about.css" />
+</head>
+<body class="about-page">
+
+  <!-- TOP NAVIGATION HEADER -->
+  <header class="about-header" id="about-header">
+    <a href="index.html" class="about-header__logo" aria-label="URTH Home">
+      <svg class="about-header__logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polygon points="20,2 38,36 2,36" stroke="#c8a96e" stroke-width="2" fill="none"/>
+        <polygon points="20,10 32,32 8,32" stroke="#c8a96e" stroke-width="1" fill="none" opacity="0.5"/>
+        <circle cx="20" cy="20" r="3" fill="#c8a96e"/>
+      </svg>
+      <span class="about-header__logo-text">URTH</span>
+    </a>
+
+    <nav class="about-header__nav" aria-label="Main Navigation">
+      <a href="index.html" class="about-header__link" id="header-nav-home">Home</a>
+      <a href="about.html" class="about-header__link active" id="header-nav-about">About</a>
+      <a href="index.html" class="about-header__link" id="header-nav-projects">Projects</a>
+      <a href="#" class="about-header__link" id="header-nav-shop">Shop</a>
+      <a href="#" class="about-header__link" id="header-nav-contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="main-content">
+
+    <!-- 1. HERO SECTION -->
+    <section class="about-hero" id="hero-section">
+      <img src="img/about_hero.png" alt="URTH Studio Interior Design" class="about-hero__bg" />
+      <div class="about-hero__content">
+        <span class="about-hero__tag">Architecture &amp; Interior Design</span>
+        <h1 class="about-hero__title">Design centered around human experience</h1>
+        <p class="about-hero__desc">
+          URTH is an international architecture and design studio crafting timeless spaces where light, natural materials, and human emotion connect seamlessly.
+        </p>
+        <div class="about-hero__actions">
+          <a href="#story-section" class="btn-primary" id="btn-explore-story">
+            <span>Our Story</span>
+            <span>&#8594;</span>
+          </a>
+          <a href="#services-section" class="btn-secondary" id="btn-view-services">
+            <span>Our Disciplines</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. PHILOSOPHY & STAGGERED COLLAGE -->
+    <section class="about-philosophy" id="philosophy-section">
+      <div class="about-philosophy__text">
+        <span class="section-label">ABOUT US</span>
+        <blockquote class="about-philosophy__quote">
+          "We believe that thoughtful architecture has the power to transform how people experience the world, bringing harmony between built environments and natural landscapes."
+        </blockquote>
+        <p class="about-philosophy__body">
+          Founded on the principles of organic minimalism and spatial purity, our studio brings together architects, interior stylists, and material researchers dedicated to creating environments that inspire tranquility and enduring beauty.
+        </p>
+      </div>
+
+      <div class="collage-container" id="collage-wrapper">
+        <img src="img/about_collage1.png" alt="Architectural design team concept" class="collage-img collage-img--1" />
+        <img src="img/about_collage2.png" alt="Studio material study and lighting" class="collage-img collage-img--2" />
+        <img src="img/about_hero.png" alt="Architectural living space" class="collage-img collage-img--3" />
+      </div>
+    </section>
+
+    <!-- 3. FEATURED STUDIO STORY -->
+    <section class="about-story" id="story-section">
+      <div class="about-story__content">
+        <span class="section-label">STUDIO ETHOS</span>
+        <h2 class="about-story__title">Architecture &amp; Interior Studio</h2>
+        <p class="about-story__p">
+          Every project begins with a deep listening process—understanding the unique topography, climate, culture, and personal ritual of the inhabitants.
+        </p>
+        <p class="about-story__p">
+          By employing raw limestone, oiled timber, hand-burnished plaster, and natural daylighting strategies, we construct spaces that feel grounded in history yet contemporary in form.
+        </p>
+        <a href="#services-section" class="btn-secondary" id="btn-discover-more">Discover Our Work</a>
+      </div>
+
+      <div class="about-story__img-wrap">
+        <img src="img/about_featured_villa.jpg" alt="Minimalist wooden villa architecture" class="about-story__img" />
+      </div>
+    </section>
+
+    <!-- 4. STATS COUNTER GRID -->
+    <section class="about-stats" id="stats-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" data-target="15">15+</div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" data-target="250">250+</div>
+          <div class="stat-label">Built Projects</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" data-target="35">35+</div>
+          <div class="stat-label">Design Awards</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" data-target="100">100%</div>
+          <div class="stat-label">Sustainable Ethos</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. PRESS & BRANDS LOGOS -->
+    <section class="about-press" id="press-section">
+      <p class="press-heading">TRUSTED BY LEADING BRANDS &amp; FEATURED IN TOP PUBLICATIONS</p>
+      <div class="press-logos">
+        <span class="press-logo-item">VOGUE</span>
+        <span class="press-logo-item">ARCHITECTURAL DIGEST</span>
+        <span class="press-logo-item">ELLE DECOR</span>
+        <span class="press-logo-item">WALLPAPER*</span>
+        <span class="press-logo-item">FRAME</span>
+        <span class="press-logo-item">DEZEEN</span>
+      </div>
+    </section>
+
+    <!-- 6. DARK CONTRAST FEATURE CONTAINER -->
+    <section class="about-dark-section" id="dark-feature-section">
+      <div class="dark-container">
+        <div class="dark-grid">
+          <div class="dark-media">
+            <img src="img/about_dark_highlight.jpg" alt="Atmospheric architectural lighting" class="dark-img" />
+          </div>
+          <div class="dark-content">
+            <span class="section-label">OUR COMMITMENT</span>
+            <h2 class="dark-title">Precision engineering meets organic artistry</h2>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; line-height: 1.7; font-weight: 300;">
+              We bridge visionary concept design with meticulous technical execution. Every corner, shadow gap, and material transition is calculated to create emotional resonance.
+            </p>
+
+            <div class="dark-cards">
+              <div class="dark-card">
+                <div class="dark-card__num">01</div>
+                <h3 class="dark-card__title">Sustainable Innovation</h3>
+                <p class="dark-card__desc">Utilizing natural ventilation, renewable timber, and low-embodied carbon concrete solutions.</p>
+              </div>
+              <div class="dark-card">
+                <div class="dark-card__num">02</div>
+                <h3 class="dark-card__title">Timeless Craftsmanship</h3>
+                <p class="dark-card__desc">Collaborating with master artisans to custom-fabricate joinery, stone, and bespoke metalwork.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. SERVICES VERTICAL CARDS LIST -->
+    <section class="about-services" id="services-section">
+      <div class="services-header">
+        <span class="section-label">WHAT WE DO</span>
+        <h2 class="services-title">Our Core Disciplines</h2>
+      </div>
+
+      <div class="services-list">
+        
+        <!-- Card 1 -->
+        <article class="service-card" id="service-card-1">
+          <img src="img/about_service1.jpg" alt="Architectural spatial design" class="service-card__img" />
+          <div class="service-card__body">
+            <span class="service-card__num">01 / ARCHITECTURE</span>
+            <h3 class="service-card__title">Architectural &amp; Spatial Planning</h3>
+            <p class="service-card__desc">
+              From private residential sanctuaries to cultural landmarks, we create tailored structural solutions that interact thoughtfully with their natural topographies.
+            </p>
+            <a href="#" class="service-card__link">
+              <span>Read Details</span>
+              <span>&#8594;</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="service-card" id="service-card-2">
+          <img src="img/about_service2.jpg" alt="Interior and furniture design" class="service-card__img" />
+          <div class="service-card__body">
+            <span class="service-card__num">02 / INTERIORS</span>
+            <h3 class="service-card__title">Interior &amp; Custom Furniture Design</h3>
+            <p class="service-card__desc">
+              Curating atmospheric, tactile interiors using custom lighting, natural textiles, and bespoke furniture handcrafted specifically for each space.
+            </p>
+            <a href="#" class="service-card__link">
+              <span>Read Details</span>
+              <span>&#8594;</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="service-card" id="service-card-3">
+          <img src="img/about_service3.jpg" alt="Ecological architecture" class="service-card__img" />
+          <div class="service-card__body">
+            <span class="service-card__num">03 / SUSTAINABILITY</span>
+            <h3 class="service-card__title">Ecological &amp; Sustainable Systems</h3>
+            <p class="service-card__desc">
+              Pioneering low-energy building envelopes, rainwater harvesting, passive solar orientation, and bio-based building materials.
+            </p>
+            <a href="#" class="service-card__link">
+              <span>Read Details</span>
+              <span>&#8594;</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="service-card" id="service-card-4">
+          <img src="img/about_service4.jpg" alt="Landscape and masterplanning" class="service-card__img" />
+          <div class="service-card__body">
+            <span class="service-card__num">04 / LANDSCAPE</span>
+            <h3 class="service-card__title">Urban &amp; Landscape Integration</h3>
+            <p class="service-card__desc">
+              Harmonizing exterior landscaping with interior architecture to foster biodiversity, seamless indoor-outdoor living, and community connection.
+            </p>
+            <a href="#" class="service-card__link">
+              <span>Read Details</span>
+              <span>&#8594;</span>
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- 8. WIDESCREEN AMBIENT BANNER & QUOTE -->
+    <section class="about-quote-banner" id="quote-banner-section">
+      <img src="img/about_quote_banner.jpg" alt="Atmospheric living room couch" class="about-quote-banner__bg" />
+      <div class="about-quote-banner__content">
+        <p class="banner-quote">"Space is the breath of art."</p>
+        <span class="banner-author">— Frank Lloyd Wright</span>
+      </div>
+    </section>
+
+    <!-- 9. FAQ ACCORDION SECTION -->
+    <section class="about-faq" id="faq-section">
+      <div class="faq-header">
+        <span class="section-label">INQUIRIES</span>
+        <h2 class="faq-title">Frequently Asked Questions</h2>
+      </div>
+
+      <div class="faq-list" id="faq-accordion">
+
+        <div class="faq-item active">
+          <button class="faq-question" aria-expanded="true" id="faq-btn-1">
+            <span>What is URTH's architectural design philosophy?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>
+              We prioritize organic minimalism, material authenticity, and light-driven spatial orientation. Every project is crafted to embody warmth, calm, and connection with nature.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" id="faq-btn-2">
+            <span>Do you accept international residential &amp; commercial commissions?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Yes. URTH operates worldwide with projects across Europe, North America, and Asia. We partner with vetted regional contractors to ensure local code compliance and flawless execution.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" id="faq-btn-3">
+            <span>What services are included from initial concept to completion?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Our comprehensive services encompass feasibility studies, architectural design, interior styling, custom furniture design, construction documentation, and full site administration.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" id="faq-btn-4">
+            <span>How do you incorporate sustainability into luxury projects?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>
+              We integrate passive solar heating, natural cross-ventilation, high-performance thermal insulation, low-VOC finishes, and responsibly sourced local stone and timber into every build.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" id="faq-btn-5">
+            <span>What is the typical project timeline?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Design development typically spans 3 to 6 months depending on scale. Construction timelines range from 12 to 24 months for high-end residential and commercial developments.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer" id="site-footer">
+    <div class="footer-logo">
+      <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polygon points="20,2 38,36 2,36" stroke="#c8a96e" stroke-width="2" fill="none"/>
+        <polygon points="20,10 32,32 8,32" stroke="#c8a96e" stroke-width="1" fill="none" opacity="0.5"/>
+        <circle cx="20" cy="20" r="3" fill="#c8a96e"/>
+      </svg>
+      <span class="logo-text">URTH</span>
+    </div>
+
+    <nav class="footer-nav" aria-label="Footer Navigation">
+      <a href="index.html" class="footer-nav__link" id="nav-home">Home</a>
+      <a href="about.html" class="footer-nav__link active" id="nav-pages">About</a>
+      <a href="index.html" class="footer-nav__link" id="nav-projects">Projects</a>
+      <a href="#" class="footer-nav__link" id="nav-project-details">Project Details</a>
+      <a href="#" class="footer-nav__link" id="nav-shop">Shop</a>
+      <a href="#" class="footer-nav__link" id="nav-blog">Blog</a>
+      <a href="#" class="footer-nav__link" id="nav-contact">Contact</a>
+    </nav>
+
+    <div class="footer-socials">
+      <a href="#" class="footer-social__link" id="social-behance" aria-label="Behance">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.803 5.731c.589 0 1.119.051 1.605.155.483.103.895.273 1.243.508.343.235.611.547.804.939.187.393.28.866.28 1.425 0 .61-.14 1.12-.421 1.535-.28.41-.684.745-1.214 1.004.726.214 1.267.585 1.629 1.108.356.524.535 1.15.535 1.888 0 .613-.12 1.141-.355 1.585-.239.445-.562.811-.965 1.096-.404.285-.864.498-1.378.635-.513.138-1.045.207-1.592.207H1V5.731h6.803zm-.351 4.972c.47 0 .854-.114 1.149-.34.296-.23.443-.582.443-1.054 0-.27-.05-.495-.147-.675-.099-.18-.232-.323-.4-.43-.167-.105-.361-.18-.578-.224-.217-.044-.444-.064-.68-.064H3.421v2.787h4.031zm.16 5.239c.267 0 .52-.025.757-.077.237-.05.445-.136.624-.256.18-.118.322-.277.427-.475.104-.2.157-.455.157-.765 0-.604-.171-1.04-.516-1.314-.344-.274-.802-.41-1.374-.41H3.421v3.297h4.191zm9.464.893c.356.348.87.521 1.543.521.481 0 .896-.12 1.246-.361.349-.241.563-.497.644-.767h2.319c-.37 1.152-.94 1.974-1.706 2.47-.768.494-1.697.74-2.791.74-.758 0-1.44-.12-2.047-.36-.607-.24-1.122-.584-1.545-1.03-.424-.447-.749-.982-.973-1.606-.225-.624-.337-1.312-.337-2.061 0-.725.116-1.4.347-2.022.232-.62.559-1.155.982-1.605.423-.45.934-.802 1.535-1.055.6-.254 1.263-.381 1.988-.381.812 0 1.527.156 2.143.469.617.312 1.128.737 1.533 1.27.405.536.697 1.148.877 1.837.178.69.238 1.418.178 2.189h-6.921c.04.759.258 1.314.613 1.752zm2.713-4.679c-.285-.314-.736-.472-1.35-.472-.393 0-.72.065-.983.196-.262.13-.472.294-.631.489-.159.195-.27.404-.334.624-.063.22-.1.425-.107.614h4.07c-.082-.643-.281-1.137-.665-1.451zm-2.97-5.275h5.024v1.292h-5.024V6.881z"/></svg>
+      </a>
+      <a href="#" class="footer-social__link" id="social-twitter" aria-label="Twitter">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/></svg>
+      </a>
+      <a href="#" class="footer-social__link" id="social-instagram" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+    </div>
+  </footer>
+
+  <!-- INTERACTIVE ACCORDION & SCROLL SCRIPT -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // FAQ Accordion Toggle
+      const faqItems = document.querySelectorAll('.faq-item');
+
+      faqItems.forEach(item => {
+        const questionBtn = item.querySelector('.faq-question');
+        questionBtn.addEventListener('click', () => {
+          const isOpen = item.classList.contains('active');
+
+          // Close all FAQ items
+          faqItems.forEach(i => {
+            i.classList.remove('active');
+            const btn = i.querySelector('.faq-question');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+          });
+
+          // Toggle clicked item
+          if (!isOpen) {
+            item.classList.add('active');
+            questionBtn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+
+      // Simple Parallax effect on collage when scrolling
+      const collage = document.getElementById('collage-wrapper');
+      if (collage) {
+        window.addEventListener('scroll', () => {
+          const scrollPos = window.scrollY;
+          const img1 = collage.querySelector('.collage-img--1');
+          const img2 = collage.querySelector('.collage-img--2');
+          const img3 = collage.querySelector('.collage-img--3');
+          if (img1 && img2 && img3) {
+            img1.style.transform = `translateY(${scrollPos * 0.03}px)`;
+            img2.style.transform = `translateY(${-scrollPos * 0.02}px)`;
+            img3.style.transform = `translateY(${scrollPos * 0.04}px)`;
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
