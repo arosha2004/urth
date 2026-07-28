@@ -50,7 +50,7 @@ html, body {
   display: flex;
   align-items: stretch;
   overflow: hidden;
-  background: #111;
+  background: #ffffff;
 }
 
 /* =========================================
@@ -65,7 +65,10 @@ html, body {
 .carousel-track {
   display: flex;
   height: 100%;
+  align-items: flex-start;
+  gap: 30px;
   will-change: transform;
+  transition: transform var(--transition);
 }
 
 /* =========================================
@@ -73,31 +76,28 @@ html, body {
    ========================================= */
 .carousel-slide {
   position: relative;
-  flex: 0 0 auto;
+  flex: 0 0 686px;
+  width: 686px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   cursor: pointer;
-  transition:
-    width var(--transition),
-    filter var(--transition);
 }
 
-/* Side slides: narrower, desaturated */
-.carousel-slide:not(.active) {
-  width: 24%;
-  filter: grayscale(0.85) brightness(0.75);
+/* Side slides: desaturated */
+.carousel-slide:not(.active) .slide-img {
+  filter: grayscale(1) brightness(0.8);
 }
 
 /* Active (center) slide: dominant */
-.carousel-slide.active {
-  width: 52%;
+.carousel-slide.active .slide-img {
   filter: grayscale(0) brightness(1);
 }
 
-/* Image container fills available space above label */
+/* Image container */
 .slide-img-wrap {
-  flex: 1;
+  flex: 0 0 376px;
+  height: 376px;
   overflow: hidden;
   position: relative;
 }
@@ -107,7 +107,7 @@ html, body {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.8s ease;
+  transition: transform 0.8s ease, filter var(--transition);
   user-select: none;
 }
 
@@ -117,24 +117,24 @@ html, body {
 
 /* ── Label beneath image ── */
 .slide-label {
-  background: var(--bg-dark);
-  padding: 18px 24px 14px;
+  background: #ffffff;
+  padding: 24px 24px 18px;
   text-align: center;
   flex-shrink: 0;
-  min-height: 80px;
+  min-height: 90px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .slide-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 400;
-  font-size: clamp(0.95rem, 1.6vw, 1.45rem);
-  color: var(--text-white);
-  letter-spacing: 0.06em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.1rem, 1.8vw, 1.6rem);
+  color: #b3b3b3;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1.2;
   white-space: nowrap;
@@ -145,10 +145,10 @@ html, body {
 
 .slide-category {
   font-family: 'Montserrat', sans-serif;
-  font-weight: 400;
+  font-weight: 700;
   font-size: clamp(0.6rem, 0.8vw, 0.72rem);
-  color: var(--text-muted);
-  letter-spacing: 0.2em;
+  color: #cccccc;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -160,24 +160,23 @@ html, body {
 .slide-line {
   display: block;
   width: 28px;
-  height: 1px;
-  background: var(--gold);
-  margin-top: 6px;
-  opacity: 0.7;
-  transition: width 0.4s ease, opacity 0.4s ease;
+  height: 2px;
+  background: #e0e0e0;
+  margin-top: 8px;
+  transition: width 0.4s ease, background 0.4s ease;
 }
 
 .carousel-slide.active .slide-line {
-  width: 44px;
-  opacity: 1;
+  width: 36px;
+  background: #111111;
 }
 
 .carousel-slide.active .slide-title {
-  color: #ffffff;
+  color: #111111;
 }
 
 .carousel-slide.active .slide-category {
-  color: var(--text-muted);
+  color: #555555;
 }
 
 /* =========================================
@@ -185,40 +184,39 @@ html, body {
    ========================================= */
 .carousel-arrow {
   position: absolute;
-  top: 44%;
+  top: 40%;
   transform: translateY(-50%);
   z-index: 20;
-  width: 46px;
-  height: 46px;
-  background: rgba(255, 255, 255, 0.92);
-  border: none;
+  width: 60px;
+  height: 60px;
+  background: #ffffff;
+  border: 1px solid #eeeeee;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
-  color: #222;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+  font-size: 1.4rem;
+  color: #111;
   transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
   outline: none;
 }
 
 .carousel-arrow:hover {
-  background: #ffffff;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
-  transform: translateY(-50%) scale(1.08);
+  background: #fafafa;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-50%) scale(1.02);
 }
 
 .carousel-arrow:active {
-  transform: translateY(-50%) scale(0.96);
+  transform: translateY(-50%) scale(0.98);
 }
 
 .carousel-arrow--prev {
-  left: 16px;
+  left: 0;
 }
 
 .carousel-arrow--next {
-  right: 16px;
+  right: 0;
 }
 
 /* Arrow is disabled state */
@@ -373,14 +371,6 @@ html, body {
     justify-content: center;
   }
 
-  .carousel-slide:not(.active) {
-    width: 20%;
-  }
-
-  .carousel-slide.active {
-    width: 60%;
-  }
-
   .slide-label {
     padding: 10px 8px;
     min-height: 64px;
@@ -396,14 +386,6 @@ html, body {
 }
 
 @media (max-width: 480px) {
-  .carousel-slide:not(.active) {
-    width: 15%;
-  }
-
-  .carousel-slide.active {
-    width: 70%;
-  }
-
   .footer-nav__link {
     font-size: 0.58rem;
   }

@@ -6,74 +6,128 @@
 (function () {
   'use strict';
 
-  const track      = document.getElementById('carouselTrack');
-  const slides     = Array.from(track.querySelectorAll('.carousel-slide'));
-  const prevBtn    = document.getElementById('prevBtn');
-  const nextBtn    = document.getElementById('nextBtn');
+  const track = document.getElementById('carouselTrack');
+  const originalSlides = Array.from(track.querySelectorAll('.carousel-slide'));
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
 
-  const TOTAL      = slides.length;
-  let   activeIdx  = slides.findIndex(s => s.classList.contains('active'));
-  if (activeIdx < 0) activeIdx = 1;
+  const TOTAL = originalSlides.length;
 
-  /* ── helpers ── */
+  // Clone slides to create infinite loop effect
+  // Append a clone set
+  originalSlides.forEach(slide => {
+    const clone = slide.cloneNode(true);
+    clone.classList.remove('active');
+    track.appendChild(clone);
+  });
+  // Prepend a clone set
+  [...originalSlides].reverse().forEach(slide => {
+    const clone = slide.cloneNode(true);
+    clone.classList.remove('active');
+    track.insertBefore(clone, track.firstChild);
+  });
 
-  function setActive(newIdx) {
-    // wrap around
-    newIdx = ((newIdx % TOTAL) + TOTAL) % TOTAL;
+  const allSlides = Array.from(track.querySelectorAll('.carousel-slide'));
+  
+  // Set initial active index to the first item in the original middle set
+  let currentIndex = TOTAL + originalSlides.findIndex(s => s.classList.contains('active'));
+  if (currentIndex < TOTAL) currentIndex = TOTAL + 1; // Fallback
 
-    slides.forEach((slide, i) => {
-      slide.classList.toggle('active', i === newIdx);
-    });
+  allSlides.forEach(s => s.classList.remove('active'));
+  allSlides[currentIndex].classList.add('active');
 
-    activeIdx = newIdx;
+  const slideWidth = 686;
+  const gap = 30;
+
+  let isAnimating = false;
+
+  function updateTrackPosition(instant = false) {
+    const trackOuter = document.querySelector('.carousel-track-outer');
+    if (!trackOuter) return;
+    const width = trackOuter.clientWidth;
+    
+    const targetLeft = (width - slideWidth) / 2;
+    const currentLeft = (currentIndex * slideWidth) + (currentIndex * gap);
+    
+    const offsetPixels = targetLeft - currentLeft;
+
+    if (instant) {
+      track.style.transition = 'none';
+      track.style.transform = `translateX(${offsetPixels}px)`;
+      void track.offsetWidth; // force reflow
+      track.style.transition = '';
+    } else {
+      track.style.transform = `translateX(${offsetPixels}px)`;
+    }
   }
 
-  /* ── Arrow clicks ── */
+  function setActive(newIdx) {
+    if (isAnimating) return;
+    isAnimating = true;
 
-  prevBtn.addEventListener('click', () => {
-    setActive(activeIdx - 1);
-  });
+    allSlides[currentIndex].classList.remove('active');
+    currentIndex = newIdx;
+    allSlides[currentIndex].classList.add('active');
+    updateTrackPosition();
 
-  nextBtn.addEventListener('click', () => {
-    setActive(activeIdx + 1);
-  });
-
-  /* ── Clicking a side slide activates it ── */
-
-  slides.forEach((slide, i) => {
-    slide.addEventListener('click', () => {
-      if (i !== activeIdx) {
-        setActive(i);
+    // Check bounds after transition
+    setTimeout(() => {
+      let changed = false;
+      if (currentIndex >= TOTAL * 2) {
+        currentIndex -= TOTAL;
+        changed = true;
+      } else if (currentIndex < TOTAL) {
+        currentIndex += TOTAL;
+        changed = true;
       }
-    });
+
+      if (changed) {
+        allSlides.forEach(s => s.classList.remove('active'));
+        allSlides[currentIndex].classList.add('active');
+        updateTrackPosition(true);
+      }
+      isAnimating = false;
+    }, 600); // 0.6s matches CSS transition
+  }
+
+  window.addEventListener('resize', () => updateTrackPosition(true));
+  setTimeout(() => updateTrackPosition(true), 50);
+
+  /* ── Arrow clicks ── */
+  prevBtn.addEventListener('click', () => setActive(currentIndex - 1));
+  nextBtn.addEventListener('click', () => setActive(currentIndex + 1));
+
+  /* ── Event Delegation for Slides ── */
+  track.addEventListener('click', (e) => {
+    const slide = e.target.closest('.carousel-slide');
+    if (!slide) return;
+    const idx = allSlides.indexOf(slide);
+    if (idx !== currentIndex && idx !== -1) {
+      setActive(idx);
+    }
   });
 
   /* ── Keyboard support ── */
-
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft')  { setActive(activeIdx - 1); }
-    if (e.key === 'ArrowRight') { setActive(activeIdx + 1); }
+    if (e.key === 'ArrowLeft')  { setActive(currentIndex - 1); }
+    if (e.key === 'ArrowRight') { setActive(currentIndex + 1); }
   });
 
   /* ── Touch / swipe support ── */
-
   let touchStartX = null;
-
   document.addEventListener('touchstart', (e) => {
     touchStartX = e.changedTouches[0].clientX;
   }, { passive: true });
-
   document.addEventListener('touchend', (e) => {
     if (touchStartX === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX;
     if (Math.abs(dx) > 50) {
-      setActive(dx < 0 ? activeIdx + 1 : activeIdx - 1);
+      setActive(dx < 0 ? currentIndex + 1 : currentIndex - 1);
     }
     touchStartX = null;
   }, { passive: true });
 
   /* ── Nav link active state on click ── */
-
   const navLinks = document.querySelectorAll('.footer-nav__link');
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
@@ -84,16 +138,13 @@
   });
 
   /* ── Auto-advance every 5 seconds ── */
-
-  let autoTimer = setInterval(() => setActive(activeIdx + 1), 5000);
-
+  let autoTimer = setInterval(() => setActive(currentIndex + 1), 5000);
   const resetTimer = () => {
     clearInterval(autoTimer);
-    autoTimer = setInterval(() => setActive(activeIdx + 1), 5000);
+    autoTimer = setInterval(() => setActive(currentIndex + 1), 5000);
   };
-
   prevBtn.addEventListener('click', resetTimer);
   nextBtn.addEventListener('click', resetTimer);
-  slides.forEach(slide => slide.addEventListener('click', resetTimer));
+  track.addEventListener('click', resetTimer);
 
 })();
