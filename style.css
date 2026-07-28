@@ -165,7 +165,7 @@ html, body {
 .slide-line {
   display: block;
   width: 28px;
-  height: 2px;
+  height: 1px;
   background: #e0e0e0;
   margin-top: 8px;
   transition: width 0.4s ease, background 0.4s ease;

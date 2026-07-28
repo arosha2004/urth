@@ -116,10 +116,9 @@
 }
 
 .banner-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 60px;
-  font-weight: 400;
-  font-style: italic;
+  font-weight: 700;
   margin-bottom: 40px;
   color: #fff;
 }
@@ -184,10 +183,9 @@
 }
 
 .heading-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 48px;
-  font-weight: 400;
-  font-style: italic;
+  font-weight: 700;
   color: #111;
   margin-bottom: 25px;
 }
