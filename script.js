@@ -7,11 +7,13 @@
   'use strict';
 
   const track = document.getElementById('carouselTrack');
-  const originalSlides = Array.from(track.querySelectorAll('.carousel-slide'));
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
+  
+  if (track) {
+    const originalSlides = Array.from(track.querySelectorAll('.carousel-slide'));
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
 
-  const TOTAL = originalSlides.length;
+    const TOTAL = originalSlides.length;
 
   // Clone slides to create robust infinite loop effect for rapid clicking
   // We'll append 3 clone sets and prepend 3 clone sets.
@@ -129,25 +131,28 @@
     }
     touchStartX = null;
   }, { passive: true });
+    /* ── Auto-advance every 5 seconds ── */
+    let autoTimer = setInterval(() => setActive(currentIndex + 1), 5000);
+    const resetTimer = () => {
+      clearInterval(autoTimer);
+      autoTimer = setInterval(() => setActive(currentIndex + 1), 5000);
+    };
+    prevBtn.addEventListener('click', resetTimer);
+    nextBtn.addEventListener('click', resetTimer);
+    track.addEventListener('click', resetTimer);
+  }
 
   /* ── Nav link active state on click ── */
   const navLinks = document.querySelectorAll('.footer-nav__link');
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
-      e.preventDefault();
+      const href = link.getAttribute('href');
+      if (!href || href === '#') {
+        e.preventDefault();
+      }
       navLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
     });
   });
-
-  /* ── Auto-advance every 5 seconds ── */
-  let autoTimer = setInterval(() => setActive(currentIndex + 1), 5000);
-  const resetTimer = () => {
-    clearInterval(autoTimer);
-    autoTimer = setInterval(() => setActive(currentIndex + 1), 5000);
-  };
-  prevBtn.addEventListener('click', resetTimer);
-  nextBtn.addEventListener('click', resetTimer);
-  track.addEventListener('click', resetTimer);
 
 })();
