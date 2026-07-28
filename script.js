@@ -13,33 +13,35 @@
 
   const TOTAL = originalSlides.length;
 
-  // Clone slides to create infinite loop effect
-  // Append a clone set
-  originalSlides.forEach(slide => {
-    const clone = slide.cloneNode(true);
-    clone.classList.remove('active');
-    track.appendChild(clone);
-  });
-  // Prepend a clone set
-  [...originalSlides].reverse().forEach(slide => {
-    const clone = slide.cloneNode(true);
-    clone.classList.remove('active');
-    track.insertBefore(clone, track.firstChild);
-  });
+  // Clone slides to create robust infinite loop effect for rapid clicking
+  // We'll append 3 clone sets and prepend 3 clone sets.
+  for (let i = 0; i < 3; i++) {
+    originalSlides.forEach(slide => {
+      const clone = slide.cloneNode(true);
+      clone.classList.remove('active');
+      track.appendChild(clone);
+    });
+  }
+  
+  for (let i = 0; i < 3; i++) {
+    [...originalSlides].reverse().forEach(slide => {
+      const clone = slide.cloneNode(true);
+      clone.classList.remove('active');
+      track.insertBefore(clone, track.firstChild);
+    });
+  }
 
   const allSlides = Array.from(track.querySelectorAll('.carousel-slide'));
   
-  // Set initial active index to the first item in the original middle set
-  let currentIndex = TOTAL + originalSlides.findIndex(s => s.classList.contains('active'));
-  if (currentIndex < TOTAL) currentIndex = TOTAL + 1; // Fallback
+  // Set initial active index to the first item in the original middle set (index = TOTAL * 3)
+  let currentIndex = (TOTAL * 3) + originalSlides.findIndex(s => s.classList.contains('active'));
+  if (currentIndex < (TOTAL * 3)) currentIndex = (TOTAL * 3) + 1; // Fallback
 
   allSlides.forEach(s => s.classList.remove('active'));
   allSlides[currentIndex].classList.add('active');
 
   const slideWidth = 686;
   const gap = 30;
-
-  let isAnimating = false;
 
   function updateTrackPosition(instant = false) {
     const trackOuter = document.querySelector('.carousel-track-outer');
@@ -62,33 +64,34 @@
   }
 
   function setActive(newIdx) {
-    if (isAnimating) return;
-    isAnimating = true;
-
     allSlides[currentIndex].classList.remove('active');
     currentIndex = newIdx;
     allSlides[currentIndex].classList.add('active');
     updateTrackPosition();
-
-    // Check bounds after transition
-    setTimeout(() => {
-      let changed = false;
-      if (currentIndex >= TOTAL * 2) {
-        currentIndex -= TOTAL;
-        changed = true;
-      } else if (currentIndex < TOTAL) {
-        currentIndex += TOTAL;
-        changed = true;
-      }
-
-      if (changed) {
-        allSlides.forEach(s => s.classList.remove('active'));
-        allSlides[currentIndex].classList.add('active');
-        updateTrackPosition(true);
-      }
-      isAnimating = false;
-    }, 600); // 0.6s matches CSS transition
   }
+
+  // Teleport track silently when the slide transition finishes
+  track.addEventListener('transitionend', (e) => {
+    if (e.target !== track) return;
+    if (e.propertyName !== 'transform') return;
+
+    let changed = false;
+    
+    // If we moved past the middle set, teleport back to the middle
+    if (currentIndex >= TOTAL * 4) {
+      currentIndex -= TOTAL;
+      changed = true;
+    } else if (currentIndex < TOTAL * 2) {
+      currentIndex += TOTAL;
+      changed = true;
+    }
+
+    if (changed) {
+      allSlides.forEach(s => s.classList.remove('active'));
+      allSlides[currentIndex].classList.add('active');
+      updateTrackPosition(true);
+    }
+  });
 
   window.addEventListener('resize', () => updateTrackPosition(true));
   setTimeout(() => updateTrackPosition(true), 50);
