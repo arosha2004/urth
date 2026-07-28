@@ -852,3 +852,9 @@ body.about-page {
     padding: 24px;
   }
 }
+
+/* Hide Webflow watermark badge */
+.w-webflow-badge {
+  display: none !important;
+  visibility: hidden !important;
+}
