@@ -131,41 +131,39 @@ body {
 
 /* --- Timeline Wrapper --- */
 .projects-timeline {
-  display: flex;
   width: 100%;
-  min-height: 100vh;
   position: relative;
   background-color: #fff;
   color: #000;
 }
 
-/* --- Left Column: Scrollable List --- */
-.timeline-list {
-  width: 35%;
-  padding: 10vh 5%; /* Adjusted padding */
-  z-index: 2;
-  background: transparent;
+.timeline-container {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0; /* Remove large gap since we use padding per item */
 }
 
+/* --- Row Layout --- */
+.timeline-row {
+  display: flex;
+  width: 100%;
+  min-height: 400px;
+  align-items: center;
+}
+
+/* Left Column: Title and READ button */
 .timeline-item {
-  opacity: 0.4;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  transform: translateY(10px);
+  width: 35%;
+  padding: 50px 5%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 50px 0;
-  border-bottom: 1px solid #eaeaea;
+  opacity: 0.4;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: translateY(10px);
 }
 
-.timeline-item:last-child {
-  border-bottom: none;
-}
-
-.timeline-item.active {
+.timeline-row.active .timeline-item {
   opacity: 1;
   transform: translateY(0);
 }
@@ -192,37 +190,12 @@ body {
   opacity: 0.6;
 }
 
-/* --- Right Column: Fixed Images Grid --- */
+/* Right Column: Images Grid */
 .timeline-images {
   width: 65%;
-  height: 100vh;
-  position: sticky;
-  top: 0;
-  right: 0;
-  z-index: 1;
-  overflow: hidden;
-  background: #fff;
-}
-
-.timeline-image-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.8s ease, transform 1s ease, visibility 0.8s;
-  transform: scale(1.02); /* Slight zoom for fade effect */
+  padding: 50px 40px;
   display: flex;
   align-items: center;
-  padding: 0 40px;
-}
-
-.timeline-image-wrapper.active {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1);
 }
 
 .img-grid {
@@ -248,21 +221,26 @@ body {
 
 /* --- Responsive Layout --- */
 @media screen and (max-width: 900px) {
-  .projects-timeline {
+  .timeline-row {
     flex-direction: column;
+    padding: 30px 0;
   }
-  .timeline-list {
+  .timeline-item {
     width: 100%;
-    padding: 10vh 5%;
-    gap: 15vh;
+    padding: 20px 5%;
   }
   .timeline-images {
     width: 100%;
-    height: 50vh;
-    position: sticky; /* Make it sticky on mobile */
-    top: 0;
+    padding: 20px 5%;
   }
   .timeline-title {
     font-size: 2.5rem;
+  }
+  .img-grid {
+    flex-direction: column;
+  }
+  .img-grid img {
+    height: auto;
+    width: 100%;
   }
 }
