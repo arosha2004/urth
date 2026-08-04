@@ -3,86 +3,119 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>URTH — Architecture &amp; Design Studio</title>
-  <meta name="description" content="URTH is a premium architecture and design studio specializing in civic, cultural, and residential projects worldwide." />
+  <title>Projects — URTH Architecture &amp; Design Studio</title>
+  <meta name="description" content="Explore URTH's portfolio of premium architecture and design projects." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="projects.css" />
 </head>
 <body>
-
-  <!-- HERO CAROUSEL -->
-  <main class="carousel-wrapper" id="main-carousel">
-
-    <button class="carousel-arrow carousel-arrow--prev" id="prevBtn" aria-label="Previous project">
-      <span style="font-weight: 300; position: relative; top: -2px;">&#10229;</span>
-    </button>
-
-    <div class="carousel-track-outer">
-      <div class="carousel-track" id="carouselTrack">
-
-        <article class="carousel-slide" data-index="0">
-          <div class="slide-img-wrap">
-            <img src="img/american_lard_station.png" alt="American Cultural Station" class="slide-img" draggable="false" />
-          </div>
-          <div class="slide-label">
-            <h2 class="slide-title">American Cultural Station</h2>
-            <p class="slide-category">Civic &amp; Cultural</p>
-            <span class="slide-line"></span>
-          </div>
-        </article>
-
-        <article class="carousel-slide active" data-index="1">
-          <div class="slide-img-wrap">
-            <img src="img/poolscape_villa.png" alt="Poolscape Villa" class="slide-img" draggable="false" />
-          </div>
-          <div class="slide-label">
-            <h2 class="slide-title">Poolscape Villa</h2>
-            <p class="slide-category">Civic &amp; Cultural</p>
-            <span class="slide-line"></span>
-          </div>
-        </article>
-
-        <article class="carousel-slide" data-index="2">
-          <div class="slide-img-wrap">
-            <img src="img/european_lard_station.png" alt="European Cultural Station" class="slide-img" draggable="false" />
-          </div>
-          <div class="slide-label">
-            <h2 class="slide-title">European Cultural Station</h2>
-            <p class="slide-category">Civic &amp; Cultural, Residential &amp; Villa</p>
-            <span class="slide-line"></span>
-          </div>
-        </article>
-
-        <article class="carousel-slide" data-index="3">
-          <div class="slide-img-wrap">
-            <img src="img/urban_tower.png" alt="Urban Glass Tower" class="slide-img" draggable="false" />
-          </div>
-          <div class="slide-label">
-            <h2 class="slide-title">Urban Glass Tower</h2>
-            <p class="slide-category">Residential &amp; Commercial</p>
-            <span class="slide-line"></span>
-          </div>
-        </article>
-
-        <article class="carousel-slide" data-index="4">
-          <div class="slide-img-wrap">
-            <img src="img/desert_residence.png" alt="Desert Residence" class="slide-img" draggable="false" />
-          </div>
-          <div class="slide-label">
-            <h2 class="slide-title">Desert Residence</h2>
-            <p class="slide-category">Residential &amp; Villa</p>
-            <span class="slide-line"></span>
-          </div>
-        </article>
-
+  
+  <!-- HERO SECTION -->
+  <header class="hero-section">
+    <div class="hero-bg">
+      <img src="img/projects_hero.jpg" alt="Hero background" />
+    </div>
+    
+    <div class="hero-top-nav">
+      <div class="logo">
+        <a href="index.html">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="white" style="vertical-align: middle; margin-right: 10px;">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" stroke-width="2" fill="none"/>
+          </svg>
+          PRAGUE
+        </a>
+      </div>
+      <nav class="center-nav">
+        <a href="index.html">HOME</a>
+        <a href="urth_clone/index.html">PAGES</a>
+        <a href="projects.html" class="active">PROJECTS</a>
+        <a href="#">PROJECT DETAILS</a>
+        <a href="#">SHOP</a>
+        <a href="#">BLOG</a>
+        <a href="#">ELEMENTOR DEMO</a>
+      </nav>
+      <div class="right-nav">
+        <button class="menu-btn" aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="white"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
       </div>
     </div>
 
-    <button class="carousel-arrow carousel-arrow--next" id="nextBtn" aria-label="Next project">
-      <span style="font-weight: 300; position: relative; top: -2px;">&#10230;</span>
-    </button>
+    <div class="hero-content">
+      <p class="hero-subtitle">EXTERIOR & INTERIOR</p>
+      <h1 class="hero-title">We Love to Create Spaces</h1>
+    </div>
+  </header>
+
+  <!-- PROJECTS TIMELINE MAIN AREA -->
+  <main class="projects-timeline" id="projects-timeline">
+    
+    <!-- LEFT COLUMN: SCROLLABLE LIST -->
+    <div class="timeline-list" id="timeline-list">
+      <!-- Title items -->
+      <div class="timeline-item" data-index="0">
+        <h4 class="timeline-title">American Cultural Station</h4>
+        <a href="#" class="timeline-read-btn">READ</a>
+      </div>
+      <div class="timeline-item" data-index="1">
+        <h4 class="timeline-title">Poolscape Villa</h4>
+        <a href="#" class="timeline-read-btn">READ</a>
+      </div>
+      <div class="timeline-item" data-index="2">
+        <h4 class="timeline-title">European Cultural Station</h4>
+        <a href="#" class="timeline-read-btn">READ</a>
+      </div>
+      <div class="timeline-item" data-index="3">
+        <h4 class="timeline-title">Urban Glass Tower</h4>
+        <a href="#" class="timeline-read-btn">READ</a>
+      </div>
+      <div class="timeline-item" data-index="4">
+        <h4 class="timeline-title">Desert Residence</h4>
+        <a href="#" class="timeline-read-btn">READ</a>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: FIXED IMAGES (GRID) -->
+    <div class="timeline-images" id="timeline-images">
+      <div class="timeline-image-wrapper active" data-index="0">
+        <div class="img-grid">
+          <img src="img/american_lard_station.png" alt="American Cultural Station" />
+          <img src="img/american_lard_station.png" alt="American Cultural Station 2" />
+          <img src="img/american_lard_station.png" alt="American Cultural Station 3" />
+        </div>
+      </div>
+      <div class="timeline-image-wrapper" data-index="1">
+        <div class="img-grid">
+          <img src="img/poolscape_villa.png" alt="Poolscape Villa" />
+          <img src="img/poolscape_villa.png" alt="Poolscape Villa 2" />
+          <img src="img/poolscape_villa.png" alt="Poolscape Villa 3" />
+        </div>
+      </div>
+      <div class="timeline-image-wrapper" data-index="2">
+        <div class="img-grid">
+          <img src="img/european_lard_station.png" alt="European Cultural Station" />
+          <img src="img/european_lard_station.png" alt="European Cultural Station 2" />
+          <img src="img/european_lard_station.png" alt="European Cultural Station 3" />
+        </div>
+      </div>
+      <div class="timeline-image-wrapper" data-index="3">
+        <div class="img-grid">
+          <img src="img/urban_tower.png" alt="Urban Glass Tower" />
+          <img src="img/urban_tower.png" alt="Urban Glass Tower 2" />
+          <img src="img/urban_tower.png" alt="Urban Glass Tower 3" />
+        </div>
+      </div>
+      <div class="timeline-image-wrapper" data-index="4">
+        <div class="img-grid">
+          <img src="img/desert_residence.png" alt="Desert Residence" />
+          <img src="img/desert_residence.png" alt="Desert Residence 2" />
+          <img src="img/desert_residence.png" alt="Desert Residence 3" />
+        </div>
+      </div>
+    </div>
 
   </main>
 
@@ -91,15 +124,17 @@
 
     <div class="footer-logo">
       <div class="logo-img-wrap">
-        <img src="img/urth_logo.png" alt="urth. logo" class="logo-img" />
+        <a href="index.html">
+          <img src="img/urth_logo.png" alt="urth. logo" class="logo-img" />
+        </a>
       </div>
     </div>
 
     <nav class="footer-nav" aria-label="Main navigation">
-      <a href="index.html" class="footer-nav__link active" id="nav-home">Home</a>
+      <a href="index.html" class="footer-nav__link" id="nav-home">Home</a>
       <a href="urth_clone/index.html" class="footer-nav__link" id="nav-about">About</a>
       <a href="urth_clone/index.html#service" class="footer-nav__link" id="nav-services">Services</a>
-      <a href="projects.html" class="footer-nav__link" id="nav-projects">Projects</a>
+      <a href="projects.html" class="footer-nav__link active" id="nav-projects">Projects</a>
       <a href="contact.html" class="footer-nav__link" id="nav-contact">Contact</a>
       <a href="#" class="footer-nav__link" id="nav-shop">Shop</a>
     </nav>
@@ -121,6 +156,6 @@
 
   </footer>
 
-  <script src="script.js"></script>
+  <script src="projects.js"></script>
 </body>
 </html>
