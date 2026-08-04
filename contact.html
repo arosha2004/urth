@@ -15,19 +15,61 @@
 
   <!-- TOP HEADER -->
   <header class="top-header">
-    <a href="index.html" class="header-logo" style="text-decoration: none; display: flex; align-items: center; gap: 12px; color: #fff; cursor: pointer;">
-      <h2 class="navbar-brand-text" style="color: white; margin: 0; font-size: 28px; font-weight: normal; letter-spacing: -1px; text-transform: lowercase; font-family: 'Montserrat', sans-serif;">urth.</h2>
-    </a>
-    <nav class="header-nav">
-      <ul class="main-menu" style="display: flex; gap: 30px; list-style: none; margin: 0; padding: 0;">
-        <li><a href="index.html" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">HOME</a></li>
-        <li><a href="urth_clone/index.html" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">ABOUT</a></li>
-        <li><a href="urth_clone/index.html#service" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">SERVICES</a></li>
-        <li><a href="projects.html" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">PROJECTS</a></li>
-        <li><a href="contact.html" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">CONTACT</a></li>
-        <li><a href="#" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">SHOP</a></li>
-      </ul>
-    </nav>
+    <style>
+      .hero-top-nav {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 30px 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 100;
+        box-sizing: border-box;
+      }
+      .hero-top-nav .logo a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 24px;
+        font-weight: 500;
+        letter-spacing: 4px;
+      }
+      .hero-top-nav .center-nav {
+        display: flex;
+        gap: 30px;
+      }
+      .hero-top-nav .center-nav a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        transition: color 0.3s ease;
+        font-family: 'Montserrat', sans-serif;
+      }
+      .hero-top-nav .center-nav a:hover,
+      .hero-top-nav .center-nav a.active {
+        color: #fff;
+      }
+    </style>
+    <div class="hero-top-nav">
+      <div class="logo">
+        <a href="index.html" style="text-decoration: none;">
+          <h2 class="navbar-brand-text" style="color: white; margin: 0; font-size: 28px; font-weight: normal; letter-spacing: -1px; text-transform: lowercase; font-family: 'Montserrat', sans-serif; display: inline-block; vertical-align: middle;">urth.</h2>
+        </a>
+      </div>
+      <nav class="center-nav">
+        <a href="index.html">HOME</a>
+        <a href="urth_clone/index.html">ABOUT</a>
+        <a href="urth_clone/index.html#service">SERVICES</a>
+        <a href="projects.html">PROJECTS</a>
+        <a href="contact.html" class="active">CONTACT</a>
+        <a href="#">SHOP</a>
+      </nav>
+      <div class="right-nav" style="width: 80px;"></div>
+    </div>
   </header>
 
   <main class="contact-page-wrapper">
