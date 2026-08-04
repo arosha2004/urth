@@ -252,24 +252,29 @@ html, body {
 .footer-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
   text-decoration: none;
   flex-shrink: 0;
 }
 
-.logo-icon {
-  width: 34px;
-  height: 34px;
+.logo-img-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.logo-text {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 600;
-  font-size: 1.05rem;
-  letter-spacing: 0.28em;
-  color: var(--text-white);
-  text-transform: uppercase;
+.logo-img {
+  /* Scale up to crop the ~15% cream padding on each side of the PNG */
+  width: 152%;
+  height: 152%;
+  object-fit: cover;
+  object-position: center;
 }
+
 
 /* ── Navigation ── */
 .footer-nav {
