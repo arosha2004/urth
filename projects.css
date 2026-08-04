@@ -135,23 +135,34 @@ body {
   width: 100%;
   min-height: 100vh;
   position: relative;
+  background-color: #fff;
+  color: #000;
 }
 
 /* --- Left Column: Scrollable List --- */
 .timeline-list {
-  width: 50%;
-  padding: 20vh 10%; /* Add space at top and bottom to allow scrolling */
+  width: 35%;
+  padding: 10vh 5%; /* Adjusted padding */
   z-index: 2;
   background: transparent;
   display: flex;
   flex-direction: column;
-  gap: 30vh; /* Large gap between items to emphasize scroll */
+  gap: 0; /* Remove large gap since we use padding per item */
 }
 
 .timeline-item {
-  opacity: 0.3;
+  opacity: 0.4;
   transition: opacity 0.5s ease, transform 0.5s ease;
-  transform: translateY(20px);
+  transform: translateY(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 50px 0;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.timeline-item:last-child {
+  border-bottom: none;
 }
 
 .timeline-item.active {
@@ -160,64 +171,37 @@ body {
 }
 
 .timeline-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 4rem;
-  font-weight: 400;
-  margin: 0 0 20px 0;
-  line-height: 1.1;
-  letter-spacing: 1px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0;
+  color: #000;
 }
 
 .timeline-read-btn {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.8rem;
-  letter-spacing: 3px;
+  font-size: 11px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: #fff;
+  color: #000;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   transition: opacity 0.3s ease;
 }
 
 .timeline-read-btn:hover {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-.timeline-read-btn .arrow-right {
-  display: inline-block;
-  margin-left: 10px;
-  width: 30px;
-  height: 1px;
-  background-color: #fff;
-  position: relative;
-  transition: width 0.3s ease;
-}
-
-.timeline-read-btn:hover .arrow-right {
-  width: 45px;
-}
-
-.timeline-read-btn .arrow-right::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: -4px;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 5px solid #fff;
-}
-
-/* --- Right Column: Fixed Images --- */
+/* --- Right Column: Fixed Images Grid --- */
 .timeline-images {
-  width: 50%;
+  width: 65%;
   height: 100vh;
   position: sticky;
   top: 0;
   right: 0;
   z-index: 1;
   overflow: hidden;
-  background: #000;
+  background: #fff;
 }
 
 .timeline-image-wrapper {
@@ -229,7 +213,10 @@ body {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.8s ease, transform 1s ease, visibility 0.8s;
-  transform: scale(1.05); /* Slight zoom for parallax/fade effect */
+  transform: scale(1.02); /* Slight zoom for fade effect */
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
 }
 
 .timeline-image-wrapper.active {
@@ -238,9 +225,15 @@ body {
   transform: scale(1);
 }
 
-.timeline-image-wrapper img {
+.img-grid {
+  display: flex;
+  gap: 15px;
   width: 100%;
-  height: 100%;
+}
+
+.img-grid img {
+  flex: 1;
+  height: 350px;
   object-fit: cover;
   object-position: center;
 }
