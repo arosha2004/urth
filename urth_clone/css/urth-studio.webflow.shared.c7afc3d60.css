@@ -4788,3 +4788,208 @@ img {
 #w-node-fac9006d-035f-3b6d-9ce9-dc43dfbaef51-dfbaef3d {
   justify-self: end;
 }
+
+
+/* ── Contact Footer ── */
+.contact-footer {
+  position: relative;
+  background-color: #111;
+  color: #fff;
+  padding: 100px 50px 50px 50px;
+  overflow: hidden;
+}
+
+.contact-footer .footer-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.3;
+}
+
+.contact-footer .footer-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1;
+}
+
+.contact-footer .footer-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.contact-footer .footer-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.contact-footer .logo-img-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-footer .logo-img {
+  width: 152%;
+  height: 152%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.contact-footer .footer-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 70px;
+}
+
+.contact-footer .footer-left {
+  max-width: 500px;
+}
+
+.contact-footer .footer-left .footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.contact-footer .footer-left .footer-logo .logo-icon {
+  width: 38px;
+  height: 38px;
+}
+
+.contact-footer .footer-left .footer-logo .logo-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.contact-footer .footer-desc p {
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #a0a0a0;
+  font-weight: 400;
+}
+
+.contact-footer .footer-right {
+  text-align: right;
+}
+
+.contact-footer .footer-info-title {
+  font-family: 'Roboto', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 25px;
+  color: #fff;
+}
+
+.contact-footer .footer-info-content p {
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: #e0e0e0;
+}
+
+.contact-footer .footer-info-content a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.contact-footer .footer-info-content a:hover {
+  color: #c8a96e;
+}
+
+.contact-footer .footer-divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin-bottom: 40px;
+}
+
+.contact-footer .footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contact-footer .footer-copyright p {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.contact-footer .footer-socials {
+  display: flex;
+  gap: 15px;
+}
+
+.contact-footer .footer-socials a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+.contact-footer .footer-socials a svg {
+  width: 14px;
+  height: 14px;
+}
+
+.contact-footer .footer-socials a:hover {
+  border-color: #fff;
+  background: #fff;
+  color: #111;
+}
+
+@media (max-width: 768px) {
+  .contact-footer .footer-top {
+    flex-direction: column;
+    gap: 40px;
+  }
+  .contact-footer .footer-right {
+    text-align: left;
+  }
+  .contact-footer .footer-bottom {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+}
+
+/* Hide Webflow watermark badge */
+.w-webflow-badge {
+  display: none !important;
+  visibility: hidden !important;
+}
