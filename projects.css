@@ -147,8 +147,8 @@ body {
 .timeline-row {
   display: flex;
   width: 100%;
-  min-height: 400px;
-  align-items: center;
+  align-items: stretch;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 /* Left Column: Title and READ button */
@@ -158,20 +158,19 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  opacity: 0.4;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  transform: translateY(10px);
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
 }
 
+.timeline-row:hover .timeline-item,
 .timeline-row.active .timeline-item {
-  opacity: 1;
-  transform: translateY(0);
+  background-color: #f7f7f7;
 }
 
 .timeline-title {
   font-family: 'Roboto', sans-serif;
-  font-size: 22px;
-  font-weight: 500;
+  font-size: 20px;
+  font-weight: 600;
   margin: 0;
   color: #000;
 }
@@ -196,17 +195,18 @@ body {
   padding: 50px 40px;
   display: flex;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .img-grid {
   display: flex;
-  gap: 15px;
+  gap: 4px;
   width: 100%;
 }
 
 .img-grid img {
   flex: 1;
-  height: 350px;
+  height: 220px;
   object-fit: cover;
   object-position: center;
 }
