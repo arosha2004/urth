@@ -4821,6 +4821,7 @@ img {
 }
 
 .contact-footer .footer-inner {
+  display: block !important;
   position: relative;
   z-index: 2;
   max-width: 1400px;
