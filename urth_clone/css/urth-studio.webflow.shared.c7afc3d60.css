@@ -2051,14 +2051,14 @@ textarea.w-input, textarea.w-select {
 }
 
 :root {
-  --white-100: #fffefb;
+  --white-100: #ffffff;
   --_typography---font-family--body: "Plus Jakarta Sans", Arial, sans-serif;
-  --brown-400: #3d362f;
+  --brown-400: #111111;
   --_typography---text: 16px;
   --_typography---body-height: 1.4;
   --_typography---font-weight--regular: 400;
   --_typography---font-family--heading: "Plus Jakarta Sans", Arial, sans-serif;
-  --black-500: #131311;
+  --black-500: #000000;
   --_typography---heading-1: 64px;
   --_typography---heading-height: 1.25;
   --_typography---width-h1: -1.9px;
@@ -2076,13 +2076,13 @@ textarea.w-input, textarea.w-select {
   --_spacing---regular: 2rem;
   --_spacing---extra-small: 1rem;
   --_spacing---tiny: .5rem;
-  --light-grey-300: #d1cdc8;
+  --light-grey-300: #cccccc;
   --_spacing---extra-tiny: .25rem;
-  --subtle-grey-200: #f6f4f0;
+  --subtle-grey-200: #edf1fc;
   --_spacing---very-small: .75rem;
   --_typography---font-weight--medium: 500;
-  --transparent-brown-350: #3d362f1a;
-  --transparent-white-50: #fffefb33;
+  --transparent-brown-350: #1111111a;
+  --transparent-white-50: #ffffff33;
   --primary-dark-600\<deleted\|variable-e56a0387-12f3-a477-fe45-e3d6cae7e527\>: #829522;
   --_spacing---extra-large: 8rem;
   --_spacing---large: 6rem;
@@ -2478,7 +2478,7 @@ img {
 
 .section.cta-section {
   height: 100vh;
-  padding: var(--_spacing---tiny);
+  padding: var(--_spacing---tiny) 0;
   justify-content: flex-start;
   align-items: flex-end;
   display: flex;
@@ -3064,9 +3064,9 @@ img {
   height: 100%;
   padding-top: var(--_spacing---extra-large);
   padding-bottom: var(--_spacing---extra-large);
-  border-radius: var(--_spacing---extra-tiny);
+  border-radius: 0;
   background-color: var(--black-500);
-  background-image: url("https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a1c/6a224726d63f5b84d983bf14_CTA.avif");
+  background-image: url("../../img/urthprojs/13.jpg");
   background-position: 50%;
   background-size: cover;
   justify-content: center;
