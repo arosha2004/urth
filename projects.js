@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Intersection Observer for images
   const observerOptions = {
     root: rightContainer,
-    rootMargin: '-30% 0px -30% 0px', // Trigger when image row is near the vertical center
+    rootMargin: '-10% 0px -80% 0px', // Trigger when image row is near the top
     threshold: 0
   };
 
@@ -39,11 +39,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   rightImages.forEach(img => {
     observer.observe(img);
+
+    img.style.cursor = 'pointer'; // Make it look clickable
+
+    img.addEventListener('mouseenter', () => {
+      const index = img.getAttribute('data-index');
+      const item = document.querySelector(`.timeline-item[data-index="${index}"]`);
+      if (item) item.classList.add('hover');
+    });
+
+    img.addEventListener('mouseleave', () => {
+      const index = img.getAttribute('data-index');
+      const item = document.querySelector(`.timeline-item[data-index="${index}"]`);
+      if (item) item.classList.remove('hover');
+    });
+
+    img.addEventListener('click', () => {
+      const index = img.getAttribute('data-index');
+      const item = document.querySelector(`.timeline-item[data-index="${index}"] .timeline-read-btn`);
+      if (item && item.href) {
+        window.location.href = item.href;
+      }
+    });
   });
 
   // Setup click events on left items
   leftItems.forEach(item => {
     item.addEventListener('click', (e) => {
+      if (e.target.classList.contains('timeline-read-btn')) {
+        // If clicking the read button, let it navigate
+        return;
+      }
+      
       e.preventDefault();
       
       const index = item.getAttribute('data-index');
@@ -61,13 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
         item.classList.add('active');
         targetImage.classList.add('active');
         
-        // Calculate position to center the image grid
-        const containerHeight = rightContainer.clientHeight;
-        const targetHeight = targetImage.clientHeight;
+        // Calculate position to align the image grid to the top (including top padding)
         const targetOffset = targetImage.offsetTop;
         
         rightContainer.scrollTo({
-          top: targetOffset - (containerHeight / 2) + (targetHeight / 2),
+          top: targetOffset - 40, // subtract the 40px top padding
           behavior: 'smooth'
         });
 

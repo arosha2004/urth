@@ -168,7 +168,7 @@ body {
   margin-top: 65px;
   overflow-y: auto;
   position: relative;
-  padding: 50vh 40px; /* Padding to allow scrolling first and last items to center */
+  padding: 40px 40px 80vh 40px; /* Padding to allow last item to reach the top */
   box-sizing: border-box;
   scroll-behavior: smooth;
   -ms-overflow-style: none;  /* IE and Edge */
@@ -191,7 +191,8 @@ body {
 }
 
 .timeline-item:hover,
-.timeline-item.active {
+.timeline-item.active,
+.timeline-item.hover {
   background-color: #f7f7f7;
 }
 
