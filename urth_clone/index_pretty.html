@@ -106,27 +106,64 @@ window.__WF_REVIEW_BRIDGE = {
 </head>
 <!--/$-->
 <body>
-<div data-animation="default" class="navbar w-variant-4ef2cf08-a1c0-4642-f6d8-de240bd9728e w-nav" data-wf--navbar--variant="absolute-light" data-easing2="ease" data-easing="ease" nav-hero-load="" data-collapse="medium" role="banner" data-duration="400">
-<div class="container full w-container">
-<div class="navbar-wrapper">
-<a href="../index.html" class="navbar-brand w-variant-4ef2cf08-a1c0-4642-f6d8-de240bd9728e w-nav-brand">
-<h2 class="navbar-brand-text" style="color: white; margin: 0; font-size: 28px; font-weight: normal; letter-spacing: -1px; text-transform: lowercase; font-family: 'Montserrat', sans-serif;">urth.</h2>
-</a>
-<nav role="navigation" id="w-node-fac9006d-035f-3b6d-9ce9-dc43dfbaef45-dfbaef3d" class="nav-menu w-variant-4ef2cf08-a1c0-4642-f6d8-de240bd9728e w-nav-menu">
-<div class="nav-menu-list" style="display: flex; align-items: center; justify-content: center; gap: 30px;">
-<a href="../index.html" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">HOME</a>
-<a href="index.html" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">ABOUT</a>
-<a href="../projects.html" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">PROJECTS</a>
-<a href="../contact.html" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">CONTACT</a>
-<a href="#" style="color: white; text-decoration: none; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 2px; font-family: sans-serif;">SHOP</a>
-</div>
-</nav>
-<div class="menu-button w-nav-button">
-<div class="w-icon-nav-menu">
-</div>
-</div>
-</div>
-</div>
+<style>
+  .hero-top-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    box-sizing: border-box;
+  }
+  .hero-top-nav .logo a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 4px;
+  }
+  .hero-top-nav .center-nav {
+    display: flex;
+    gap: 30px;
+  }
+  .hero-top-nav .center-nav a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .hero-top-nav .center-nav a:hover,
+  .hero-top-nav .center-nav a.active {
+    color: #fff;
+  }
+  @media (max-width: 768px) {
+    .hero-top-nav .center-nav {
+      display: none;
+    }
+  }
+</style>
+<div class="hero-top-nav">
+  <div class="logo">
+    <a href="../index.html" style="text-decoration: none;">
+      <h2 class="navbar-brand-text" style="color: white; margin: 0; font-size: 28px; font-weight: normal; letter-spacing: -1px; text-transform: lowercase; font-family: 'Montserrat', sans-serif; display: inline-block; vertical-align: middle;">urth.</h2>
+    </a>
+  </div>
+  <nav class="center-nav">
+    <a href="../index.html">HOME</a>
+    <a href="index.html" class="active">ABOUT</a>
+    <a href="../projects.html">PROJECTS</a>
+    <a href="../contact.html">CONTACT</a>
+    <a href="#">SHOP</a>
+  </nav>
+  <div class="right-nav" style="width: 80px;"></div>
 </div>
 <div class="sticky-section">
 <section id="hero" class="section hero-section" style="background-image: url('../img/urthprojs/img_e5003.webp'); background-size: cover; background-position: center; height: 100vh; display: flex; align-items: center; justify-content: center; position: relative;">
