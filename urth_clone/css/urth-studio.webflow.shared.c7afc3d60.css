@@ -2478,7 +2478,7 @@ img {
 
 .section.cta-section {
   height: 100vh;
-  padding: var(--_spacing---tiny);
+  padding: var(--_spacing---tiny) 0;
   justify-content: flex-start;
   align-items: flex-end;
   display: flex;
@@ -3064,9 +3064,9 @@ img {
   height: 100%;
   padding-top: var(--_spacing---extra-large);
   padding-bottom: var(--_spacing---extra-large);
-  border-radius: var(--_spacing---extra-tiny);
+  border-radius: 0;
   background-color: var(--black-500);
-  background-image: url("https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a1c/6a224726d63f5b84d983bf14_CTA.avif");
+  background-image: url("../../img/urthprojs/13.jpg");
   background-position: 50%;
   background-size: cover;
   justify-content: center;
