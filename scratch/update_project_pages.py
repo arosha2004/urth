@@ -1,10 +1,15 @@
-<!DOCTYPE html>
+import os
+
+with open(r"c:\xampp\htdocs\Urth\urth\scratch\project_section.html", "r", encoding="utf-8") as f:
+    project_section = f.read()
+
+template = f"""<!DOCTYPE html>
 <html lang="en" data-wf-page="6a1c3d9d7686060838b279f9" data-wf-site="6a1c3d9d7686060838b27a1c" class="w-mod-js">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Amman Rotana Hotel — urth</title>
-  <meta name="description" content="Explore Amman Rotana Hotel by URTH." />
+  <title>{{PROJECT_NAME}} — urth</title>
+  <meta name="description" content="Explore {{PROJECT_NAME}} by URTH." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
@@ -17,20 +22,20 @@
   
   <!-- Webflow Styles & Scripts for the scroll effects -->
   <link href="urth_clone/css/urth-studio.webflow.shared.c7afc3d60.css" rel="stylesheet" type="text/css" >
-  <style>html.w-mod-js:not(.w-mod-ix3) :is([long-heading], .value-item-about, .counter.up, .counter.down, .parallax-image, .link-line, [fade-in-down], [fade-in-up-1], [button-text], [fade-in-up-3], [heading-up-1], [fade-in-up-2], [fade-in-up-4], .answer, .faq-icon, .faq-dropdown, .button-hover-bg, .service-image-inner, [data-wf-target*='["6a1c3d9d7686060838b279f9","bbbecb12-4ddc-6540-44b3-bab933ba27d6"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","f6733bf2-2f50-42f6-f382-d5cd3298c8d0"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","ca255160-7d44-adf6-6977-cf67932046ee"]'], .about-image-two, .wcu-image, .wcu-overlay, .wcu-text-wrapper, .text, .heading-5, .heading-2, .process-headline, .process-item.one, .process-item.two, .process-item.three, .process-item.four, .project-item, .counter-2.down, .counter-2.up, .partner-list.one, .partner-list.two, .testimonial-list, .hero-load-background, .contact-image.two, .contact-image.three, .contact-image.four) {visibility: hidden !important;}</style>
+  <style>html.w-mod-js:not(.w-mod-ix3) :is([long-heading], .value-item-about, .counter.up, .counter.down, .parallax-image, .link-line, [fade-in-down], [fade-in-up-1], [button-text], [fade-in-up-3], [heading-up-1], [fade-in-up-2], [fade-in-up-4], .answer, .faq-icon, .faq-dropdown, .button-hover-bg, .service-image-inner, [data-wf-target*='["6a1c3d9d7686060838b279f9","bbbecb12-4ddc-6540-44b3-bab933ba27d6"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","f6733bf2-2f50-42f6-f382-d5cd3298c8d0"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","ca255160-7d44-adf6-6977-cf67932046ee"]'], .about-image-two, .wcu-image, .wcu-overlay, .wcu-text-wrapper, .text, .heading-5, .heading-2, .process-headline, .process-item.one, .process-item.two, .process-item.three, .process-item.four, .project-item, .counter-2.down, .counter-2.up, .partner-list.one, .partner-list.two, .testimonial-list, .hero-load-background, .contact-image.two, .contact-image.three, .contact-image.four) {{visibility: hidden !important;}}</style>
   <style>
     /* Fix global styles overridden by Webflow */
-    body {
+    body {{
       background-color: transparent !important;
       color: inherit !important;
       font-family: inherit !important;
       line-height: inherit !important;
-    }
-    .hero-section {
+    }}
+    .hero-section {{
       height: 100vh;
       position: relative;
-    }
-    .hero-bg img {
+    }}
+    .hero-bg img {{
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -38,22 +43,22 @@
       top: 0;
       left: 0;
       z-index: -1;
-    }
-    .hero-title {
+    }}
+    .hero-title {{
       color: white !important;
       font-size: 80px !important;
       text-transform: uppercase;
       font-family: 'Cormorant Garamond', serif !important;
-    }
+    }}
   </style>
-  <script type="text/javascript">!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);</script>
+  <script type="text/javascript">!function(o,c){{var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}}(window,document);</script>
 </head>
 <body>
   
   <!-- HERO SECTION -->
   <header class="hero-section">
     <div class="hero-bg">
-      <img src="img/poolscape_villa.png" alt="Amman Rotana Hotel" />
+      <img src="{{PROJECT_IMAGE}}" alt="{{PROJECT_NAME}}" />
     </div>
     
     <div class="hero-top-nav">
@@ -74,12 +79,12 @@
 
     <div class="hero-content">
       <p class="hero-subtitle" style="color: white; letter-spacing: 2px;">URTH. ARCHITECTURE</p>
-      <h1 class="hero-title">Amman Rotana Hotel</h1>
+      <h1 class="hero-title">{{PROJECT_NAME}}</h1>
     </div>
   </header>
 
   <!-- INSERT WEBFLOW SECTION HERE -->
-  <section id="project" class="section"><div class="w-layout-blockcontainer container w-container"><div class="vertical-wrapper"><div class="vertical-headline project-headline"><div fade-in-up-1="" class="subtitle">Project</div><h2 fade-in-up-2="" class="heading-2">Selected works that define our architectural philosophy</h2></div><div class="w-dyn-list"><div role="list" class="project-list w-dyn-items"><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><img src="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a24/6a23c53cde20611e2fd123b4_PROJECT%20The%20Heritage%20Pavilion.avif" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Singapore</div><div class="heading-4">The Heritage Pavilion</div></div><p>This project breathed new life into a mid-century commercial structure, transforming it into a highly functional, open-concept contemporary workspace. By reconfiguring the core layout and introducing a minimalist central courtyard, we brought natural daylight deep into the interior, fostering collaboration and productivity.</p><a href="the-heritage-pavilion.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><img src="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a24/6a23c54d2c253b9e5ee2370e_PROJECT%20Residence%20K.avif" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Tokyo, Japan</div><div class="heading-4">Residence K</div></div><p>Designed for a compact private apartment, this project centers on absolute spatial efficiency without sacrificing aesthetic warmth. We curated a bespoke system of floor-to-ceiling hidden storage, multifunctional minimalist furniture pieces, and selected a soft textile palette to establish a calm, clutter-free urban retreat.</p><a href="residence-k.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><img src="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a24/6a23c56287aa71f7de6de4d6_PROJECT%20Loft%20No.%2007.avif" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Melbourne, Australia</div><div class="heading-4">Loft No. 07</div></div><p>A comprehensive interior overhaul of a converted industrial penthouse. By stripping away redundant partitions, we maximized spatial flow and unlocked panoramic city views. The design utilizes a warm, neutral color palette, integrated minimalist lighting, and raw structural steel accents to preserve the building's heritage while elevating modern comfort.</p><a href="loft-no-07.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><img src="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a24/6a23c5798ef0cd3e847e8b58_PROJECT%20The%20Monolith%20House.avif" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Ubud, Bali</div><div class="heading-4">The Monolith House</div></div><p>A brutalist-inspired residential villa crafted from raw board-formed concrete, expansive floor-to-ceiling glass, and local natural stone. The design prioritizes a seamless blur between indoor luxury and the untamed tropical landscape, creating a private sanctuary that embraces natural ventilation and passive cooling</p><a href="the-monolith-house.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div></div></div></div></div></section>
+  {project_section}
 
   <!-- LARGE CONTACT FOOTER -->
   <footer class="contact-footer" style="position: relative; z-index: 10;">
@@ -130,4 +135,21 @@
   <script src="urth_clone/js/SplitText.min.js" type="text/javascript"></script>
   <script src="urth_clone/js/ScrollTrigger.min.js" type="text/javascript"></script>
 </body>
-</html>
+</html>"""
+
+projects = [
+    ("poolscape-villa.html", "Poolscape Villa", "img/poolscape_villa.png"),
+    ("european-lard-station.html", "European Lard Station", "img/european_lard_station.png"),
+    ("yabroudi-villa.html", "Yabroudi Villa", "img/desert_residence.png"),
+    ("cultural-complex-centre.html", "Cultural Complex Centre", "img/american_lard_station.png"),
+    ("dalbourne-villa.html", "Dalbourne Villa", "img/urban_tower.png"),
+    ("amman-rotana-hotel.html", "Amman Rotana Hotel", "img/poolscape_villa.png")
+]
+
+for filename, title, img in projects:
+    # We used {{PROJECT_NAME}} in the f-string, which became {PROJECT_NAME} in the template variable.
+    content = template.replace("{PROJECT_NAME}", title).replace("{PROJECT_IMAGE}", img)
+    with open(f"c:\\xampp\\htdocs\\Urth\\urth\\{filename}", "w", encoding="utf-8") as f:
+        f.write(content)
+
+print("Project pages generated with fixed template variables and styling.")
