@@ -40,7 +40,22 @@ window.__WF_REVIEW_BRIDGE = {
   reviewScriptUrl: "https://validation-worker.createsomething.workers.dev/app-validator/snippet/review.js"
 };
 </script>
-<script src="js/review.js"></script></head><!--/$--><body><header class="top-header">
+<script src="js/review.js"></script>
+<style>
+  /* Stack effect for project items */
+  #project .project-item {
+    position: sticky !important;
+  }
+  #project .project-item:nth-child(1) { top: var(--_spacing---semi-large) !important; }
+  #project .project-item:nth-child(2) { top: calc(var(--_spacing---semi-large) + 30px) !important; }
+  #project .project-item:nth-child(3) { top: calc(var(--_spacing---semi-large) + 60px) !important; }
+  #project .project-item:nth-child(4) { top: calc(var(--_spacing---semi-large) + 90px) !important; }
+  #project .project-item:nth-child(5) { top: calc(var(--_spacing---semi-large) + 120px) !important; }
+  #project, #project .w-layout-blockcontainer, #project .vertical-wrapper, #project .w-dyn-list, #project .project-list {
+    overflow: visible !important;
+  }
+</style>
+</head><!--/$--><body><header class="top-header">
   <style>
     .hero-top-nav {
       position: absolute;
