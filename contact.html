@@ -10,8 +10,21 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="contact.css" />
   <link rel="icon" type="image/png" href="img/favicon.png" />
+
+  <link rel="stylesheet" href="mobile-nav.css" />
 </head>
 <body>
+
+  <div class="mobile-nav-overlay">
+    <nav class="mobile-nav-links">
+      <a href="index.html">HOME</a>
+      <a href="urth_clone/index.html">ABOUT</a>
+      <a href="projects.html">PROJECTS</a>
+      <a href="contact.html">CONTACT</a>
+      <a href="#">SHOP</a>
+    </nav>
+  </div>
+
 
   <!-- TOP HEADER -->
   <header class="top-header">
@@ -67,7 +80,15 @@
         <a href="contact.html" class="active">CONTACT</a>
         <a href="#">SHOP</a>
       </nav>
-      <div class="right-nav" style="width: 80px;"></div>
+      <div class="right-nav" style="width: 80px;">
+
+        <button class="mobile-nav-toggle" aria-label="Toggle Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    
+</div>
     </div>
   </header>
 
@@ -178,5 +199,7 @@
   </footer>
 
   <script src="script.js"></script>
+
+  <script src="mobile-nav.js"></script>
 </body>
 </html>

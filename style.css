@@ -377,6 +377,17 @@ html, body {
     justify-content: center;
   }
 
+  /* Make carousel fluid on mobile */
+  .carousel-slide {
+    flex: 0 0 85vw;
+    width: 85vw;
+  }
+
+  .slide-img-wrap {
+    flex: 0 0 auto;
+    height: 60vw;
+  }
+
   .slide-label {
     padding: 10px 8px;
     min-height: 64px;

@@ -526,6 +526,22 @@
     gap: 20px;
     align-items: flex-start;
   }
+  
+  /* Additional mobile styles for forms and banner */
+  .contact-form .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .banner-columns {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .banner-col-item:not(:last-child)::after {
+    display: none;
+  }
+  .banner-title {
+    font-size: 32px;
+  }
 }
 
 /* Hide Webflow watermark badge */

@@ -172,8 +172,37 @@ var woocommerce_params = {"ajax_url":"/wp-admin/admin-ajax.php","wc_ajax_url":"/
 }
 </style>
 <noscript><style> .wpb_animate_when_almost_visible { opacity: 1; }</style></noscript>
-  </head>
+  
+  <link rel="stylesheet" href="mobile-nav.css" />
+</head>
 <body class="wp-singular page-template-default page page-id-2809 wp-theme-prague theme-prague woocommerce-no-js  bottom_menu wpb-js-composer js-comp-ver-8.7.4 vc_responsive" data-scrollbar="">
+
+  <header class="mobile-index-header">
+    <div class="logo">
+      <a href="index.html" style="text-decoration: none;">
+        <h2>urth.</h2>
+      </a>
+    </div>
+    
+        <button class="mobile-nav-toggle" aria-label="Toggle Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    
+  </header>
+
+
+  <div class="mobile-nav-overlay">
+    <nav class="mobile-nav-links">
+      <a href="index.html">HOME</a>
+      <a href="urth_clone/index.html">ABOUT</a>
+      <a href="projects.html">PROJECTS</a>
+      <a href="contact.html">CONTACT</a>
+      <a href="#">SHOP</a>
+    </nav>
+  </div>
+
 
 			<div class="prague-loader">
 			<div class="prague-loader-wrapper">
@@ -608,6 +637,8 @@ const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(
 //# sourceURL=https://prague.foxthemes.me/wp-includes/js/wp-emoji-loader.min.js
 </script>
 <script></script><script type="text/javascript">var to_like_post = {"url":"https://prague.foxthemes.me/wp-admin/admin-ajax.php","nonce":"d2f7e5eb20"};!function(t){"use strict";t(document).ready(function(){t(document).on("click",".to-post-like:not('.to-post-like-unactive')",function(e){e.preventDefault();var o=t(this),n=o.data("post-id"),s=parseInt(o.find(".to-like-count").text());return o.addClass("heart-pulse"),t.ajax({type:"post",url:to_like_post.url,data:{nonce:to_like_post.nonce,action:"to_like_post",post_id:n,like_nb:s},context:o,success:function(e){e&&((o=t(this)).attr("title",e.title),o.find(".to-like-count").text(e.count),o.removeClass(e.remove_class+" heart-pulse").addClass(e.add_class))}}),!1})})}(jQuery);</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a22146052d534efc',t:'MTc4NTIxNDMzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"0d8c4078606d4942a3c7006adcb3da88","r":1}' crossorigin="anonymous"></script>
+
+  <script src="mobile-nav.js"></script>
 </body>
 </html>
 

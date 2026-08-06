@@ -253,3 +253,21 @@ body {
   filter: grayscale(0%);
 }
 
+@media (max-width: 768px) {
+  .timeline-container {
+    flex-direction: column;
+  }
+  .timeline-left {
+    width: 100%;
+    height: auto;
+    padding: 20px 0;
+  }
+  .timeline-right {
+    width: 100%;
+    margin-top: 0;
+    padding: 20px;
+  }
+  .img-grid {
+    grid-template-columns: 1fr;
+  }
+}
