@@ -90,24 +90,27 @@
     /* Index page mobile header */
     .mobile-index-header {
         display: flex;
-        position: absolute;
-        top: 0;
-        left: 0;
+        position: relative;
         width: 100%;
         padding: 20px 20px;
         justify-content: space-between;
         align-items: center;
+        background: #ffffff;
         z-index: 100;
         box-sizing: border-box;
     }
     .mobile-index-header .logo h2 {
-        color: white;
+        color: #111;
         margin: 0;
         font-size: 24px;
         font-weight: normal;
         letter-spacing: -1px;
         text-transform: lowercase;
         font-family: 'Montserrat', sans-serif;
+    }
+    
+    .mobile-index-header .mobile-nav-toggle span {
+        background-color: #111;
     }
 
     /* Hide standard navigations on mobile */
