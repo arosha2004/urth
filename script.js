@@ -42,14 +42,16 @@
   allSlides.forEach(s => s.classList.remove('active'));
   allSlides[currentIndex].classList.add('active');
 
-  const slideWidth = 686;
-  const gap = 30;
-
   function updateTrackPosition(instant = false) {
     const trackOuter = document.querySelector('.carousel-track-outer');
     if (!trackOuter) return;
     const width = trackOuter.clientWidth;
     
+    const currentSlide = allSlides[currentIndex];
+    const slideWidth = currentSlide ? currentSlide.offsetWidth : 686;
+    const computedTrackStyle = window.getComputedStyle(track);
+    const gap = parseFloat(computedTrackStyle.gap) || 30;
+
     const targetLeft = (width - slideWidth) / 2;
     const currentLeft = (currentIndex * slideWidth) + (currentIndex * gap);
     
