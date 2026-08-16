@@ -1,21 +1,77 @@
 <!DOCTYPE html><!-- This site was created in Webflow. https://webflow.com --><!-- Last Published: Fri Jun 19 2026 00:43:42 GMT+0000 (Coordinated Universal Time) --><!--$--><html data-wf-domain="urth-studio.webflow.io" data-wf-page="6a1c3d9d7686060838b279f9" data-wf-site="6a1c3d9d7686060838b27a1c" lang="en"><!--$--><head><meta charset="utf-8"><!--$--><link href="https://cdn.prod.website-files.com" rel="preconnect" ><!--/$--><title>About — urth</title><meta content="Transform ordinary rooms into warm, minimalist retreats. Urth blends functional architecture with refined interior design for luxury living spaces." name="description"><meta content="About — urth" property="og:title"><meta content="Transform ordinary rooms into warm, minimalist retreats. Urth blends functional architecture with refined interior design for luxury living spaces." property="og:description"><meta content="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a1c/6a25614410db1a130a2d0147_urth%20home.avif" property="og:image"><meta content="About — urth" name="twitter:title"><meta content="Transform ordinary rooms into warm, minimalist retreats. Urth blends functional architecture with refined interior design for luxury living spaces." name="twitter:description"><meta content="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a1c/6a25614410db1a130a2d0147_urth%20home.avif" name="twitter:image"><meta property="og:type" content="website"><meta content="summary_large_image" name="twitter:card"><meta content="width=device-width, initial-scale=1" name="viewport"><meta content="Webflow" name="generator"><!--$--><link href="css/urth-studio.webflow.shared.c7afc3d60.css" rel="stylesheet" type="text/css" ><!--/$--><style>html.w-mod-js:not(.w-mod-ix3) :is([long-heading], .value-item-about, .counter.up, .counter.down, .parallax-image, .link-line, [fade-in-down], [fade-in-up-1], [button-text], [fade-in-up-3], [heading-up-1], [fade-in-up-2], [fade-in-up-4], .answer, .faq-icon, .faq-dropdown, .button-hover-bg, .service-image-inner, [data-wf-target*='["6a1c3d9d7686060838b279f9","bbbecb12-4ddc-6540-44b3-bab933ba27d6"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","f6733bf2-2f50-42f6-f382-d5cd3298c8d0"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","ca255160-7d44-adf6-6977-cf67932046ee"]'], .about-image-two, .wcu-image, .wcu-overlay, .wcu-text-wrapper, .text, .heading-5, .heading-2, .process-headline, .process-item.one, .process-item.two, .process-item.three, .process-item.four, .project-item, .counter-2.down, .counter-2.up, .partner-list.one, .partner-list.two, .testimonial-list, .hero-load-background, .contact-image.two, .contact-image.three, .contact-image.four) {visibility: hidden !important;}
     /* Filter Bar Styles */
-    .filter-bar-container {
+    .filter-bar-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
         width: 100%;
         margin-bottom: 40px;
+    }
+    .filter-bar-container {
+        width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none; /* Firefox */
-        border-bottom: 1px solid #eee;
+        scroll-behavior: smooth;
     }
     .filter-bar-container::-webkit-scrollbar {
         display: none; /* Chrome/Safari */
     }
+    .filter-bar-wrapper::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: #eee;
+        z-index: 0;
+    }
     .filter-bar {
         display: flex;
         gap: 32px;
+        padding: 0 16px;
         padding-bottom: 1px;
         min-width: max-content;
+        position: relative;
+        z-index: 1;
+    }
+    .filter-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        color: #333;
+        transition: opacity 0.3s ease, visibility 0.3s ease, background 0.3s ease;
+    }
+    .filter-arrow svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+    .filter-arrow:hover {
+        background: #f0f0f0;
+    }
+    .filter-arrow-left {
+        left: -18px;
+    }
+    .filter-arrow-right {
+        right: -18px;
+    }
+    .filter-arrow.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
     }
     .filter-tab {
         display: flex;
@@ -114,22 +170,78 @@ window.__WF_REVIEW_BRIDGE = {
   }
 
     /* Filter Bar Styles */
-    .filter-bar-container {
+    .filter-bar-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
         width: 100%;
         margin-bottom: 40px;
+    }
+    .filter-bar-container {
+        width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none; /* Firefox */
-        border-bottom: 1px solid #eee;
+        scroll-behavior: smooth;
     }
     .filter-bar-container::-webkit-scrollbar {
         display: none; /* Chrome/Safari */
     }
+    .filter-bar-wrapper::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: #eee;
+        z-index: 0;
+    }
     .filter-bar {
         display: flex;
         gap: 32px;
+        padding: 0 16px;
         padding-bottom: 1px;
         min-width: max-content;
+        position: relative;
+        z-index: 1;
+    }
+    .filter-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        color: #333;
+        transition: opacity 0.3s ease, visibility 0.3s ease, background 0.3s ease;
+    }
+    .filter-arrow svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+    .filter-arrow:hover {
+        background: #f0f0f0;
+    }
+    .filter-arrow-left {
+        left: -18px;
+    }
+    .filter-arrow-right {
+        right: -18px;
+    }
+    .filter-arrow.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
     }
     .filter-tab {
         display: flex;
@@ -213,22 +325,78 @@ window.__WF_REVIEW_BRIDGE = {
     }
   
     /* Filter Bar Styles */
-    .filter-bar-container {
+    .filter-bar-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
         width: 100%;
         margin-bottom: 40px;
+    }
+    .filter-bar-container {
+        width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none; /* Firefox */
-        border-bottom: 1px solid #eee;
+        scroll-behavior: smooth;
     }
     .filter-bar-container::-webkit-scrollbar {
         display: none; /* Chrome/Safari */
     }
+    .filter-bar-wrapper::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: #eee;
+        z-index: 0;
+    }
     .filter-bar {
         display: flex;
         gap: 32px;
+        padding: 0 16px;
         padding-bottom: 1px;
         min-width: max-content;
+        position: relative;
+        z-index: 1;
+    }
+    .filter-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        color: #333;
+        transition: opacity 0.3s ease, visibility 0.3s ease, background 0.3s ease;
+    }
+    .filter-arrow svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+    .filter-arrow:hover {
+        background: #f0f0f0;
+    }
+    .filter-arrow-left {
+        left: -18px;
+    }
+    .filter-arrow-right {
+        right: -18px;
+    }
+    .filter-arrow.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
     }
     .filter-tab {
         display: flex;
@@ -319,8 +487,12 @@ window.__WF_REVIEW_BRIDGE = {
     </nav>
   </div>
 <section id="project" class="section"><div class="w-layout-blockcontainer container w-container"><div class="vertical-wrapper"><div class="vertical-headline project-headline"><div fade-in-up-1="" class="subtitle">Project</div><h2 fade-in-up-2="" class="heading-2">Selected works that define our architectural philosophy</h2></div>
-<div class="filter-bar-container">
-    <div class="filter-bar" id="project-filters">
+<div class="filter-bar-wrapper">
+    <button class="filter-arrow filter-arrow-left hidden" aria-label="Scroll left">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <div class="filter-bar-container">
+        <div class="filter-bar" id="project-filters">
         <div class="filter-tab active" data-filter="All">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
             All
@@ -354,6 +526,10 @@ window.__WF_REVIEW_BRIDGE = {
             Ideas Hub
         </div>
     </div>
+    </div>
+    <button class="filter-arrow filter-arrow-right hidden" aria-label="Scroll right">
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </button>
 </div>
 <div class="w-dyn-list"><div role="list" class="project-list w-dyn-items"><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><div class="category-tag">Architectural Design</div><img src="../img/poolscape_villa.png" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Architectural Design</div><div class="heading-4">Poolscape Villa</div></div><p>This project breathed new life into a mid-century commercial structure, transforming it into a highly functional, open-concept contemporary workspace. By reconfiguring the core layout and introducing a minimalist central courtyard, we brought natural daylight deep into the interior, fostering collaboration and productivity.</p><a href="poolscape-villa.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><div class="category-tag">Interior Designing</div><img src="../img/european_lard_station.png" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Interior Designing</div><div class="heading-4">European Lard Station</div></div><p>Designed for a compact private apartment, this project centers on absolute spatial efficiency without sacrificing aesthetic warmth. We curated a bespoke system of floor-to-ceiling hidden storage, multifunctional minimalist furniture pieces, and selected a soft textile palette to establish a calm, clutter-free urban retreat.</p><a href="european-lard-station.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><div class="category-tag">Urban Planning</div><img src="../img/desert_residence.png" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Urban Planning</div><div class="heading-4">Yabroudi Villa</div></div><p>A comprehensive interior overhaul of a converted industrial penthouse. By stripping away redundant partitions, we maximized spatial flow and unlocked panoramic city views. The design utilizes a warm, neutral color palette, integrated minimalist lighting, and raw structural steel accents to preserve the building's heritage while elevating modern comfort.</p><a href="yabroudi-villa.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><div class="category-tag">Landscape Design</div><img src="../img/american_lard_station.png" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Landscape Design</div><div class="heading-4">Cultural Complex Centre</div></div><p>A brutalist-inspired residential villa crafted from raw board-formed concrete, expansive floor-to-ceiling glass, and local natural stone. The design prioritizes a seamless blur between indoor luxury and the untamed tropical landscape, creating a private sanctuary that embraces natural ventilation and passive cooling</p><a href="cultural-complex-centre.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><div class="category-tag">Custom Furnitures</div><img src="../img/american_lard_station.png" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Custom Furnitures</div><div class="heading-4">Custom Furnitures Showcase</div></div><p>A brutalist-inspired residential villa crafted from raw board-formed concrete, expansive floor-to-ceiling glass, and local natural stone. The design prioritizes a seamless blur between indoor luxury and the untamed tropical landscape, creating a private sanctuary that embraces natural ventilation and passive cooling</p><a href="cultural-complex-centre.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><div class="category-tag">Spatial Redesign</div><img src="../img/american_lard_station.png" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Spatial Redesign</div><div class="heading-4">Spatial Redesign Showcase</div></div><p>A brutalist-inspired residential villa crafted from raw board-formed concrete, expansive floor-to-ceiling glass, and local natural stone. The design prioritizes a seamless blur between indoor luxury and the untamed tropical landscape, creating a private sanctuary that embraces natural ventilation and passive cooling</p><a href="cultural-complex-centre.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div><div role="listitem" class="project-item w-dyn-item"><div class="project-image"><div class="category-tag">Ideas Hub</div><img src="../img/american_lard_station.png" loading="lazy" alt="" class="parallax-image"></div><div fade-in-up-2="" class="projct-info"><div class="vertical-headline"><div class="subtitle">Ideas Hub</div><div class="heading-4">Ideas Hub Showcase</div></div><p>A brutalist-inspired residential villa crafted from raw board-formed concrete, expansive floor-to-ceiling glass, and local natural stone. The design prioritizes a seamless blur between indoor luxury and the untamed tropical landscape, creating a private sanctuary that embraces natural ventilation and passive cooling</p><a href="cultural-complex-centre.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Project Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div></div></div></div></div></section><section id="service" class="section subtle-grey"><div class="w-layout-blockcontainer container w-container"><div class="service-wrapper"><div class="service-headline"><div class="service-collection w-dyn-list"><div role="list" class="service-list w-dyn-items"><div role="listitem" class="service-headline-item w-dyn-item"><div class="vertical-headline small-left"><div fade-in-up-1="" class="subtitle">OUR&nbsp;Service</div><h2 fade-in-up-2="" class="heading-3">Architectural Design</h2></div><div class="vertical-headline service-cta"><p fade-in-up-1="" class="text service-description">We create modern, sustainable, and structurally sound architectural blueprints. Our approach focuses on clean lines, natural light, and a seamless integration between the building and its surrounding environment.</p><div fade-in-up-2="" class="button-wrapper"><a href="architectural-design.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Service Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Service Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div></div></div></div><div class="service-collection w-dyn-list"><div role="list" class="service-list w-dyn-items"><div role="listitem" class="service-headline-item w-dyn-item"><div class="vertical-headline small-left"><div fade-in-up-1="" class="subtitle">OUR&nbsp;Service</div><h2 fade-in-up-2="" class="heading-3">Interior Architecture</h2></div><div class="vertical-headline service-cta"><p fade-in-up-1="" class="text">Beyond superficial decorating, we define the spatial layout, material palette, and fixed elements of your interior. We optimize the flow of your space to ensure your home or office feels effortlessly cohesive.</p><div fade-in-up-2="" class="button-wrapper"><a href="interior-architecture.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Service Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Service Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div></div></div></div><div class="service-collection w-dyn-list"><div role="list" class="service-list w-dyn-items"><div role="listitem" class="service-headline-item w-dyn-item"><div class="vertical-headline small-left"><div fade-in-up-1="" class="subtitle">OUR&nbsp;Service</div><h2 fade-in-up-2="" class="heading-3">Custom Furniture</h2></div><div class="vertical-headline service-cta"><p fade-in-up-1="" class="text">To achieve a truly minimalist aesthetic, clutter must be eliminated. We design custom built-ins, bespoke furniture, and select curated decor items that fit your space’s exact proportions and color story.</p><div fade-in-up-2="" class="button-wrapper"><a href="custom-furniture.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Service Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Service Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div></div></div></div><div class="service-collection w-dyn-list"><div role="list" class="service-list w-dyn-items"><div role="listitem" class="service-headline-item w-dyn-item"><div class="vertical-headline small-left"><div fade-in-up-1="" class="subtitle">OUR&nbsp;Service</div><h2 fade-in-up-2="" class="heading-3">Spatial Redesign</h2></div><div class="vertical-headline service-cta"><p fade-in-up-1="" class="text">We transform outdated layouts into functional, contemporary spaces. Whether it is a single-room transformation or a complete structural overhaul, we strip away the unnecessary to reveal the space's true potential.</p><div fade-in-up-2="" class="button-wrapper"><a href="spatial-redesign.html" id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown" class="button w-inline-block"><div class="button-text-wrapper"><div class="button-text-inner"><div class="button-text-item"><div button-text="" class="button-text">Service Detail</div></div><div class="button-text-item"><div button-text="" class="button-text">Service Detail</div></div></div></div><div class="button-hover-bg"></div></a></div></div></div></div></div></div><div fade-in-up-2="" class="service-image-wrapper"><div class="service-image-inner"><div class="service-image-collection w-dyn-list"><div role="list" class="service-image-list w-dyn-items"><div role="listitem" class="service-image-item w-dyn-item"><div class="service-image"><img src="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a24/6a24c4a192c518a59f96ec04_Architectural%20Design%20Service.avif" loading="lazy" alt="" class="image"></div></div></div></div><div data-wf-target="[[[&quot;6a1c3d9d7686060838b279f9&quot;,&quot;bbbecb12-4ddc-6540-44b3-bab933ba27d6&quot;],[]]]" class="service-image-collection w-dyn-list"><div role="list" class="service-image-list w-dyn-items"><div role="listitem" class="service-image-item w-dyn-item"><div class="service-image"><img src="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a24/6a24c4aca18d5d024da935ad_Interior%20Architecture%20Service.avif" loading="lazy" alt="" class="image"></div></div></div></div><div data-wf-target="[[[&quot;6a1c3d9d7686060838b279f9&quot;,&quot;f6733bf2-2f50-42f6-f382-d5cd3298c8d0&quot;],[]]]" class="service-image-collection w-dyn-list"><div role="list" class="service-image-list w-dyn-items"><div role="listitem" class="service-image-item w-dyn-item"><div class="service-image"><img src="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a24/6a24c4bd0786361962bb252c_Custom%20Furniture%20Service.avif" loading="lazy" alt="" class="image"></div></div></div></div><div data-wf-target="[[[&quot;6a1c3d9d7686060838b279f9&quot;,&quot;ca255160-7d44-adf6-6977-cf67932046ee&quot;],[]]]" class="service-image-collection w-dyn-list"><div role="list" class="service-image-list w-dyn-items"><div role="listitem" class="service-image-item w-dyn-item"><div class="service-image"><img src="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a24/6a24c53b3546e70bdfab2d91_Spatial%20Redesign%20Service.avif" loading="lazy" alt="" class="image"></div></div></div></div></div></div></div></div></section><section id="faq" class="section"><div class="w-layout-blockcontainer container w-container"><div class="vertical-wrapper"><div class="vertical-headline faq-headline"><div fade-in-up-1="" class="subtitle">FAQS</div><h2 fade-in-up-2="" class="heading-2">Frequently Asked Questions Answered</h2></div><div class="faq-wrapper"><div fade-in-up-3="" class="faq-list"><div class="faq-dropdown"><div class="question"><div class="heading-5">What services do you provide?</div><div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png" alt="Simple black plus sign on a white background."></div></div><div class="answer"><div class="answer-wrapper"><p class="text">We offer full-scale architectural design, interior architecture, custom furniture styling, renovations, and complete turnkey project management.</p></div></div></div><div class="faq-dropdown"><div class="question"><div class="heading-5">How do you determine project pricing?</div><div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png" alt="Simple black plus sign on a white background." class="faq-icon-image"></div></div><div class="answer"><div class="answer-wrapper"><p class="text">Pricing is tailored to each project based on its scale, scope of work, and complexity. We provide a detailed, transparent quote after our initial consultation.</p></div></div></div><div class="faq-dropdown"><div class="question"><div class="heading-5">Do you handle construction and contractors?</div><div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png" alt="Simple black plus sign on a white background." class="faq-icon-image"></div></div><div class="answer"><div class="answer-wrapper"><p class="text">Yes. Through our Turnkey Project Management service, we supervise the entire build, manage trusted contractors, and handle material sourcing from start to finish.</p></div></div></div><div class="faq-dropdown"><div class="question"><div class="heading-5">Can I hire you for interior design only?</div><div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png" alt="Simple black plus sign on a white background." class="faq-icon-image"></div></div><div class="answer"><div class="answer-wrapper"><p class="text">Absolutely. We take on standalone interior architecture and custom styling projects, as well as full structural architectural builds.</p></div></div></div><div class="faq-dropdown"><div class="question"><div class="heading-5">Do you offer renovation and remodeling services?</div><div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png" alt="Simple black plus sign on a white background." class="faq-icon-image"></div></div><div class="answer"><div class="answer-wrapper"><p class="text">Yes. We handle renovation and remodeling projects of all sizes, helping clients refresh, improve, and transform existing spaces while maintaining quality.</p></div></div></div><div class="faq-dropdown"><div class="question"><div class="heading-5">How long does a typical project take to complete?</div><div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png" alt="Simple black plus sign on a white background." class="faq-icon-image"></div></div><div class="answer"><div class="answer-wrapper"><p class="text">Timelines vary depending on project scope, size, and complexity. After the initial consultation, we provide a clear schedule and keep you informed.</p></div></div></div></div></div></div></div></section><footer class="contact-footer">
     <div class="footer-overlay"></div>
@@ -444,6 +620,45 @@ window.__WF_REVIEW_BRIDGE = {
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    
+    // Arrow logic
+    const container = document.querySelector('.filter-bar-container');
+    const leftArrow = document.querySelector('.filter-arrow-left');
+    const rightArrow = document.querySelector('.filter-arrow-right');
+
+    function updateArrows() {
+        if (!container || !leftArrow || !rightArrow) return;
+        
+        if (container.scrollLeft <= 10) {
+            leftArrow.classList.add('hidden');
+        } else {
+            leftArrow.classList.remove('hidden');
+        }
+        
+        // Use Math.ceil to prevent fractional pixel issues
+        if (Math.ceil(container.scrollLeft) >= container.scrollWidth - container.clientWidth - 10) {
+            rightArrow.classList.add('hidden');
+        } else {
+            rightArrow.classList.remove('hidden');
+        }
+    }
+
+    if (container && leftArrow && rightArrow) {
+        // Run after a tiny delay to ensure fonts/layout are loaded
+        setTimeout(updateArrows, 100);
+        
+        container.addEventListener('scroll', updateArrows);
+        window.addEventListener('resize', updateArrows);
+        
+        leftArrow.addEventListener('click', () => {
+            container.scrollBy({ left: -250, behavior: 'smooth' });
+        });
+        
+        rightArrow.addEventListener('click', () => {
+            container.scrollBy({ left: 250, behavior: 'smooth' });
+        });
+    }
+
     const filterTabs = document.querySelectorAll('.filter-tab');
     const projectItems = document.querySelectorAll('.project-item');
 
