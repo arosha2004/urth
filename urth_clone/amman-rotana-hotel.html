@@ -108,12 +108,23 @@ window.__WF_REVIEW_BRIDGE = {
       top: 0;
       left: 0;
       width: 100%;
-      padding: 30px 50px;
+      height: 92px;
+      padding: 0 50px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 10;
       box-sizing: border-box;
+      transition: top 0.3s ease;
+    }
+    .hero-top-nav.sticky {
+      position: fixed;
+      top: -92px;
+      background-color: rgba(17, 17, 17, 0.95);
+      z-index: 9999;
+    }
+    .hero-top-nav.sticky.scrolled {
+      top: 0;
     }
     .hero-top-nav .logo a {
       color: #fff;
@@ -173,6 +184,22 @@ window.__WF_REVIEW_BRIDGE = {
       }
     }
   </style>
+  <script>
+    document.addEventListener("scroll", function() {
+      var nav = document.querySelector('.hero-top-nav');
+      if (!nav) return;
+      if (window.scrollY > 200) {
+        nav.classList.add('sticky');
+      } else {
+        nav.classList.remove('sticky', 'scrolled');
+      }
+      if (window.scrollY > 400) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+  </script>
   <div class="hero-bg">
     <img src="../img/poolscape_villa.png" alt="Hero background" />
   </div>
