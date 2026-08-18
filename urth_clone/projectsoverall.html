@@ -740,48 +740,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const projectItems = document.querySelectorAll('.project-item');
     const sidebarList = document.getElementById('sidebar-list');
 
-    let cachedTops = [];
-    let cachedStickyOffsets = [];
-    
-    function updateTopsCache() {
-        if (!sidebarList) return;
-        cachedStickyOffsets = [];
-        projectItems.forEach(item => {
-            cachedStickyOffsets.push(parseInt(window.getComputedStyle(item).top, 10) || 40);
-        });
-
-        projectItems.forEach(item => {
-            item.dataset.origPos = item.style.getPropertyValue('position') || '';
-            item.dataset.origPrio = item.style.getPropertyPriority('position') || '';
-            item.style.setProperty('position', 'static', 'important');
-        });
-        
-        cachedTops = [];
-        projectItems.forEach(item => {
-            let naturalTop = 0;
-            let currentEl = item;
-            while (currentEl && currentEl !== document.body) {
-                naturalTop += currentEl.offsetTop;
-                currentEl = currentEl.offsetParent;
-            }
-            cachedTops.push(naturalTop);
-        });
-        
-        projectItems.forEach(item => {
-            const origPos = item.dataset.origPos;
-            const origPrio = item.dataset.origPrio;
-            if (origPos) {
-                item.style.setProperty('position', origPos, origPrio);
-            } else {
-                item.style.removeProperty('position');
-            }
-        });
-    }
-
     if (sidebarList) {
-        updateTopsCache();
-        window.addEventListener('resize', updateTopsCache);
-
         projectItems.forEach((item, index) => {
             const titleEl = item.querySelector('.heading-4');
             const titleText = titleEl ? titleEl.textContent : `Project ${index + 1}`;
@@ -794,9 +753,9 @@ document.addEventListener("DOMContentLoaded", function() {
             `;
             
             sidebarItem.addEventListener('click', () => {
-                const naturalTop = cachedTops[index] || 0;
-                const stickyOffset = cachedStickyOffsets[index] || 40;
-                window.scrollTo({ top: naturalTop - stickyOffset, behavior: 'smooth' });
+                const itemTop = item.getBoundingClientRect().top + window.scrollY;
+                const stickyOffset = parseInt(window.getComputedStyle(item).top, 10) || 40;
+                window.scrollTo({ top: itemTop - stickyOffset, behavior: 'smooth' });
             });
             
             sidebarList.appendChild(sidebarItem);
@@ -804,15 +763,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
         window.addEventListener('scroll', () => {
             let activeIndex = 0;
-            const scrollY = window.scrollY;
             
             projectItems.forEach((item, index) => {
                 if (item.style.display === 'none') return;
-                
-                const naturalTop = cachedTops[index] || 0;
-                const computedTop = cachedStickyOffsets[index] || 40;
-                
-                if (scrollY >= naturalTop - computedTop - 10) {
+                const rect = item.getBoundingClientRect();
+                const computedTop = parseInt(window.getComputedStyle(item).top, 10) || 40;
+                if (rect.top <= computedTop + 5) {
                     activeIndex = index;
                 }
             });
@@ -859,11 +815,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
             });
-            
-            setTimeout(() => {
-                updateTopsCache();
-                window.dispatchEvent(new Event('scroll'));
-            }, 50);
+            window.dispatchEvent(new Event('scroll'));
         });
     });
 });
