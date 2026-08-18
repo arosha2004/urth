@@ -330,6 +330,7 @@
       font-weight: 600;
       font-family: 'Plus Jakarta Sans', sans-serif;
       color: #000;
+      text-decoration: none;
     }
 
     /* Make sure dyn-list takes remaining space */
@@ -1465,15 +1466,18 @@
         projectItems.forEach((item, index) => {
           const titleEl = item.querySelector('.heading-4');
           const titleText = titleEl ? titleEl.textContent : `Project ${index + 1}`;
+          const projectLinkEl = item.querySelector('a.button');
+          const projectHref = projectLinkEl ? projectLinkEl.getAttribute('href') : '#';
 
           const sidebarItem = document.createElement('div');
           sidebarItem.className = 'sidebar-item' + (index === 0 ? ' active' : '');
           sidebarItem.innerHTML = `
                 <span class="sidebar-title">${titleText}</span>
-                <span class="sidebar-read">READ</span>
+                <a href="${projectHref}" class="sidebar-read">READ</a>
             `;
 
-          sidebarItem.addEventListener('click', () => {
+          sidebarItem.addEventListener('click', (e) => {
+            if (e.target.closest('a')) return;
             const naturalTop = cachedTops[index] || 0;
             const stickyOffset = cachedStickyOffsets[index] || 40;
             window.scrollTo({ top: naturalTop - stickyOffset, behavior: 'smooth' });
