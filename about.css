@@ -3,6 +3,8 @@
    ========================================= */
 
 /* Core Variables & Theme */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
 :root {
   --bg-cream:       #f6f4ee;
   --bg-card:        #eae5dc;
@@ -16,8 +18,8 @@
   --gold:           #c8a96e;
   --gold-light:     #dfc18f;
   
-  --font-serif:     'Cormorant Garamond', Georgia, serif;
-  --font-sans:      'Montserrat', sans-serif;
+  --font-serif:     'Plus Jakarta Sans', sans-serif;
+  --font-sans:      'Plus Jakarta Sans', sans-serif;
   
   --transition:     0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --shadow-soft:    0 12px 40px rgba(0, 0, 0, 0.08);

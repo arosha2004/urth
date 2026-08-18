@@ -53,7 +53,7 @@
     color: #fff;
     text-decoration: none;
     font-size: 24px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 400;
     letter-spacing: 3px;
     text-transform: uppercase;
@@ -106,7 +106,7 @@
         font-weight: normal;
         letter-spacing: -1px;
         text-transform: lowercase;
-        font-family: 'Montserrat', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
     
     .mobile-index-header .mobile-nav-toggle span {

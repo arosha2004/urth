@@ -2,9 +2,12 @@
    CONTACT PAGE STYLES
    ========================================= */
 
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
 .contact-page-wrapper {
   width: 100%;
   background: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 /* ── Top Header ── */
@@ -34,7 +37,7 @@
 }
 
 .header-logo .logo-text {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 1.15rem;
   font-weight: 600;
   letter-spacing: 0.28em;
@@ -52,7 +55,7 @@
 
 .header-nav .main-menu li a {
   text-decoration: none;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 11px;
   font-weight: 700;
   color: #fff;
@@ -106,7 +109,7 @@
 }
 
 .banner-subtitle {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.15em;
@@ -116,7 +119,7 @@
 }
 
 .banner-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 60px;
   font-weight: 700;
   margin-bottom: 40px;
@@ -149,7 +152,7 @@
 }
 
 .banner-col-item .col-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -158,7 +161,7 @@
 }
 
 .banner-col-item .col-subtitle {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 14px;
   font-weight: 300;
   color: #e0e0e0;
@@ -173,7 +176,7 @@
 }
 
 .heading-subtitle {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.15em;
@@ -183,7 +186,7 @@
 }
 
 .heading-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 48px;
   font-weight: 700;
   color: #111;
@@ -191,7 +194,7 @@
 }
 
 .heading-content p {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 14px;
   line-height: 1.8;
   color: #777;
@@ -248,7 +251,7 @@
 }
 
 .team-name {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 18px;
   font-weight: 700;
   color: #111;
@@ -257,7 +260,7 @@
 }
 
 .team-role {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 13px;
   color: #777;
   font-weight: 500;
@@ -267,7 +270,7 @@
 }
 
 .team-contact {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 14px;
 }
 
@@ -305,7 +308,7 @@
 
 .form-group label {
   display: block;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 12px;
   font-weight: 500;
   color: #111;
@@ -325,7 +328,7 @@
   padding: 12px 15px;
   border: 1px solid #e0e0e0;
   background-color: #fbfbfb;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 14px;
   color: #333;
   outline: none;
@@ -349,7 +352,7 @@
 .form-submit button {
   background: transparent;
   border: none;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -534,7 +537,7 @@
 }
 
 .contact-footer .footer-left .footer-logo .logo-text {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 1.15rem;
   font-weight: 600;
   letter-spacing: 0.28em;
@@ -543,7 +546,7 @@
 }
 
 .contact-footer .footer-desc p {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 13px;
   line-height: 1.8;
   color: #a0a0a0;
@@ -555,7 +558,7 @@
 }
 
 .contact-footer .footer-info-title {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.2em;
@@ -565,7 +568,7 @@
 }
 
 .contact-footer .footer-info-content p {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 13px;
   margin-bottom: 10px;
   color: #e0e0e0;
@@ -596,7 +599,7 @@
 }
 
 .contact-footer .footer-copyright p {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.15em;

@@ -4,7 +4,7 @@
    ========================================= */
 
 /* ── Google Font import fallback ── */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 /* ── CSS Variables ── */
 :root {
@@ -36,7 +36,7 @@ html, body {
   min-height: 100vh;
   overflow-x: hidden;
   background: #ffffff;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -129,7 +129,7 @@ html, body {
 
 .slide-title {
   display: inline-block;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 24px;
   font-style: normal;
   font-weight: 700;
@@ -148,7 +148,7 @@ html, body {
 }
 
 .slide-category {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 700;
   font-size: 12px;
   line-height: 24px;
@@ -288,7 +288,7 @@ html, body {
 .footer-nav__link {
   display: inline-block;
   white-space: nowrap;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   color: var(--text-nav);
   text-decoration: none;
   font-size: 12px;
