@@ -6,7 +6,7 @@
       <div class="footer-top">
         <div class="footer-left">
           <div class="footer-logo">
-            <h2 class="footer-brand-text" style="font-family: 'Plus Jakarta Sans', sans-serif; color: white; margin: 0; font-size: 28px; font-weight: normal; letter-spacing: -1px; text-transform: lowercase;">urth.</h2>
+            <img src="img/URTH (1).png" alt="Urth Logo" class="footer-brand-image" style="height: 22px; margin: 0; padding: 0; object-fit: contain; vertical-align: middle; transform: translateY(-2px);">
           </div>
           <div class="footer-desc">
             <p style="color: rgba(255,255,255,0.7);">The company principle of Architecture-Studio is the collective conception. From the very beginning, the practice has believed in the virtues of exchange, crossing ideas, common effort, shared knowledge and enthusiasm.</p>
