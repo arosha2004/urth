@@ -248,6 +248,10 @@ window.__WF_REVIEW_BRIDGE = {
     }
     .gallery-item {
       margin: 0;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      background-color: #ffffff;
     }
     /* Row 1, 5, 9... */
     .gallery-item:nth-child(12n+1),
@@ -302,6 +306,47 @@ window.__WF_REVIEW_BRIDGE = {
       height: 100%;
       object-fit: cover;
       display: block;
+      transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .gallery-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .gallery-caption {
+      color: #111111;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      transform: translateY(8px);
+      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      margin: 0;
+    }
+    .gallery-item:hover img {
+      opacity: 0.15;
+      transform: scale(1.03);
+    }
+    .gallery-item:hover .gallery-overlay {
+      opacity: 1;
+      visibility: visible;
+    }
+    .gallery-item:hover .gallery-caption {
+      transform: translateY(0);
     }
     @media (max-width: 1300px) {
       .gallery-container {
@@ -323,18 +368,54 @@ window.__WF_REVIEW_BRIDGE = {
     }
   </style>
   <div class="gallery-container">
-    <div class="gallery-item"><img src="../img/urthprojs/1.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/I.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/2.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/I1.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/7.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/I2.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/8.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/I3.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/9.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/10.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/I5.jpg" alt="Interior"></div>
-    <div class="gallery-item"><img src="../img/urthprojs/1.jpg" alt="Interior"></div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/1.jpg" alt="Desert Living Room">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Desert Living Room</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/I.jpg" alt="Kitchen Lights">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Kitchen Lights</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/2.jpg" alt="Dining Area">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Dining Area</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/I1.jpg" alt="Sunlit Foyer">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Sunlit Foyer</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/7.jpg" alt="Master Suite">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Master Suite</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/I2.jpg" alt="Warm Lighting">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Warm Lighting</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/8.jpg" alt="Villa Courtyard">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Villa Courtyard</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/I3.jpg" alt="Interior Alcove">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Interior Alcove</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/9.jpg" alt="Desert Vista">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Desert Vista</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/10.jpg" alt="Modern Facade">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Modern Facade</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/I5.jpg" alt="Custom Furniture">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Custom Furniture</h4></div>
+    </div>
+    <div class="gallery-item">
+      <img src="../img/urthprojs/1.jpg" alt="Poolside Terrace">
+      <div class="gallery-overlay"><h4 class="gallery-caption">Poolside Terrace</h4></div>
+    </div>
   </div>
 </section><footer class="contact-footer" style="position: relative; z-index: 10;">
     <div class="footer-overlay"></div>
