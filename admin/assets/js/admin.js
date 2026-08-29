@@ -87,6 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+
+
   // Open Edit Modal
   document.querySelectorAll('.edit-project-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -94,12 +96,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const title = btn.getAttribute('data-title');
       const category = btn.getAttribute('data-category');
       const description = btn.getAttribute('data-description');
+      const image = btn.getAttribute('data-image');
 
       document.getElementById('edit_id').value = id;
       document.getElementById('edit_title').value = title;
       document.getElementById('edit_category').value = category;
       const descField = document.getElementById('edit_description');
       if (descField) descField.value = description || '';
+      
+      const editPreview = document.getElementById('edit_hero_preview');
+      const editContainer = document.getElementById('edit_hero_preview_container');
+      if (editPreview && editContainer) {
+        editPreview.src = image || '';
+        editContainer.style.display = image ? 'block' : 'none';
+      }
 
       openModal(editModal);
     });
@@ -118,13 +128,63 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  function setupFilePreview(inputId, previewImgId, containerId) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewImgId);
+    const container = document.getElementById(containerId);
+    
+    if (input && preview && container) {
+      input.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            preview.src = e.target.result;
+            container.style.display = 'block';
+          }
+          reader.readAsDataURL(this.files[0]);
+        } else {
+          // If no new file selected for Edit, don't clear the preview (it might show existing image)
+          if (inputId === 'add_image_file') {
+            preview.src = '';
+            container.style.display = 'none';
+          }
+        }
+      });
+    }
+  }
+
+  setupFilePreview('add_image_file', 'add_hero_preview', 'add_hero_preview_container');
+  setupFilePreview('edit_image_file', 'edit_hero_preview', 'edit_hero_preview_container');
+
   const addGalleryInput = document.getElementById('add_gallery');
-  if (addGalleryInput) {
+  const galleryContainer = document.getElementById('add_gallery_preview_container');
+  
+  if (addGalleryInput && galleryContainer) {
     addGalleryInput.addEventListener('change', function() {
+      galleryContainer.innerHTML = ''; // clear previous
+      
       if (this.files.length > 12) {
         alert('You can only select up to 12 gallery images.');
         this.value = ''; // Reset selection
+        return;
       }
+      
+      Array.from(this.files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.width = '80px';
+            img.style.height = '80px';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '4px';
+            img.style.border = '1px solid #ddd';
+            galleryContainer.appendChild(img);
+          }
+          reader.readAsDataURL(file);
+        }
+      });
     });
   }
 

@@ -314,11 +314,15 @@ switch ($msg) {
                 <div class="form-group">
                     <label for="add_image_file" class="form-label">Hero Image / Thumbnail</label>
                     <input type="file" id="add_image_file" name="image1" class="form-control" accept="image/*" required>
+                    <div class="img-preview-box" id="add_hero_preview_container" style="display: none; margin-top: 10px;">
+                        <img id="add_hero_preview" src="" alt="Hero Preview" style="max-width: 100%; max-height: 200px; border-radius: 4px; object-fit: cover;">
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="add_gallery" class="form-label">Gallery Images (Optional)</label>
+                    <label for="add_gallery" class="form-label">Gallery Images (Optional - Max 12. Select multiple files at once)</label>
                     <input type="file" id="add_gallery" name="gallery_images[]" class="form-control" accept="image/*" multiple>
+                    <div id="add_gallery_preview_container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -364,6 +368,9 @@ switch ($msg) {
                 <div class="form-group">
                     <label for="edit_image_file" class="form-label">Hero Image (Leave empty to keep current)</label>
                     <input type="file" id="edit_image_file" name="image1" class="form-control" accept="image/*">
+                    <div class="img-preview-box" id="edit_hero_preview_container" style="margin-top: 10px;">
+                        <img id="edit_hero_preview" src="" alt="Hero Preview" style="max-width: 100%; max-height: 200px; border-radius: 4px; object-fit: cover;">
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
