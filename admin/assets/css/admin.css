@@ -5,24 +5,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --bg-body: #0c0d0e;
-  --bg-canvas: #121316;
-  --bg-card: rgba(22, 24, 29, 0.85);
-  --bg-card-solid: #16181d;
-  --bg-elevated: #1e2128;
-  --bg-hover: #262932;
+  --bg-body: #f8fafc;
+  --bg-canvas: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-card-solid: #ffffff;
+  --bg-elevated: #f1f5f9;
+  --bg-hover: #e2e8f0;
   
-  --gold-primary: #c8a96e;
-  --gold-hover: #dfc18f;
-  --gold-glow: rgba(200, 169, 110, 0.25);
-  --gold-subtle: rgba(200, 169, 110, 0.12);
+  --gold-primary: #a68449;
+  --gold-hover: #8f723b;
+  --gold-glow: rgba(166, 132, 73, 0.15);
+  --gold-subtle: rgba(166, 132, 73, 0.08);
   
-  --text-primary: #f5f5f7;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
   
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-active: rgba(200, 169, 110, 0.4);
+  --border-color: rgba(15, 23, 42, 0.08);
+  --border-active: rgba(166, 132, 73, 0.4);
   
   --danger: #ef4444;
   --danger-hover: #dc2626;
@@ -39,10 +39,10 @@
   --radius-lg: 16px;
   --radius-xl: 24px;
   
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
-  --shadow-gold: 0 0 25px rgba(200, 169, 110, 0.2);
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12);
+  --shadow-gold: 0 0 25px rgba(166, 132, 73, 0.15);
   
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -74,7 +74,7 @@ body::before {
   transform: translateX(-50%);
   width: 800px;
   height: 400px;
-  background: radial-gradient(circle, rgba(200, 169, 110, 0.08) 0%, rgba(12, 13, 14, 0) 70%);
+  background: radial-gradient(circle, rgba(166, 132, 73, 0.05) 0%, rgba(248, 250, 252, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -93,7 +93,7 @@ body::before {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(18, 19, 22, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-color);
@@ -115,7 +115,7 @@ body::before {
   width: 38px;
   height: 38px;
   background: linear-gradient(135deg, var(--gold-primary), #8f723b);
-  color: #000;
+  color: #fff;
   font-weight: 800;
   font-size: 16px;
   letter-spacing: 1px;
@@ -231,8 +231,8 @@ body::before {
 }
 
 .btn-gold {
-  background: linear-gradient(135deg, var(--gold-primary), #a68449);
-  color: #0c0d0e;
+  background: linear-gradient(135deg, var(--gold-primary), #8f723b);
+  color: #fff;
   box-shadow: 0 4px 14px var(--gold-glow);
 }
 
@@ -250,8 +250,8 @@ body::before {
 
 .btn-outline:hover {
   background: var(--bg-hover);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  border-color: rgba(15, 23, 42, 0.2);
+  color: var(--text-primary);
 }
 
 .btn-danger {
@@ -443,7 +443,7 @@ select.form-control {
 }
 
 .custom-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(15, 23, 42, 0.02);
 }
 
 .custom-table tbody tr:last-child td {
@@ -485,7 +485,7 @@ select.form-control {
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(15, 23, 42, 0.04);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
 }
@@ -550,7 +550,7 @@ select.form-control {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
@@ -727,7 +727,7 @@ select.form-control {
   width: 52px;
   height: 52px;
   background: linear-gradient(135deg, var(--gold-primary), #8f723b);
-  color: #000;
+  color: #fff;
   font-size: 22px;
   font-weight: 800;
   display: flex;
