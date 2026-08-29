@@ -5,23 +5,33 @@
 
 require_once __DIR__ . '/auth.php';
 require_admin_auth();
+require_once '../config.php';
+require_once 'resize_image.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id'] ?? 0);
-    $title = trim($_POST['title'] ?? '');
-    $category = trim($_POST['category'] ?? '');
-    $link_url = trim($_POST['link_url'] ?? '');
-    $image_url = trim($_POST['image_url'] ?? '');
+    $title = $conn->real_escape_string(trim($_POST['title'] ?? ''));
+    $category = $conn->real_escape_string(trim($_POST['category'] ?? ''));
+    $description = $conn->real_escape_string(trim($_POST['description'] ?? ''));
 
-    if ($id > 0 && !empty($title) && !empty($category) && !empty($link_url)) {
-        if (empty($image_url)) {
-            $image_url = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80';
+    if ($id > 0 && !empty($title) && !empty($category)) {
+        
+        $sql = "UPDATE projects SET title = '$title', category = '$category', description = '$description' WHERE id = $id";
+        $conn->query($sql);
+        
+        $upload_dir = '../img/uploads/';
+        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+
+        // Handle Hero Image if uploaded
+        if (isset($_FILES['image1']) && $_FILES['image1']['error'] === UPLOAD_ERR_OK) {
+            $filename = time() . '_hero_' . basename($_FILES['image1']['name']);
+            $target_file = $upload_dir . $filename;
+            if (move_uploaded_file($_FILES['image1']['tmp_name'], $target_file)) {
+                resizeImage($target_file, $target_file, 1920, 1080);
+                $image1_path = 'img/uploads/' . $filename;
+                $conn->query("UPDATE projects SET image1 = '$image1_path' WHERE id = $id");
+            }
         }
-
-        require_once '../config.php';
-        $stmt = $conn->prepare("UPDATE projects SET title = ?, category = ?, link_url = ?, image1 = ? WHERE id = ?");
-        $stmt->bind_param("ssssi", $title, $category, $link_url, $image_url, $id);
-        $stmt->execute();
 
         header('Location: index.php?msg=updated');
         exit;

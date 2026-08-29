@@ -179,7 +179,6 @@ switch ($msg) {
                             <th style="width: 70px;">ID</th>
                             <th>Title</th>
                             <th>Category</th>
-                            <th>Link URL</th>
                             <th style="width: 100px;">Images</th>
                             <th style="width: 160px; text-align: right;">Actions</th>
                         </tr>
@@ -218,13 +217,13 @@ switch ($msg) {
                                     </td>
                                     
                                     <td>
-                                        <a href="<?= htmlspecialchars($project['link_url']) ?>" target="_blank" class="link-url-text" title="<?= htmlspecialchars($project['link_url']) ?>">
-                                            <?= htmlspecialchars($project['link_url']) ?>
-                                        </a>
-                                    </td>
-                                    
-                                    <td>
-                                        <img src="<?= htmlspecialchars($project['image_url']) ?>" 
+                                        <?php 
+                                            $thumbSrc = $project['image_url'];
+                                            if (!empty($thumbSrc) && !preg_match('/^https?:\/\//i', $thumbSrc)) {
+                                                $thumbSrc = '../' . $thumbSrc;
+                                            }
+                                        ?>
+                                        <img src="<?= htmlspecialchars($thumbSrc) ?>" 
                                              alt="<?= htmlspecialchars($project['title']) ?>" 
                                              class="project-thumb"
                                              onerror="this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80'">
@@ -237,7 +236,7 @@ switch ($msg) {
                                                     data-id="<?= $project['id'] ?>"
                                                     data-title="<?= htmlspecialchars($project['title'], ENT_QUOTES) ?>"
                                                     data-category="<?= htmlspecialchars($project['category'], ENT_QUOTES) ?>"
-                                                    data-link="<?= htmlspecialchars($project['link_url'], ENT_QUOTES) ?>"
+                                                    data-description="<?= htmlspecialchars($project['description'] ?? '', ENT_QUOTES) ?>"
                                                     data-image="<?= htmlspecialchars($project['image_url'], ENT_QUOTES) ?>"
                                                     title="Edit project">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -288,7 +287,7 @@ switch ($msg) {
             <h3 class="modal-title">Add New Project</h3>
             <button type="button" class="modal-close" data-modal-close>&times;</button>
         </div>
-        <form action="project_add.php" method="POST">
+        <form action="project_add.php" method="POST" enctype="multipart/form-data">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="add_title" class="form-label">Project Title</label>
@@ -308,16 +307,18 @@ switch ($msg) {
                 </div>
 
                 <div class="form-group">
-                    <label for="add_link_url" class="form-label">Link URL</label>
-                    <input type="text" id="add_link_url" name="link_url" class="form-control" placeholder="e.g. project_detail.php?id=8" required>
+                    <label for="add_description" class="form-label">Description</label>
+                    <textarea id="add_description" name="description" class="form-control" rows="4" placeholder="Enter project description..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="add_image_url" class="form-label">Image URL / Thumbnail</label>
-                    <input type="url" id="add_image_url" name="image_url" class="form-control" placeholder="https://images.unsplash.com/..." required>
-                    <div class="img-preview-box">
-                        <img id="add_img_preview" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Preview">
-                    </div>
+                    <label for="add_image_file" class="form-label">Hero Image / Thumbnail</label>
+                    <input type="file" id="add_image_file" name="image1" class="form-control" accept="image/*" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="add_gallery" class="form-label">Gallery Images (Optional)</label>
+                    <input type="file" id="add_gallery" name="gallery_images[]" class="form-control" accept="image/*" multiple>
                 </div>
             </div>
             <div class="modal-footer">
@@ -335,7 +336,7 @@ switch ($msg) {
             <h3 class="modal-title">Edit Project</h3>
             <button type="button" class="modal-close" data-modal-close>&times;</button>
         </div>
-        <form action="project_edit.php" method="POST">
+        <form action="project_edit.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" id="edit_id" name="id">
             <div class="modal-body">
                 <div class="form-group">
@@ -356,16 +357,13 @@ switch ($msg) {
                 </div>
 
                 <div class="form-group">
-                    <label for="edit_link_url" class="form-label">Link URL</label>
-                    <input type="text" id="edit_link_url" name="link_url" class="form-control" required>
+                    <label for="edit_description" class="form-label">Description</label>
+                    <textarea id="edit_description" name="description" class="form-control" rows="4"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="edit_image_url" class="form-label">Image URL / Thumbnail</label>
-                    <input type="url" id="edit_image_url" name="image_url" class="form-control" required>
-                    <div class="img-preview-box">
-                        <img id="edit_img_preview" src="" alt="Preview">
-                    </div>
+                    <label for="edit_image_file" class="form-label">Hero Image (Leave empty to keep current)</label>
+                    <input type="file" id="edit_image_file" name="image1" class="form-control" accept="image/*">
                 </div>
             </div>
             <div class="modal-footer">

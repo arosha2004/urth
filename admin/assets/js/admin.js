@@ -93,17 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const id = btn.getAttribute('data-id');
       const title = btn.getAttribute('data-title');
       const category = btn.getAttribute('data-category');
-      const link = btn.getAttribute('data-link');
-      const image = btn.getAttribute('data-image');
+      const description = btn.getAttribute('data-description');
 
       document.getElementById('edit_id').value = id;
       document.getElementById('edit_title').value = title;
       document.getElementById('edit_category').value = category;
-      document.getElementById('edit_link_url').value = link;
-      document.getElementById('edit_image_url').value = image;
-      
-      const imgPreview = document.getElementById('edit_img_preview');
-      if (imgPreview) imgPreview.src = image;
+      const descField = document.getElementById('edit_description');
+      if (descField) descField.value = description || '';
 
       openModal(editModal);
     });
@@ -122,23 +118,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Live Image Preview Listeners
-  const setupImagePreview = (inputId, previewId) => {
-    const input = document.getElementById(inputId);
-    const preview = document.getElementById(previewId);
-    if (input && preview) {
-      input.addEventListener('input', () => {
-        const val = input.value.trim();
-        if (val) {
-          preview.src = val;
-        } else {
-          preview.src = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80';
-        }
-      });
-    }
-  };
-
-  setupImagePreview('add_image_url', 'add_img_preview');
-  setupImagePreview('edit_image_url', 'edit_img_preview');
+  const addGalleryInput = document.getElementById('add_gallery');
+  if (addGalleryInput) {
+    addGalleryInput.addEventListener('change', function() {
+      if (this.files.length > 12) {
+        alert('You can only select up to 12 gallery images.');
+        this.value = ''; // Reset selection
+      }
+    });
+  }
 
 });
