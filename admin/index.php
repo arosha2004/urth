@@ -319,10 +319,20 @@ switch ($msg) {
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="add_gallery" class="form-label">Gallery Images (Optional - Max 12. Select multiple files at once)</label>
-                    <input type="file" id="add_gallery" name="gallery_images[]" class="form-control" accept="image/*" multiple>
-                    <div id="add_gallery_preview_container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></div>
+                <div class="form-group" id="gallery_section">
+                    <label class="form-label">Gallery Images (Optional - Max 12)</label>
+                    <div id="gallery_inputs_wrapper">
+                        <div class="gallery-input-row" style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
+                            <div style="flex-grow: 1;">
+                                <input type="file" name="gallery_images[]" class="form-control gallery-file-input" accept="image/*">
+                            </div>
+                            <div class="preview-slot" style="width: 42px; height: 42px; border-radius: 4px; border: 1px solid #ddd; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                <span style="color: #bbb; font-size: 10px;">No img</span>
+                            </div>
+                            <button type="button" class="btn btn-danger btn-sm remove-gallery-row" style="padding: 0 10px; height: 42px; display: none;" title="Remove">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm" id="add_gallery_btn" style="margin-top: 5px;">+ Add Another Image</button>
                 </div>
             </div>
             <div class="modal-footer">
