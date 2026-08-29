@@ -248,6 +248,9 @@ window.__WF_REVIEW_BRIDGE = {
   <div class="hero-content">
     <p class="hero-subtitle">URTH. ARCHITECURE</p>
     <h1 class="hero-title"><?= htmlspecialchars($project['title']) ?></h1>
+    <div class="hero-description" style="margin-top: 20px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.5; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.9;">
+      <?= nl2br(htmlspecialchars($project['description'] ?? '')) ?>
+    </div>
   </div>
 </header><section class="gallery-section">
   <style>
