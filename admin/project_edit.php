@@ -18,14 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $image_url = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80';
         }
 
-        $stmt = $pdo->prepare("UPDATE projects SET title = :title, category = :category, link_url = :link_url, image_url = :image_url WHERE id = :id");
-        $stmt->execute([
-            'title' => $title,
-            'category' => $category,
-            'link_url' => $link_url,
-            'image_url' => $image_url,
-            'id' => $id
-        ]);
+        require_once '../config.php';
+        $stmt = $conn->prepare("UPDATE projects SET title = ?, category = ?, link_url = ?, image1 = ? WHERE id = ?");
+        $stmt->bind_param("ssssi", $title, $category, $link_url, $image_url, $id);
+        $stmt->execute();
 
         header('Location: index.php?msg=updated');
         exit;

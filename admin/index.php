@@ -6,9 +6,17 @@
 require_once __DIR__ . '/auth.php';
 require_admin_auth();
 
-// Fetch all projects sorted by ID DESC
-$stmt = $pdo->query("SELECT * FROM projects ORDER BY id DESC");
-$projects = $stmt->fetchAll();
+// Fetch all projects sorted by ID DESC from MySQL
+require_once '../config.php';
+$result = $conn->query("SELECT * FROM projects ORDER BY id DESC");
+$projects = [];
+if ($result) {
+    while($row = $result->fetch_assoc()) {
+        // Map MySQL schema to what the Admin UI expects
+        $row['image_url'] = $row['image1'] ?? '';
+        $projects[] = $row;
+    }
+}
 
 // Statistics calculation
 $totalProjects = count($projects);
