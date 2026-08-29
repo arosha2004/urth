@@ -577,6 +577,15 @@ select.form-control {
   transform: scale(0.95) translateY(10px);
   transition: var(--transition);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.modal-dialog form {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .modal-overlay.active .modal-dialog {
@@ -617,6 +626,7 @@ select.form-control {
 
 .modal-body {
   padding: 1.5rem;
+  overflow-y: auto;
 }
 
 .modal-footer {
