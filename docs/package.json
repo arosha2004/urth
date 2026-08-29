@@ -1,0 +1,24 @@
+{
+  "name": "urth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arosha2004/urth.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/arosha2004/urth/issues"
+  },
+  "homepage": "https://github.com/arosha2004/urth#readme",
+  "dependencies": {
+    "website-scraper": "^6.0.0"
+  }
+}

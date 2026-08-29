@@ -5,7 +5,7 @@
  * suitable for hosting on GitHub Pages.
  */
 
-$export_dir = __DIR__ . '/github_pages_export';
+$export_dir = __DIR__ . '/docs';
 if (!is_dir($export_dir)) {
     mkdir($export_dir, 0777, true);
 }
