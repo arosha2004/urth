@@ -1,4 +1,21 @@
-<!DOCTYPE html><!-- This site was created in Webflow. https://webflow.com --><!-- Last Published: Fri Jun 19 2026 00:43:42 GMT+0000 (Coordinated Universal Time) --><!--$--><html data-wf-domain="urth-studio.webflow.io" data-wf-page="6a1c3d9d7686060838b279f9" data-wf-site="6a1c3d9d7686060838b27a1c" lang="en"><!--$--><head><meta charset="utf-8"><!--$--><link href="https://cdn.prod.website-files.com" rel="preconnect" ><!--/$--><title>About — urth</title><meta content="Transform ordinary rooms into warm, minimalist retreats. Urth blends functional architecture with refined interior design for luxury living spaces." name="description"><meta content="About — urth" property="og:title"><meta content="Transform ordinary rooms into warm, minimalist retreats. Urth blends functional architecture with refined interior design for luxury living spaces." property="og:description"><meta content="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a1c/6a25614410db1a130a2d0147_urth%20home.avif" property="og:image"><meta content="About — urth" name="twitter:title"><meta content="Transform ordinary rooms into warm, minimalist retreats. Urth blends functional architecture with refined interior design for luxury living spaces." name="twitter:description"><meta content="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a1c/6a25614410db1a130a2d0147_urth%20home.avif" name="twitter:image"><meta property="og:type" content="website"><meta content="summary_large_image" name="twitter:card"><meta content="width=device-width, initial-scale=1" name="viewport"><meta content="Webflow" name="generator"><!--$--><link href="css/urth-studio.webflow.shared.c7afc3d60.css" rel="stylesheet" type="text/css" ><!--/$--><style>html.w-mod-js:not(.w-mod-ix3) :is([long-heading], .value-item-about, .counter.up, .counter.down, .parallax-image, .link-line, [fade-in-down], [fade-in-up-1], [button-text], [fade-in-up-3], [heading-up-1], [fade-in-up-2], [fade-in-up-4], .answer, .faq-icon, .faq-dropdown, .button-hover-bg, .service-image-inner, [data-wf-target*='["6a1c3d9d7686060838b279f9","bbbecb12-4ddc-6540-44b3-bab933ba27d6"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","f6733bf2-2f50-42f6-f382-d5cd3298c8d0"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","ca255160-7d44-adf6-6977-cf67932046ee"]'], .about-image-two, .wcu-image, .wcu-overlay, .wcu-text-wrapper, .text, .heading-5, .heading-2, .process-headline, .process-item.one, .process-item.two, .process-item.three, .process-item.four, .project-item, .counter-2.down, .counter-2.up, .partner-list.one, .partner-list.two, .testimonial-list, .hero-load-background, .contact-image.two, .contact-image.three, .contact-image.four) {visibility: hidden !important;}</style><script type="text/javascript">!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);</script><!--$--><!--/$--><!--$--><!--/$--><!--$--><!--/$--><!--$--><!--/$--><!--$--><!--/$--><!--$--><!--/$--><script type="application/ld+json">
+<?php
+require_once 'config.php';
+
+if (!isset($_GET['id'])) {
+    header('Location: projects.php');
+    exit;
+}
+$id = (int)$_GET['id'];
+$result = $conn->query("SELECT * FROM projects WHERE id=$id");
+$project = $result->fetch_assoc();
+if (!$project) {
+    header('Location: projects.php');
+    exit;
+}
+
+$gallery_result = $conn->query("SELECT * FROM project_images WHERE project_id=$id");
+?>
+<!DOCTYPE html><!-- This site was created in Webflow. https://webflow.com --><!-- Last Published: Fri Jun 19 2026 00:43:42 GMT+0000 (Coordinated Universal Time) --><!--$--><html data-wf-domain="urth-studio.webflow.io" data-wf-page="6a1c3d9d7686060838b279f9" data-wf-site="6a1c3d9d7686060838b27a1c" lang="en"><!--$--><head><meta charset="utf-8"><!--$--><link href="https://cdn.prod.website-files.com" rel="preconnect" ><!--/$--><title><?= htmlspecialchars($project['title']) ?> — urth</title><meta content="Transform ordinary rooms into warm, minimalist retreats. Urth blends functional architecture with refined interior design for luxury living spaces." name="description"><meta content="About — urth" property="og:title"><meta content="Transform ordinary rooms into warm, minimalist retreats. Urth blends functional architecture with refined interior design for luxury living spaces." property="og:description"><meta content="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a1c/6a25614410db1a130a2d0147_urth%20home.avif" property="og:image"><meta content="About — urth" name="twitter:title"><meta content="Transform ordinary rooms into warm, minimalist retreats. Urth blends functional architecture with refined interior design for luxury living spaces." name="twitter:description"><meta content="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a1c/6a25614410db1a130a2d0147_urth%20home.avif" name="twitter:image"><meta property="og:type" content="website"><meta content="summary_large_image" name="twitter:card"><meta content="width=device-width, initial-scale=1" name="viewport"><meta content="Webflow" name="generator"><!--$--><link href="urth_clone/css/urth-studio.webflow.shared.c7afc3d60.css" rel="stylesheet" type="text/css" ><!--/$--><style>html.w-mod-js:not(.w-mod-ix3) :is([long-heading], .value-item-about, .counter.up, .counter.down, .parallax-image, .link-line, [fade-in-down], [fade-in-up-1], [button-text], [fade-in-up-3], [heading-up-1], [fade-in-up-2], [fade-in-up-4], .answer, .faq-icon, .faq-dropdown, .button-hover-bg, .service-image-inner, [data-wf-target*='["6a1c3d9d7686060838b279f9","bbbecb12-4ddc-6540-44b3-bab933ba27d6"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","f6733bf2-2f50-42f6-f382-d5cd3298c8d0"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","ca255160-7d44-adf6-6977-cf67932046ee"]'], .about-image-two, .wcu-image, .wcu-overlay, .wcu-text-wrapper, .text, .heading-5, .heading-2, .process-headline, .process-item.one, .process-item.two, .process-item.three, .process-item.four, .project-item, .counter-2.down, .counter-2.up, .partner-list.one, .partner-list.two, .testimonial-list, .hero-load-background, .contact-image.two, .contact-image.three, .contact-image.four) {visibility: hidden !important;}</style><script type="text/javascript">!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);</script><!--$--><!--/$--><!--$--><!--/$--><!--$--><!--/$--><!--$--><!--/$--><!--$--><!--/$--><!--$--><!--/$--><script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -40,7 +57,7 @@ window.__WF_REVIEW_BRIDGE = {
   reviewScriptUrl: "https://validation-worker.createsomething.workers.dev/app-validator/snippet/review.js"
 };
 </script>
-<script src="js/review.js"></script>
+<script src="urth_clone/js/review.js"></script>
 <style>
   /* Stack effect for project items */
   #project .project-item {
@@ -56,17 +73,17 @@ window.__WF_REVIEW_BRIDGE = {
   }
 </style>
 
-  <link rel="stylesheet" href="../mobile-nav.css" />
+  <link rel="stylesheet" href="mobile-nav.css" />
 
   <link rel="icon" type="image/png" href="images/favicon-512.png" />
 </head><!--/$--><body>
 
   <div class="mobile-nav-overlay">
     <nav class="mobile-nav-links">
-      <a href="../index.html">HOME</a>
-      <a href="../urth_clone/about.html">ABOUT</a>
-      <a href="../projects.php">PROJECTS</a>
-      <a href="../contact.html">CONTACT</a>
+      <a href="index.html">HOME</a>
+      <a href="urth_clone/about.html">ABOUT</a>
+      <a href="projects.php">PROJECTS</a>
+      <a href="contact.html">CONTACT</a>
       <a href="#">SHOP</a>
     </nav>
   </div>
@@ -203,19 +220,19 @@ window.__WF_REVIEW_BRIDGE = {
     });
   </script>
   <div class="hero-bg">
-    <img src="../img/desert_residence.png" alt="Hero background" />
+    <img src="<?= htmlspecialchars($project['image1']) ?>" alt="Hero background" />
   </div>
   <div class="hero-top-nav">
     <div class="logo">
-      <a href="../index.html" style="text-decoration: none;">
-        <img src="../img/URTH (1).png" alt="Urth Logo" class="navbar-brand-image" style="height: 22px; margin: 0; padding: 0; object-fit: contain; vertical-align: middle; transform: translateY(-2px);">
+      <a href="index.html" style="text-decoration: none;">
+        <img src="img/URTH (1).png" alt="Urth Logo" class="navbar-brand-image" style="height: 22px; margin: 0; padding: 0; object-fit: contain; vertical-align: middle; transform: translateY(-2px);">
       </a>
     </div>
     <nav class="center-nav">
-      <a href="../index.html">HOME</a>
-      <a href="../urth_clone/about2.html">ABOUT</a>
-      <a href="../projects.php" class="active">PROJECTS</a>
-      <a href="../contact.html">CONTACT</a>
+      <a href="index.html">HOME</a>
+      <a href="urth_clone/about2.html">ABOUT</a>
+      <a href="projects.php" class="active">PROJECTS</a>
+      <a href="contact.html">CONTACT</a>
       <a href="#">SHOP</a>
     </nav>
     <div class="right-nav" style="width: 80px;">
@@ -230,7 +247,7 @@ window.__WF_REVIEW_BRIDGE = {
   </div>
   <div class="hero-content">
     <p class="hero-subtitle">URTH. ARCHITECURE</p>
-    <h1 class="hero-title">Yabroudi Villa</h1>
+    <h1 class="hero-title"><?= htmlspecialchars($project['title']) ?></h1>
   </div>
 </header><section class="gallery-section">
   <style>
@@ -370,56 +387,13 @@ window.__WF_REVIEW_BRIDGE = {
     }
   </style>
   <div class="gallery-container">
+    <?php while($gimg = $gallery_result->fetch_assoc()): ?>
     <div class="gallery-item">
-      <img src="../img/urthprojs/1.jpg" alt="Desert Living Room">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Desert Living Room</h4></div>
+      <img src="<?= htmlspecialchars($gimg['image_path']) ?>" alt="<?= htmlspecialchars($project['title']) ?>">
+      <div class="gallery-overlay"><h4 class="gallery-caption"><?= htmlspecialchars($project['title']) ?></h4></div>
     </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/I.jpg" alt="Kitchen Lights">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Kitchen Lights</h4></div>
-    </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/2.jpg" alt="Dining Area">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Dining Area</h4></div>
-    </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/I1.jpg" alt="Sunlit Foyer">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Sunlit Foyer</h4></div>
-    </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/7.jpg" alt="Master Suite">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Master Suite</h4></div>
-    </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/I2.jpg" alt="Warm Lighting">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Warm Lighting</h4></div>
-    </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/8.jpg" alt="Villa Courtyard">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Villa Courtyard</h4></div>
-    </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/I3.jpg" alt="Interior Alcove">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Interior Alcove</h4></div>
-    </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/9.jpg" alt="Desert Vista">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Desert Vista</h4></div>
-    </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/10.jpg" alt="Modern Facade">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Modern Facade</h4></div>
-    </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/I5.jpg" alt="Custom Furniture">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Custom Furniture</h4></div>
-    </div>
-    <div class="gallery-item">
-      <img src="../img/urthprojs/1.jpg" alt="Poolside Terrace">
-      <div class="gallery-overlay"><h4 class="gallery-caption">Poolside Terrace</h4></div>
-    </div>
-  </div>
-</section><footer class="contact-footer" style="position: relative; z-index: 10;">
+    <?php endwhile; ?>
+  </div></section><footer class="contact-footer" style="position: relative; z-index: 10;">
     <div class="footer-overlay"></div>
     <img src="https://prague.foxthemes.me/wp-content/uploads/2017/03/ffa51a33625455.56b20f01c3608.jpg" class="footer-bg" alt="Footer Background" />
     
@@ -427,7 +401,7 @@ window.__WF_REVIEW_BRIDGE = {
       <div class="footer-top">
         <div class="footer-left">
           <div class="footer-logo">
-            <img src="../img/URTH (1).png" alt="Urth Logo" class="footer-brand-image" style="width: auto; height: 32px; margin: 0; padding: 0; object-fit: contain; object-position: left; filter: brightness(0) invert(1);">
+            <img src="img/URTH (1).png" alt="Urth Logo" class="footer-brand-image" style="width: auto; height: 32px; margin: 0; padding: 0; object-fit: contain; object-position: left; filter: brightness(0) invert(1);">
           </div>
           <div class="footer-desc">
             <p style="color: rgba(255,255,255,0.7);">The company principle of Architecture-Studio is the collective conception. From the very beginning, the practice has believed in the virtues of exchange, crossing ideas, common effort, shared knowledge and enthusiasm.</p>
@@ -458,51 +432,8 @@ window.__WF_REVIEW_BRIDGE = {
         </div>
       </div>
     </div>
-  </footer><script src="js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript" ></script><script src="js/webflow.schunk.bc050c0221fd17bc.js" type="text/javascript" ></script><script src="js/webflow.df406d78.c0de89fbab670a49.js" type="text/javascript" ></script><script src="js/gsap.min.js" type="text/javascript"></script><script src="js/SplitText.min.js" type="text/javascript"></script><script src="js/ScrollTrigger.min.js" type="text/javascript"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const project = urlParams.get('project');
+  </footer><script src="urth_clone/js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript" ></script><script src="urth_clone/js/webflow.schunk.bc050c0221fd17bc.js" type="text/javascript" ></script><script src="urth_clone/js/webflow.df406d78.c0de89fbab670a49.js" type="text/javascript" ></script><script src="urth_clone/js/gsap.min.js" type="text/javascript"></script><script src="urth_clone/js/SplitText.min.js" type="text/javascript"></script><script src="urth_clone/js/ScrollTrigger.min.js" type="text/javascript"></script>
+<!-- dynamic script removed -->
 
-    const projectData = {
-      'poolscape-villa': {
-        title: 'Poolscape Villa',
-        bg: '../img/poolscape_villa.png'
-      },
-      'european-lard-station': {
-        title: 'European Lard Station',
-        bg: '../img/european_lard_station.png'
-      },
-      'yabroudi-villa': {
-        title: 'Yabroudi Villa',
-        bg: '../img/desert_residence.png'
-      },
-      'cultural-complex-centre': {
-        title: 'Cultural Complex Centre',
-        bg: '../img/american_lard_station.png'
-      },
-      'dalbourne-villa': {
-        title: 'Dalbourne Villa',
-        bg: '../img/urban_tower.png'
-      },
-      'amman-rotana-hotel': {
-        title: 'Amman Rotana Hotel',
-        bg: '../img/poolscape_villa.png'
-      }
-    };
-
-    if (project && projectData[project]) {
-      const data = projectData[project];
-      const titleEl = document.querySelector('.hero-title');
-      const bgImgEl = document.querySelector('.hero-bg img');
-      const subtitleEl = document.querySelector('.hero-subtitle');
-
-      if (titleEl) titleEl.textContent = data.title;
-      if (bgImgEl) bgImgEl.src = data.bg;
-      if (subtitleEl) subtitleEl.textContent = 'Project Detail';
-    }
-  });
-</script>
-
-  <script src="../mobile-nav.js"></script>
+  <script src="mobile-nav.js"></script>
 </body></html><!--/$-->

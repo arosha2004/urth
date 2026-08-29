@@ -4,7 +4,7 @@ const path = require('path');
 function walk(dir) {
     let results = [];
     const list = fs.readdirSync(dir);
-    list.forEach(function(file) {
+    list.forEach(function (file) {
         file = path.join(dir, file);
         const stat = fs.statSync(file);
         if (stat && stat.isDirectory() && !file.includes('node_modules') && !file.includes('.git')) {
@@ -22,14 +22,14 @@ const htmlFiles = walk(path.join(__dirname, '..'));
 htmlFiles.forEach(file => {
     let content = fs.readFileSync(file, 'utf8');
     let changed = false;
-    
-    // Replace height: 34px; and its alignment with height: 22px; and new alignment
+
+ 
     const regex = /(<img src="[^"]*URTH \(1\)\.png" alt="Urth Logo"[^>]*style="[^"]*height:\s*)34px;(\s*margin:\s*0;\s*padding:\s*0;\s*object-fit:\s*contain;)\s*vertical-align:\s*middle;\s*transform:\s*translateY\(-4px\);/g;
     if (regex.test(content)) {
         content = content.replace(regex, '$122px;$2 vertical-align: middle; transform: translateY(-2px);');
         changed = true;
     }
-    
+
     if (changed) {
         fs.writeFileSync(file, content, 'utf8');
         console.log('Updated', file);

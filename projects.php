@@ -1,3 +1,13 @@
+<?php
+require_once 'config.php';
+$projects_query = $conn->query("SELECT * FROM projects ORDER BY id ASC");
+$projects = [];
+if($projects_query) {
+    while($p = $projects_query->fetch_assoc()) {
+        $projects[] = $p;
+    }
+}
+?>
 <!DOCTYPE html>
 <!-- This site was created in Webflow. https://webflow.com --><!-- Last Published: Fri Jun 19 2026 00:43:42 GMT+0000 (Coordinated Universal Time) --><!--$-->
 <html data-wf-domain="urth-studio.webflow.io" data-wf-page="6a1c3d9d7686060838b279f9"
@@ -26,7 +36,7 @@
   <meta content="summary_large_image" name="twitter:card">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <meta content="Webflow" name="generator"><!--$-->
-  <link href="css/urth-studio.webflow.shared.c7afc3d60.css" rel="stylesheet" type="text/css"><!--/$-->
+  <link href="urth_clone/css/urth-studio.webflow.shared.c7afc3d60.css" rel="stylesheet" type="text/css"><!--/$-->
   <style>
     html.w-mod-js:not(.w-mod-ix3) :is([long-heading], .value-item-about, .counter.up, .counter.down, .parallax-image, .link-line, [fade-in-down], [fade-in-up-1], [button-text], [fade-in-up-3], [heading-up-1], [fade-in-up-2], [fade-in-up-4], .answer, .faq-icon, .faq-dropdown, .button-hover-bg, .service-image-inner, [data-wf-target*='["6a1c3d9d7686060838b279f9","bbbecb12-4ddc-6540-44b3-bab933ba27d6"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","f6733bf2-2f50-42f6-f382-d5cd3298c8d0"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","ca255160-7d44-adf6-6977-cf67932046ee"]'], .about-image-two, .wcu-image, .wcu-overlay, .wcu-text-wrapper, .text, .heading-5, .heading-2, .process-headline, .process-item.one, .process-item.two, .process-item.three, .process-item.four, .project-item, .counter-2.down, .counter-2.up, .partner-list.one, .partner-list.two, .testimonial-list, .hero-load-background, .contact-image.two, .contact-image.three, .contact-image.four) {
       visibility: hidden !important;
@@ -213,7 +223,7 @@
       reviewScriptUrl: "https://validation-worker.createsomething.workers.dev/app-validator/snippet/review.js"
     };
   </script>
-  <script src="js/review.js"></script>
+  <script src="urth_clone/js/review.js"></script>
   <style>
     /* Stack effect for project items */
     #project .project-item {
@@ -470,8 +480,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../projects.css" />
-  <link rel="stylesheet" href="../mobile-nav.css" />
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="mobile-nav.css" />
   <style>
     /* Override projects.css black background for this specific page */
     body {
@@ -643,7 +653,7 @@
     .project-item {}
   </style>
 
-  <link rel="icon" type="image/png" href="images/favicon-512.png" />
+  <link rel="icon" type="image/png" href="urth_clone/images/favicon-512.png" />
 </head><!--/$-->
 
 <body>
@@ -651,20 +661,20 @@
   <!-- HERO SECTION -->
   <header class="hero-section">
     <div class="hero-bg">
-      <img src="../img/urthprojs/EXTERIOR.png" alt="Hero background" />
+      <img src="img/urthprojs/EXTERIOR.png" alt="Hero background" />
     </div>
 
     <div class="hero-top-nav">
       <div class="logo">
-        <a href="../index.html" style="text-decoration: none;">
-          <img src="../img/URTH (1).png" alt="Urth Logo" class="navbar-brand-image" style="height: 22px; margin: 0; padding: 0; object-fit: contain; vertical-align: middle; transform: translateY(-2px);">
+        <a href="index.html" style="text-decoration: none;">
+          <img src="img/URTH (1).png" alt="Urth Logo" class="navbar-brand-image" style="height: 22px; margin: 0; padding: 0; object-fit: contain; vertical-align: middle; transform: translateY(-2px);">
         </a>
       </div>
       <nav class="center-nav">
-        <a href="../index.html">HOME</a>
+        <a href="index.html">HOME</a>
         <a href="about.html">ABOUT</a>
-        <a href="../projects.php" class="active">PROJECTS</a>
-        <a href="../contact.html">CONTACT</a>
+        <a href="projects.php" class="active">PROJECTS</a>
+        <a href="contact.html">CONTACT</a>
         <a href="#">SHOP</a>
       </nav>
       <div class="right-nav" style="width: 80px;">
@@ -687,10 +697,10 @@
 
   <div class="mobile-nav-overlay">
     <nav class="mobile-nav-links">
-      <a href="../index.html">HOME</a>
-      <a href="../urth_clone/about.html">ABOUT</a>
-      <a href="../projects.php">PROJECTS</a>
-      <a href="../contact.html">CONTACT</a>
+      <a href="index.html">HOME</a>
+      <a href="urth_clone/about.html">ABOUT</a>
+      <a href="projects.php">PROJECTS</a>
+      <a href="contact.html">CONTACT</a>
       <a href="#">SHOP</a>
     </nav>
   </div>
@@ -779,217 +789,35 @@
           </div>
           <div class="w-dyn-list projects-content">
             <div role="list" class="project-list w-dyn-items">
+<?php foreach($projects as $project): ?>
               <div role="listitem" class="project-item w-dyn-item">
                 <div class="project-image">
-                  <div class="category-tag">Architectural Design</div><img src="../img/poolscape_villa.png"
-                    loading="lazy" alt="" class="parallax-image">
+                  <div class="category-tag"><?= htmlspecialchars($project['category']) ?></div><img src="<?= htmlspecialchars($project['image1']) ?>"
+                    loading="lazy" alt="<?= htmlspecialchars($project['title']) ?>" class="parallax-image">
                 </div>
                 <div fade-in-up-2="" class="projct-info">
                   <div class="vertical-headline">
-                    <div class="subtitle">Architectural Design</div>
-                    <div class="heading-4">Poolscape Villa</div>
+                    <div class="subtitle"><?= htmlspecialchars($project['category']) ?></div>
+                    <div class="heading-4"><?= htmlspecialchars($project['title']) ?></div>
                   </div>
-                  <p>This project breathed new life into a mid-century commercial structure, transforming it into a
-                    highly functional, open-concept contemporary workspace. By reconfiguring the core layout and
-                    introducing a minimalist central courtyard, we brought natural daylight deep into the interior,
-                    fostering collaboration and productivity.</p><a href="poolscape-villa.html"
-                    id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
+                  <p><?= htmlspecialchars($project['description']) ?></p><a href="<?= htmlspecialchars($project['link_url']) ?>"
+                    data-wf--button--variant="brown"
                     class="button w-inline-block">
                     <div class="button-text-wrapper">
                       <div class="button-text-inner">
                         <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
+                          <div button-text="" class="button-text">Read More</div>
                         </div>
                         <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
+                          <div button-text="" class="button-text">Read More</div>
                         </div>
                       </div>
                     </div>
-                    <div class="button-hover-bg"></div>
                   </a>
                 </div>
               </div>
-              <div role="listitem" class="project-item w-dyn-item">
-                <div class="project-image">
-                  <div class="category-tag">Interior Designing</div><img src="../img/european_lard_station.png"
-                    loading="lazy" alt="" class="parallax-image">
-                </div>
-                <div fade-in-up-2="" class="projct-info">
-                  <div class="vertical-headline">
-                    <div class="subtitle">Interior Designing</div>
-                    <div class="heading-4">European Lard Station</div>
-                  </div>
-                  <p>Designed for a compact private apartment, this project centers on absolute spatial efficiency
-                    without sacrificing aesthetic warmth. We curated a bespoke system of floor-to-ceiling hidden
-                    storage, multifunctional minimalist furniture pieces, and selected a soft textile palette to
-                    establish a calm, clutter-free urban retreat.</p><a href="european-lard-station.html"
-                    id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
-                    class="button w-inline-block">
-                    <div class="button-text-wrapper">
-                      <div class="button-text-inner">
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="button-hover-bg"></div>
-                  </a>
-                </div>
-              </div>
-              <div role="listitem" class="project-item w-dyn-item">
-                <div class="project-image">
-                  <div class="category-tag">Urban Planning</div><img src="../img/desert_residence.png" loading="lazy"
-                    alt="" class="parallax-image">
-                </div>
-                <div fade-in-up-2="" class="projct-info">
-                  <div class="vertical-headline">
-                    <div class="subtitle">Urban Planning</div>
-                    <div class="heading-4">Yabroudi Villa</div>
-                  </div>
-                  <p>A comprehensive interior overhaul of a converted industrial penthouse. By stripping away redundant
-                    partitions, we maximized spatial flow and unlocked panoramic city views. The design utilizes a warm,
-                    neutral color palette, integrated minimalist lighting, and raw structural steel accents to preserve
-                    the building's heritage while elevating modern comfort.</p><a href="yabroudi-villa.html"
-                    id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
-                    class="button w-inline-block">
-                    <div class="button-text-wrapper">
-                      <div class="button-text-inner">
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="button-hover-bg"></div>
-                  </a>
-                </div>
-              </div>
-              <div role="listitem" class="project-item w-dyn-item">
-                <div class="project-image">
-                  <div class="category-tag">Landscape Design</div><img src="../img/american_lard_station.png"
-                    loading="lazy" alt="" class="parallax-image">
-                </div>
-                <div fade-in-up-2="" class="projct-info">
-                  <div class="vertical-headline">
-                    <div class="subtitle">Landscape Design</div>
-                    <div class="heading-4">Cultural Complex Centre</div>
-                  </div>
-                  <p>A brutalist-inspired residential villa crafted from raw board-formed concrete, expansive
-                    floor-to-ceiling glass, and local natural stone. The design prioritizes a seamless blur between
-                    indoor luxury and the untamed tropical landscape, creating a private sanctuary that embraces natural
-                    ventilation and passive cooling</p><a href="cultural-complex-centre.html"
-                    id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
-                    class="button w-inline-block">
-                    <div class="button-text-wrapper">
-                      <div class="button-text-inner">
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="button-hover-bg"></div>
-                  </a>
-                </div>
-              </div>
-              <div role="listitem" class="project-item w-dyn-item">
-                <div class="project-image">
-                  <div class="category-tag">Custom Furnitures</div><img src="../img/american_lard_station.png"
-                    loading="lazy" alt="" class="parallax-image">
-                </div>
-                <div fade-in-up-2="" class="projct-info">
-                  <div class="vertical-headline">
-                    <div class="subtitle">Custom Furnitures</div>
-                    <div class="heading-4">Custom Furnitures Showcase</div>
-                  </div>
-                  <p>A brutalist-inspired residential villa crafted from raw board-formed concrete, expansive
-                    floor-to-ceiling glass, and local natural stone. The design prioritizes a seamless blur between
-                    indoor luxury and the untamed tropical landscape, creating a private sanctuary that embraces natural
-                    ventilation and passive cooling</p><a href="cultural-complex-centre.html"
-                    id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
-                    class="button w-inline-block">
-                    <div class="button-text-wrapper">
-                      <div class="button-text-inner">
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="button-hover-bg"></div>
-                  </a>
-                </div>
-              </div>
-              <div role="listitem" class="project-item w-dyn-item">
-                <div class="project-image">
-                  <div class="category-tag">Spatial Redesign</div><img src="../img/american_lard_station.png"
-                    loading="lazy" alt="" class="parallax-image">
-                </div>
-                <div fade-in-up-2="" class="projct-info">
-                  <div class="vertical-headline">
-                    <div class="subtitle">Spatial Redesign</div>
-                    <div class="heading-4">Spatial Redesign Showcase</div>
-                  </div>
-                  <p>A brutalist-inspired residential villa crafted from raw board-formed concrete, expansive
-                    floor-to-ceiling glass, and local natural stone. The design prioritizes a seamless blur between
-                    indoor luxury and the untamed tropical landscape, creating a private sanctuary that embraces natural
-                    ventilation and passive cooling</p><a href="cultural-complex-centre.html"
-                    id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
-                    class="button w-inline-block">
-                    <div class="button-text-wrapper">
-                      <div class="button-text-inner">
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="button-hover-bg"></div>
-                  </a>
-                </div>
-              </div>
-              <div role="listitem" class="project-item w-dyn-item">
-                <div class="project-image">
-                  <div class="category-tag">Ideas Hub</div><img src="../img/american_lard_station.png" loading="lazy"
-                    alt="" class="parallax-image">
-                </div>
-                <div fade-in-up-2="" class="projct-info">
-                  <div class="vertical-headline">
-                    <div class="subtitle">Ideas Hub</div>
-                    <div class="heading-4">Ideas Hub Showcase</div>
-                  </div>
-                  <p>A brutalist-inspired residential villa crafted from raw board-formed concrete, expansive
-                    floor-to-ceiling glass, and local natural stone. The design prioritizes a seamless blur between
-                    indoor luxury and the untamed tropical landscape, creating a private sanctuary that embraces natural
-                    ventilation and passive cooling</p><a href="cultural-complex-centre.html"
-                    id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
-                    class="button w-inline-block">
-                    <div class="button-text-wrapper">
-                      <div class="button-text-inner">
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                        <div class="button-text-item">
-                          <div button-text="" class="button-text">Project Detail</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="button-hover-bg"></div>
-                  </a>
-                </div>
-              </div>
-            </div>
+<?php endforeach; ?>
+</div>
           </div>
         </div>
       </div>
@@ -1181,7 +1009,7 @@
             <div class="faq-dropdown">
               <div class="question">
                 <div class="heading-5">What services do you provide?</div>
-                <div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png"
+                <div class="faq-icon"><img loading="lazy" src="urth_clone/images/6a1c3d9d7686060838b27aaa_plus%201.png"
                     alt="Simple black plus sign on a white background."></div>
               </div>
               <div class="answer">
@@ -1194,7 +1022,7 @@
             <div class="faq-dropdown">
               <div class="question">
                 <div class="heading-5">How do you determine project pricing?</div>
-                <div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png"
+                <div class="faq-icon"><img loading="lazy" src="urth_clone/images/6a1c3d9d7686060838b27aaa_plus%201.png"
                     alt="Simple black plus sign on a white background." class="faq-icon-image"></div>
               </div>
               <div class="answer">
@@ -1207,7 +1035,7 @@
             <div class="faq-dropdown">
               <div class="question">
                 <div class="heading-5">Do you handle construction and contractors?</div>
-                <div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png"
+                <div class="faq-icon"><img loading="lazy" src="urth_clone/images/6a1c3d9d7686060838b27aaa_plus%201.png"
                     alt="Simple black plus sign on a white background." class="faq-icon-image"></div>
               </div>
               <div class="answer">
@@ -1220,7 +1048,7 @@
             <div class="faq-dropdown">
               <div class="question">
                 <div class="heading-5">Can I hire you for interior design only?</div>
-                <div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png"
+                <div class="faq-icon"><img loading="lazy" src="urth_clone/images/6a1c3d9d7686060838b27aaa_plus%201.png"
                     alt="Simple black plus sign on a white background." class="faq-icon-image"></div>
               </div>
               <div class="answer">
@@ -1233,7 +1061,7 @@
             <div class="faq-dropdown">
               <div class="question">
                 <div class="heading-5">Do you offer renovation and remodeling services?</div>
-                <div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png"
+                <div class="faq-icon"><img loading="lazy" src="urth_clone/images/6a1c3d9d7686060838b27aaa_plus%201.png"
                     alt="Simple black plus sign on a white background." class="faq-icon-image"></div>
               </div>
               <div class="answer">
@@ -1246,7 +1074,7 @@
             <div class="faq-dropdown">
               <div class="question">
                 <div class="heading-5">How long does a typical project take to complete?</div>
-                <div class="faq-icon"><img loading="lazy" src="images/6a1c3d9d7686060838b27aaa_plus%201.png"
+                <div class="faq-icon"><img loading="lazy" src="urth_clone/images/6a1c3d9d7686060838b27aaa_plus%201.png"
                     alt="Simple black plus sign on a white background." class="faq-icon-image"></div>
               </div>
               <div class="answer">
@@ -1269,7 +1097,7 @@
       <div class="footer-top">
         <div class="footer-left">
           <div class="footer-logo">
-            <img src="../img/URTH (1).png" alt="Urth Logo" class="footer-brand-image" style="width: auto; height: 32px; margin: 0; padding: 0; object-fit: contain; object-position: left; filter: brightness(0) invert(1);">
+            <img src="img/URTH (1).png" alt="Urth Logo" class="footer-brand-image" style="width: auto; height: 32px; margin: 0; padding: 0; object-fit: contain; object-position: left; filter: brightness(0) invert(1);">
           </div>
           <div class="footer-desc">
             <p style="color: rgba(255,255,255,0.7);">The company principle of Architecture-Studio is the collective conception. From the very beginning, the practice has believed in the virtues of exchange, crossing ideas, common effort, shared knowledge and enthusiasm.</p>
@@ -1301,12 +1129,12 @@
       </div>
     </div>
   </footer>
-  <script src="js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript"></script>
-  <script src="js/webflow.schunk.bc050c0221fd17bc.js" type="text/javascript"></script>
-  <script src="js/webflow.df406d78.c0de89fbab670a49.js" type="text/javascript"></script>
-  <script src="js/gsap.min.js" type="text/javascript"></script>
-  <script src="js/SplitText.min.js" type="text/javascript"></script>
-  <script src="js/ScrollTrigger.min.js" type="text/javascript"></script>
+  <script src="urth_clone/js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript"></script>
+  <script src="urth_clone/js/webflow.schunk.bc050c0221fd17bc.js" type="text/javascript"></script>
+  <script src="urth_clone/js/webflow.df406d78.c0de89fbab670a49.js" type="text/javascript"></script>
+  <script src="urth_clone/js/gsap.min.js" type="text/javascript"></script>
+  <script src="urth_clone/js/SplitText.min.js" type="text/javascript"></script>
+  <script src="urth_clone/js/ScrollTrigger.min.js" type="text/javascript"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const urlParams = new URLSearchParams(window.location.search);
@@ -1352,7 +1180,7 @@
     });
   </script>
 
-  <script src="../mobile-nav.js"></script>
+  <script src="mobile-nav.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
