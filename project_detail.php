@@ -230,7 +230,7 @@ window.__WF_REVIEW_BRIDGE = {
     </div>
     <nav class="center-nav">
       <a href="index.html">HOME</a>
-      <a href="urth_clone/about2.html">ABOUT</a>
+      <a href="urth_clone/about.html">ABOUT</a>
       <a href="projects.php" class="active">PROJECTS</a>
       <a href="contact.html">CONTACT</a>
       <a href="#">SHOP</a>
