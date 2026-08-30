@@ -46,7 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Handle Gallery Images
             if (isset($_FILES['gallery_images'])) {
                 $total = count($_FILES['gallery_images']['name']);
-                if ($total > 12) $total = 12; // Enforce maximum of 12 images
+                if ($total > 12) $total = 12; // Enforce maximum of 1
+                // 2 images
                 
                 for ($i = 0; $i < $total; $i++) {
                     if ($_FILES['gallery_images']['error'][$i] === UPLOAD_ERR_OK) {
