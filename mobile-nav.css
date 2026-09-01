@@ -113,6 +113,10 @@
         background-color: #111;
     }
 
+    .mobile-index-header .logo img {
+        filter: invert(1);
+    }
+
     /* Hide standard navigations on mobile */
     .hero-top-nav .center-nav {
         display: none !important;

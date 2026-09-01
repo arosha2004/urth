@@ -368,6 +368,10 @@ html, body {
     height: auto;
   }
 
+  .footer-logo {
+    display: none;
+  }
+
   .footer-nav {
     position: static;
     transform: none;
@@ -429,7 +433,11 @@ html, body {
   }
 
   .footer-socials {
-    display: none;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 5px;
+    padding-bottom: 5px;
   }
 }
 

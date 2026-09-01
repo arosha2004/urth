@@ -73,8 +73,8 @@ window.__WF_REVIEW_BRIDGE = {
   }
 </style>
 
-  <link rel="stylesheet" href="projects.css" />`n  <link rel="stylesheet" href="mobile-nav.css" />
-
+  <link rel="stylesheet" href="projects.css" />
+  <link rel="stylesheet" href="mobile-nav.css" />
   <link rel="icon" type="image/png" href="images/favicon-512.png" />
 </head><!--/$--><body>
 

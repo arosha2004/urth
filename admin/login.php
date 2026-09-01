@@ -82,11 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
         </form>
 
-        <div class="demo-creds">
-            <strong>Default Credentials:</strong><br>
-            Username: <code>urthadmin</code><br>
-            Password: <code>12345678</code>
-        </div>
+
     </div>
 
     <script src="assets/js/admin.js"></script>
