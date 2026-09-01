@@ -27,6 +27,8 @@ $conn->select_db('urth_db');
 $sql = "CREATE TABLE IF NOT EXISTS projects (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
+    category VARCHAR(255) DEFAULT 'Architectural Design',
+    description TEXT DEFAULT NULL,
     link_url VARCHAR(255) NOT NULL,
     image1 VARCHAR(255) NOT NULL,
     image2 VARCHAR(255) NOT NULL,
@@ -38,6 +40,20 @@ if ($conn->query($sql) === TRUE) {
     echo "Table projects created successfully or already exists.<br>";
 } else {
     echo "Error creating table: " . $conn->error . "<br>";
+}
+
+// Create project_images table
+$sql_images = "CREATE TABLE IF NOT EXISTS project_images (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    project_id INT(6) UNSIGNED NOT NULL,
+    image_path VARCHAR(255) NOT NULL,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+)";
+
+if ($conn->query($sql_images) === TRUE) {
+    echo "Table project_images created successfully or already exists.<br>";
+} else {
+    echo "Error creating project_images table: " . $conn->error . "<br>";
 }
 
 $conn->close();
