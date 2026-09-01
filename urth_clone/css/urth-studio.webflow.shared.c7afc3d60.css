@@ -3589,7 +3589,7 @@ img {
 }
 
 .testimonial-item:hover {
-  background-color: var(--brown-400);
+  background-color: #000000;
   color: var(--white-100);
   transform: scale(1.1);
 }
