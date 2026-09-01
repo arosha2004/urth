@@ -97,6 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const category = btn.getAttribute('data-category');
       const description = btn.getAttribute('data-description');
       const image = btn.getAttribute('data-image');
+      const galleryData = btn.getAttribute('data-gallery');
+      let gallery = [];
+      try {
+        gallery = JSON.parse(galleryData || '[]');
+      } catch (e) {}
 
       document.getElementById('edit_id').value = id;
       document.getElementById('edit_title').value = title;
@@ -109,6 +114,63 @@ document.addEventListener('DOMContentLoaded', () => {
       if (editPreview && editContainer) {
         editPreview.src = image || '';
         editContainer.style.display = image ? 'block' : 'none';
+      }
+
+      document.getElementById('deleted_gallery_images').value = '';
+      const wrapper = document.getElementById('edit_gallery_inputs_wrapper');
+      if (wrapper) {
+        wrapper.innerHTML = ''; 
+        if (gallery.length === 0) {
+          wrapper.innerHTML = `
+            <div class="gallery-input-row" style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
+                <div style="flex-grow: 1;">
+                    <input type="file" name="gallery_images[]" class="form-control gallery-file-input" accept="image/*">
+                </div>
+                <div class="preview-slot" style="width: 42px; height: 42px; border-radius: 4px; border: 1px solid #ddd; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                    <span style="color: #bbb; font-size: 10px;">No img</span>
+                </div>
+                <button type="button" class="btn btn-danger btn-sm remove-gallery-row" style="padding: 0 10px; height: 42px; display: none;" title="Remove">&times;</button>
+            </div>
+          `;
+        } else {
+          gallery.forEach((img) => {
+            wrapper.innerHTML += `
+              <div class="gallery-input-row" data-existing-id="${img.id}" style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
+                  <div style="flex-grow: 1;">
+                      <div class="existing-image-info" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; font-size: 13px; color: #555;">
+                        Existing Image
+                      </div>
+                  </div>
+                  <div class="preview-slot" style="width: 42px; height: 42px; border-radius: 4px; border: 1px solid #ddd; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                      <img src="${img.path}" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <button type="button" class="btn btn-danger btn-sm remove-gallery-row" style="padding: 0 10px; height: 42px; display: block;" title="Remove">&times;</button>
+              </div>
+            `;
+          });
+          if (gallery.length < 12) {
+             wrapper.innerHTML += `
+              <div class="gallery-input-row" style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
+                  <div style="flex-grow: 1;">
+                      <input type="file" name="gallery_images[]" class="form-control gallery-file-input" accept="image/*">
+                  </div>
+                  <div class="preview-slot" style="width: 42px; height: 42px; border-radius: 4px; border: 1px solid #ddd; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                      <span style="color: #bbb; font-size: 10px;">No img</span>
+                  </div>
+                  <button type="button" class="btn btn-danger btn-sm remove-gallery-row" style="padding: 0 10px; height: 42px; display: block;" title="Remove">&times;</button>
+              </div>
+            `;
+          }
+        }
+      }
+
+      const addGalleryBtn = document.getElementById('edit_add_gallery_btn');
+      if (addGalleryBtn) {
+        if (gallery.length >= 12) {
+          addGalleryBtn.style.display = 'none';
+        } else {
+          addGalleryBtn.style.display = 'inline-block';
+        }
       }
 
       openModal(editModal);
@@ -156,63 +218,98 @@ document.addEventListener('DOMContentLoaded', () => {
   setupFilePreview('add_image_file', 'add_hero_preview', 'add_hero_preview_container');
   setupFilePreview('edit_image_file', 'edit_hero_preview', 'edit_hero_preview_container');
 
-  const galleryInputsWrapper = document.getElementById('gallery_inputs_wrapper');
-  const addGalleryBtn = document.getElementById('add_gallery_btn');
+  function setupGalleryInputs(wrapperId, addBtnId) {
+    const galleryInputsWrapper = document.getElementById(wrapperId);
+    const addGalleryBtn = document.getElementById(addBtnId);
 
-  if (galleryInputsWrapper && addGalleryBtn) {
-    let rowCount = 1;
+    if (galleryInputsWrapper && addGalleryBtn) {
 
-    addGalleryBtn.addEventListener('click', function() {
-      if (rowCount >= 12) {
-        alert('You can only add up to 12 gallery images.');
-        return;
+      function getRowCount() {
+        return galleryInputsWrapper.querySelectorAll('.gallery-input-row').length;
       }
-      const firstRow = galleryInputsWrapper.querySelector('.gallery-input-row');
-      const newRow = firstRow.cloneNode(true);
-      newRow.querySelector('input[type="file"]').value = ''; // clear file
-      newRow.querySelector('.preview-slot').innerHTML = '<span style="color: #bbb; font-size: 10px;">No img</span>';
-      galleryInputsWrapper.appendChild(newRow);
-      rowCount++;
-      updateRemoveButtons();
-    });
 
-    galleryInputsWrapper.addEventListener('click', function(e) {
-      if (e.target.closest('.remove-gallery-row') || e.target.classList.contains('remove-gallery-row')) {
-        if (rowCount > 1) {
-          e.target.closest('.gallery-input-row').remove();
-          rowCount--;
-          updateRemoveButtons();
+      function updateButtons() {
+        const rows = galleryInputsWrapper.querySelectorAll('.gallery-input-row');
+        const count = rows.length;
+        rows.forEach(row => {
+          const btn = row.querySelector('.remove-gallery-row');
+          if (count > 1) {
+            btn.style.display = 'block';
+          } else {
+            btn.style.display = 'none';
+          }
+        });
+        
+        if (count >= 12) {
+          addGalleryBtn.style.display = 'none';
+        } else {
+          addGalleryBtn.style.display = 'inline-block';
         }
       }
-    });
 
-    function updateRemoveButtons() {
-      const rows = galleryInputsWrapper.querySelectorAll('.gallery-input-row');
-      rows.forEach(row => {
-        const btn = row.querySelector('.remove-gallery-row');
-        if (rows.length > 1) {
-          btn.style.display = 'block';
-        } else {
-          btn.style.display = 'none';
+      addGalleryBtn.addEventListener('click', function() {
+        if (getRowCount() >= 12) {
+          alert('You can only add up to 12 gallery images.');
+          return;
+        }
+        
+        const newRow = document.createElement('div');
+        newRow.className = 'gallery-input-row';
+        newRow.style.cssText = 'display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;';
+        newRow.innerHTML = `
+            <div style="flex-grow: 1;">
+                <input type="file" name="gallery_images[]" class="form-control gallery-file-input" accept="image/*">
+            </div>
+            <div class="preview-slot" style="width: 42px; height: 42px; border-radius: 4px; border: 1px solid #ddd; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                <span style="color: #bbb; font-size: 10px;">No img</span>
+            </div>
+            <button type="button" class="btn btn-danger btn-sm remove-gallery-row" style="padding: 0 10px; height: 42px; display: block;" title="Remove">&times;</button>
+        `;
+        galleryInputsWrapper.appendChild(newRow);
+        updateButtons();
+      });
+
+      galleryInputsWrapper.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-gallery-row') || e.target.classList.contains('remove-gallery-row')) {
+          const row = e.target.closest('.gallery-input-row');
+          const existingId = row.dataset.existingId;
+          if (existingId) {
+             const deletedInput = document.getElementById('deleted_gallery_images');
+             if (deletedInput) {
+                 let deleted = deletedInput.value ? deletedInput.value.split(',') : [];
+                 deleted.push(existingId);
+                 deletedInput.value = deleted.join(',');
+             }
+          }
+          if (getRowCount() > 1) {
+            row.remove();
+            updateButtons();
+          }
         }
       });
-    }
 
-    galleryInputsWrapper.addEventListener('change', function(e) {
-      if (e.target.classList.contains('gallery-file-input')) {
-        const file = e.target.files[0];
-        const previewSlot = e.target.closest('.gallery-input-row').querySelector('.preview-slot');
-        if (file && file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = function(event) {
-            previewSlot.innerHTML = `<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+      galleryInputsWrapper.addEventListener('change', function(e) {
+        if (e.target.classList.contains('gallery-file-input')) {
+          const file = e.target.files[0];
+          const previewSlot = e.target.closest('.gallery-input-row').querySelector('.preview-slot');
+          if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+              previewSlot.innerHTML = `<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            }
+            reader.readAsDataURL(file);
+          } else {
+            previewSlot.innerHTML = '<span style="color: #bbb; font-size: 10px;">No img</span>';
           }
-          reader.readAsDataURL(file);
-        } else {
-          previewSlot.innerHTML = '<span style="color: #bbb; font-size: 10px;">No img</span>';
         }
-      }
-    });
+      });
+
+      // Initial state
+      updateButtons();
+    }
   }
+
+  setupGalleryInputs('gallery_inputs_wrapper', 'add_gallery_btn');
+  setupGalleryInputs('edit_gallery_inputs_wrapper', 'edit_add_gallery_btn');
 
 });

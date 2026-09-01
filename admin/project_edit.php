@@ -33,6 +33,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // Handle deleted gallery images
+        if (!empty($_POST['deleted_gallery_images'])) {
+            $deleted_ids = explode(',', $_POST['deleted_gallery_images']);
+            foreach ($deleted_ids as $del_id) {
+                $del_id = intval($del_id);
+                if ($del_id > 0) {
+                    $conn->query("DELETE FROM project_images WHERE id = $del_id AND project_id = $id");
+                }
+            }
+        }
+
+        // Handle new gallery images
+        if (isset($_FILES['gallery_images'])) {
+            $curr_result = $conn->query("SELECT COUNT(id) as count FROM project_images WHERE project_id = $id");
+            $curr_count = 0;
+            if ($curr_row = $curr_result->fetch_assoc()) {
+                $curr_count = intval($curr_row['count']);
+            }
+            
+            $total = count($_FILES['gallery_images']['name']);
+            for ($i = 0; $i < $total; $i++) {
+                if ($curr_count >= 12) break;
+                if ($_FILES['gallery_images']['error'][$i] === UPLOAD_ERR_OK) {
+                    $filename = time() . '_' . $i . '_gal_' . basename($_FILES['gallery_images']['name'][$i]);
+                    $target_file = $upload_dir . $filename;
+                    if (move_uploaded_file($_FILES['gallery_images']['tmp_name'][$i], $target_file)) {
+                        resizeImage($target_file, $target_file, 800, 800);
+                        $rel_path = 'img/uploads/' . $filename;
+                        
+                        $stmt = $conn->prepare("INSERT INTO project_images (project_id, image_path) VALUES (?, ?)");
+                        $stmt->bind_param("is", $id, $rel_path);
+                        $stmt->execute();
+                        $curr_count++;
+                    }
+                }
+            }
+        }
+
         header('Location: index.php?msg=updated');
         exit;
     } else {
