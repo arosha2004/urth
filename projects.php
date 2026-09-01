@@ -791,10 +791,10 @@ if($projects_query) {
             <div role="list" class="project-list w-dyn-items">
 <?php foreach($projects as $project): ?>
               <div role="listitem" class="project-item w-dyn-item">
-                <div class="project-image">
+                <a href="<?= htmlspecialchars($project['link_url']) ?>" class="project-image" style="display: block;">
                   <div class="category-tag"><?= htmlspecialchars($project['category']) ?></div><img src="<?= htmlspecialchars($project['image1']) ?>"
                     loading="lazy" alt="<?= htmlspecialchars($project['title']) ?>" class="parallax-image">
-                </div>
+                </a>
                 <div fade-in-up-2="" class="projct-info">
                   <div class="vertical-headline">
                     <div class="subtitle"><?= htmlspecialchars($project['category']) ?></div>
