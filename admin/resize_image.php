@@ -10,6 +10,13 @@
  * @return bool True on success, false on failure.
  */
 function resizeImage($source_path, $dest_path, $max_width = 1920, $max_height = 1080) {
+    if (!function_exists('imagecreatetruecolor')) {
+        if ($source_path !== $dest_path) {
+            return copy($source_path, $dest_path);
+        }
+        return true;
+    }
+
     // Get original image dimensions and type
     $imgInfo = getimagesize($source_path);
     if ($imgInfo === false) {

@@ -6,9 +6,38 @@
 require_once __DIR__ . '/auth.php';
 require_admin_auth();
 
-// Fetch all projects sorted by ID DESC
-$stmt = $pdo->query("SELECT * FROM projects ORDER BY id DESC");
-$projects = $stmt->fetchAll();
+// Fetch all projects sorted by ID DESC from MySQL
+require_once '../config.php';
+$result = $conn->query("SELECT * FROM projects ORDER BY id DESC");
+$projects = [];
+if ($result) {
+    while($row = $result->fetch_assoc()) {
+        // Map MySQL schema to what the Admin UI expects
+        $row['image_url'] = $row['image1'] ?? '';
+        $projects[] = $row;
+    }
+}
+
+// Fetch all gallery images
+$images_result = $conn->query("SELECT project_id, id, image_path FROM project_images ORDER BY id ASC");
+$gallery_images = [];
+if ($images_result) {
+    while($img = $images_result->fetch_assoc()) {
+        $path = $img['image_path'];
+        if (!empty($path) && !preg_match('/^https?:\/\//i', $path)) {
+            $path = '../' . $path;
+        }
+        $gallery_images[$img['project_id']][] = [
+            'id' => $img['id'],
+            'path' => $path
+        ];
+    }
+}
+
+foreach ($projects as &$p) {
+    $p['gallery'] = $gallery_images[$p['id']] ?? [];
+}
+unset($p);
 
 // Statistics calculation
 $totalProjects = count($projects);
@@ -171,7 +200,6 @@ switch ($msg) {
                             <th style="width: 70px;">ID</th>
                             <th>Title</th>
                             <th>Category</th>
-                            <th>Link URL</th>
                             <th style="width: 100px;">Images</th>
                             <th style="width: 160px; text-align: right;">Actions</th>
                         </tr>
@@ -210,13 +238,13 @@ switch ($msg) {
                                     </td>
                                     
                                     <td>
-                                        <a href="<?= htmlspecialchars($project['link_url']) ?>" target="_blank" class="link-url-text" title="<?= htmlspecialchars($project['link_url']) ?>">
-                                            <?= htmlspecialchars($project['link_url']) ?>
-                                        </a>
-                                    </td>
-                                    
-                                    <td>
-                                        <img src="<?= htmlspecialchars($project['image_url']) ?>" 
+                                        <?php 
+                                            $thumbSrc = $project['image_url'];
+                                            if (!empty($thumbSrc) && !preg_match('/^https?:\/\//i', $thumbSrc)) {
+                                                $thumbSrc = '../' . $thumbSrc;
+                                            }
+                                        ?>
+                                        <img src="<?= htmlspecialchars($thumbSrc) ?>" 
                                              alt="<?= htmlspecialchars($project['title']) ?>" 
                                              class="project-thumb"
                                              onerror="this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80'">
@@ -229,8 +257,9 @@ switch ($msg) {
                                                     data-id="<?= $project['id'] ?>"
                                                     data-title="<?= htmlspecialchars($project['title'], ENT_QUOTES) ?>"
                                                     data-category="<?= htmlspecialchars($project['category'], ENT_QUOTES) ?>"
-                                                    data-link="<?= htmlspecialchars($project['link_url'], ENT_QUOTES) ?>"
-                                                    data-image="<?= htmlspecialchars($project['image_url'], ENT_QUOTES) ?>"
+                                                    data-description="<?= htmlspecialchars($project['description'] ?? '', ENT_QUOTES) ?>"
+                                                    data-image="<?= htmlspecialchars($thumbSrc, ENT_QUOTES) ?>"
+                                                    data-gallery="<?= htmlspecialchars(json_encode($project['gallery']), ENT_QUOTES) ?>"
                                                     title="Edit project">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                                 Edit
@@ -280,7 +309,7 @@ switch ($msg) {
             <h3 class="modal-title">Add New Project</h3>
             <button type="button" class="modal-close" data-modal-close>&times;</button>
         </div>
-        <form action="project_add.php" method="POST">
+        <form action="project_add.php" method="POST" enctype="multipart/form-data">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="add_title" class="form-label">Project Title</label>
@@ -300,16 +329,32 @@ switch ($msg) {
                 </div>
 
                 <div class="form-group">
-                    <label for="add_link_url" class="form-label">Link URL</label>
-                    <input type="text" id="add_link_url" name="link_url" class="form-control" placeholder="e.g. project_detail.php?id=8" required>
+                    <label for="add_description" class="form-label">Description</label>
+                    <textarea id="add_description" name="description" class="form-control" rows="4" placeholder="Enter project description..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="add_image_url" class="form-label">Image URL / Thumbnail</label>
-                    <input type="url" id="add_image_url" name="image_url" class="form-control" placeholder="https://images.unsplash.com/..." required>
-                    <div class="img-preview-box">
-                        <img id="add_img_preview" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80" alt="Preview">
+                    <label for="add_image_file" class="form-label">Hero Image / Thumbnail</label>
+                    <input type="file" id="add_image_file" name="image1" class="form-control" accept="image/*" required>
+                    <div class="img-preview-box" id="add_hero_preview_container" style="display: none; margin-top: 10px;">
+                        <img id="add_hero_preview" src="" alt="Hero Preview" style="max-width: 100%; max-height: 200px; border-radius: 4px; object-fit: cover;">
                     </div>
+                </div>
+
+                <div class="form-group" id="gallery_section">
+                    <label class="form-label">Gallery Images (Optional - Max 12)</label>
+                    <div id="gallery_inputs_wrapper">
+                        <div class="gallery-input-row" style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
+                            <div style="flex-grow: 1;">
+                                <input type="file" name="gallery_images[]" class="form-control gallery-file-input" accept="image/*">
+                            </div>
+                            <div class="preview-slot" style="width: 42px; height: 42px; border-radius: 4px; border: 1px solid #ddd; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                <span style="color: #bbb; font-size: 10px;">No img</span>
+                            </div>
+                            <button type="button" class="btn btn-danger btn-sm remove-gallery-row" style="padding: 0 10px; height: 42px; display: none;" title="Remove">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm" id="add_gallery_btn" style="margin-top: 5px;">+ Add Another Image</button>
                 </div>
             </div>
             <div class="modal-footer">
@@ -327,7 +372,7 @@ switch ($msg) {
             <h3 class="modal-title">Edit Project</h3>
             <button type="button" class="modal-close" data-modal-close>&times;</button>
         </div>
-        <form action="project_edit.php" method="POST">
+        <form action="project_edit.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" id="edit_id" name="id">
             <div class="modal-body">
                 <div class="form-group">
@@ -348,16 +393,34 @@ switch ($msg) {
                 </div>
 
                 <div class="form-group">
-                    <label for="edit_link_url" class="form-label">Link URL</label>
-                    <input type="text" id="edit_link_url" name="link_url" class="form-control" required>
+                    <label for="edit_description" class="form-label">Description</label>
+                    <textarea id="edit_description" name="description" class="form-control" rows="4"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="edit_image_url" class="form-label">Image URL / Thumbnail</label>
-                    <input type="url" id="edit_image_url" name="image_url" class="form-control" required>
-                    <div class="img-preview-box">
-                        <img id="edit_img_preview" src="" alt="Preview">
+                    <label for="edit_image_file" class="form-label">Hero Image</label>
+                    <input type="file" id="edit_image_file" name="image1" class="form-control" accept="image/*">
+                    <div class="img-preview-box" id="edit_hero_preview_container" style="margin-top: 10px;">
+                        <img id="edit_hero_preview" src="" alt="Hero Preview" style="max-width: 100%; max-height: 200px; border-radius: 4px; object-fit: cover;">
                     </div>
+                </div>
+
+                <div class="form-group" id="edit_gallery_section">
+                    <label class="form-label">Gallery Images (Optional - Max 12)</label>
+                    <input type="hidden" name="deleted_gallery_images" id="deleted_gallery_images" value="">
+                    <div id="edit_gallery_inputs_wrapper">
+                        <!-- Existing gallery images will be injected here via JS -->
+                        <div class="gallery-input-row" style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
+                            <div style="flex-grow: 1;">
+                                <input type="file" name="gallery_images[]" class="form-control gallery-file-input" accept="image/*">
+                            </div>
+                            <div class="preview-slot" style="width: 42px; height: 42px; border-radius: 4px; border: 1px solid #ddd; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                <span style="color: #bbb; font-size: 10px;">No img</span>
+                            </div>
+                            <button type="button" class="btn btn-danger btn-sm remove-gallery-row" style="padding: 0 10px; height: 42px; display: none;" title="Remove">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm" id="edit_add_gallery_btn" style="margin-top: 5px;">+ Add Another Image</button>
                 </div>
             </div>
             <div class="modal-footer">

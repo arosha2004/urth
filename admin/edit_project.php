@@ -125,7 +125,7 @@ $gallery_result = $conn->query("SELECT * FROM project_images WHERE project_id=$i
                 <textarea name="description" rows="4" required><?= htmlspecialchars($project['description']) ?></textarea>
             </div>
             <div class="form-group">
-                <label>Hero Image (Leave blank to keep current)</label>
+                <label>Hero Image</label>
                 <input type="file" name="image1" accept="image/*">
                 <?php if($project['image1']): ?>
                     <img src="../<?= htmlspecialchars($project['image1']) ?>" class="current-img">

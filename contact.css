@@ -659,6 +659,9 @@
     gap: 20px;
     align-items: flex-start;
   }
+  .contact-footer .footer-logo {
+    display: none;
+  }
   
   /* Additional mobile styles for forms and banner */
   .contact-form .form-row {
