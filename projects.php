@@ -1168,7 +1168,7 @@ if($projects_query) {
   </footer>
   <script src="urth_clone/js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript"></script>
   <script src="urth_clone/js/webflow.schunk.bc050c0221fd17bc.js" type="text/javascript"></script>
-  <script src="urth_clone/js/webflow.df406d78.c0de89fbab670a49.js?v=2" type="text/javascript"></script>
+  <script src="urth_clone/js/webflow.df406d78.c0de89fbab670a49.js?v=4" type="text/javascript"></script>
   <script src="urth_clone/js/gsap.min.js" type="text/javascript"></script>
   <script src="urth_clone/js/SplitText.min.js" type="text/javascript"></script>
   <script src="urth_clone/js/ScrollTrigger.min.js" type="text/javascript"></script>
