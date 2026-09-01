@@ -122,8 +122,9 @@
         display: none !important;
     }
     
-    /* Footer nav in index */
-    .site-footer .footer-nav {
+    /* Footer nav and logo in index */
+    .site-footer .footer-nav,
+    .site-footer .footer-logo {
         display: none !important;
     }
 

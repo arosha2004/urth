@@ -414,7 +414,12 @@ html, body {
   }
 
   .slide-category {
-    display: none;
+    display: block;
+    font-size: 10px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.4;
+    margin-top: 4px;
   }
   
   .carousel-arrow {
