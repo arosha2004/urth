@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once 'config.php';
 
 if (!isset($_GET['id'])) {
@@ -414,9 +414,9 @@ window.__WF_REVIEW_BRIDGE = {
         <div class="footer-right">
           <h6 class="footer-info-title">GET IN TOUCH</h6>
           <div class="footer-info-content">
-            <p><a href="tel:+7(885)5896985" style="color: white;">+7 (885) 589 69 85</a></p>
-            <p><a href="mailto:urth-architects@info.com" style="color: white;">urth-architects@info.com</a></p>
-            <p style="color: rgba(255,255,255,0.7);">Litačka, Jungmannova 35/29, Nové Město,Czech Republic</p>
+            <p><a href="tel:0768008687" style="color: white;">0768008687</a></p>
+            <p><a href="mailto:info@urthspaces.com" style="color: white;">info@urthspaces.com</a></p>
+            <p style="color: rgba(255,255,255,0.7);">No.374, Peradeniya Road, Kandy 20000, Sri Lanka</p>
           </div>
         </div>
       </div>
@@ -440,3 +440,4 @@ window.__WF_REVIEW_BRIDGE = {
 
   <script src="mobile-nav.js"></script>
 </body></html><!--/$-->
+
