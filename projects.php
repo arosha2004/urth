@@ -922,13 +922,39 @@ if($projects_query) {
               <div role="listitem" class="service-headline-item w-dyn-item">
                 <div class="vertical-headline small-left">
                   <div fade-in-up-1="" class="subtitle">OUR&nbsp;Service</div>
-                  <h2 fade-in-up-2="" class="heading-3">Spatial Redesign</h2>
+                  <h2 fade-in-up-2="" class="heading-3">360° Interactive Videos & Virtual Walkthroughs</h2>
                 </div>
                 <div class="vertical-headline service-cta">
-                  <p fade-in-up-1="" class="text">We transform outdated layouts into functional, contemporary spaces.
-                    Whether it is a single-room transformation or a complete structural overhaul, we strip away the
-                    unnecessary to reveal the space's true potential.</p>
+                  <p fade-in-up-1="" class="text">Photorealistic virtual tours and interactive digital previews for high-impact spatial presentation.</p>
                   <div fade-in-up-2="" class="button-wrapper"><a href="spatial-redesign.html"
+                      id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
+                      class="button w-inline-block">
+                      <div class="button-text-wrapper">
+                        <div class="button-text-inner">
+                          <div class="button-text-item">
+                            <div button-text="" class="button-text">Service Detail</div>
+                          </div>
+                          <div class="button-text-item">
+                            <div button-text="" class="button-text">Service Detail</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="button-hover-bg"></div>
+                    </a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="service-collection w-dyn-list">
+            <div role="list" class="service-list w-dyn-items">
+              <div role="listitem" class="service-headline-item w-dyn-item">
+                <div class="vertical-headline small-left">
+                  <div fade-in-up-1="" class="subtitle">OUR&nbsp;Service</div>
+                  <h2 fade-in-up-2="" class="heading-3">Scaled Miniature Models</h2>
+                </div>
+                <div class="vertical-headline service-cta">
+                  <p fade-in-up-1="" class="text">High-precision physical scale models crafted for architectural displays and client presentations.</p>
+                  <div fade-in-up-2="" class="button-wrapper"><a href="scaled-miniature-models.html"
                       id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
                       class="button w-inline-block">
                       <div class="button-text-wrapper">
@@ -988,6 +1014,17 @@ if($projects_query) {
                 <div role="listitem" class="service-image-item w-dyn-item">
                   <div class="service-image"><img
                       src="https://cdn.prod.website-files.com/6a1c3d9d7686060838b27a24/6a24c53b3546e70bdfab2d91_Spatial%20Redesign%20Service.avif"
+                      loading="lazy" alt="" class="image"></div>
+                </div>
+              </div>
+            </div>
+            <div
+              data-wf-target="[[[&quot;6a1c3d9d7686060838b279f9&quot;,&quot;da366271-8e55-bef7-7a88-df78043157ff&quot;],[]]]"
+              class="service-image-collection w-dyn-list">
+              <div role="list" class="service-image-list w-dyn-items">
+                <div role="listitem" class="service-image-item w-dyn-item">
+                  <div class="service-image"><img
+                      src="img/miniature_model.jpg"
                       loading="lazy" alt="" class="image"></div>
                 </div>
               </div>
@@ -1131,7 +1168,7 @@ if($projects_query) {
   </footer>
   <script src="urth_clone/js/jquery-3.5.1.min.dc5e7f18c8.js" type="text/javascript"></script>
   <script src="urth_clone/js/webflow.schunk.bc050c0221fd17bc.js" type="text/javascript"></script>
-  <script src="urth_clone/js/webflow.df406d78.c0de89fbab670a49.js" type="text/javascript"></script>
+  <script src="urth_clone/js/webflow.df406d78.c0de89fbab670a49.js?v=2" type="text/javascript"></script>
   <script src="urth_clone/js/gsap.min.js" type="text/javascript"></script>
   <script src="urth_clone/js/SplitText.min.js" type="text/javascript"></script>
   <script src="urth_clone/js/ScrollTrigger.min.js" type="text/javascript"></script>
