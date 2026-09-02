@@ -169,7 +169,24 @@ if($projects_query) {
     }
 
     /* Project Item Transition */
-    .project-item {}
+    .project-item {
+      align-items: center !important;
+    }
+    .projct-info {
+      justify-content: center !important;
+      gap: 2rem !important;
+    }
+      .project-item .parallax-image {
+      transform: none !important;
+      height: 100% !important;
+      width: 100% !important;
+      object-fit: cover !important;
+    }
+    .project-image {
+      overflow: hidden !important;
+      position: relative !important;
+      border-radius: var(--_spacing---extra-tiny) !important;
+    }
   </style>
   <script
     type="text/javascript">!function (o, c) { var n = c.documentElement, t = " w-mod-"; n.className += t + "js", ("ontouchstart" in o || o.DocumentTouch && c instanceof DocumentTouch) && (n.className += t + "touch") }(window, document);</script>
@@ -228,35 +245,22 @@ if($projects_query) {
     /* Stack effect for project items */
     #project .project-item {
       position: sticky !important;
-    }
-
-    #project .project-item:nth-child(1) {
       top: var(--_spacing---semi-large, 40px) !important;
     }
 
-    #project .project-item:nth-child(2) {
-      top: calc(var(--_spacing---semi-large, 40px) + 30px) !important;
-    }
+    
 
-    #project .project-item:nth-child(3) {
-      top: calc(var(--_spacing---semi-large, 40px) + 60px) !important;
-    }
+    
 
-    #project .project-item:nth-child(4) {
-      top: calc(var(--_spacing---semi-large, 40px) + 90px) !important;
-    }
+    
 
-    #project .project-item:nth-child(5) {
-      top: calc(var(--_spacing---semi-large, 40px) + 120px) !important;
-    }
+    
 
-    #project .project-item:nth-child(6) {
-      top: calc(var(--_spacing---semi-large, 40px) + 150px) !important;
-    }
+    
 
-    #project .project-item:nth-child(7) {
-      top: calc(var(--_spacing---semi-large, 40px) + 180px) !important;
-    }
+    
+
+    
 
     #project,
     #project .w-layout-blockcontainer,
@@ -474,7 +478,13 @@ if($projects_query) {
     }
 
     /* Project Item Transition */
-    .project-item {}
+    .project-item {
+      align-items: center !important;
+    }
+    .projct-info {
+      justify-content: center !important;
+      gap: 2rem !important;
+    }
   </style>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -650,7 +660,13 @@ if($projects_query) {
     }
 
     /* Project Item Transition */
-    .project-item {}
+    .project-item {
+      align-items: center !important;
+    }
+    .projct-info {
+      justify-content: center !important;
+      gap: 2rem !important;
+    }
   </style>
 
   <link rel="icon" type="image/png" href="urth_clone/images/favicon-512.png" />
@@ -672,7 +688,7 @@ if($projects_query) {
       </div>
       <nav class="center-nav">
         <a href="index.html">HOME</a>
-        <a href="urth_clone/about.html">ABOUT</a>
+        <a href="about.html">ABOUT</a>
         <a href="projects.php" class="active">PROJECTS</a>
         <a href="contact.html">CONTACT</a>
         <a href="#">SHOP</a>
@@ -698,7 +714,7 @@ if($projects_query) {
   <div class="mobile-nav-overlay">
     <nav class="mobile-nav-links">
       <a href="index.html">HOME</a>
-      <a href="urth_clone/about.html">ABOUT</a>
+      <a href="about.html">ABOUT</a>
       <a href="projects.php">PROJECTS</a>
       <a href="contact.html">CONTACT</a>
       <a href="#">SHOP</a>
