@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!-- This site was created in Webflow. https://webflow.com --><!-- Last Published: Fri Jun 19 2026 00:43:42 GMT+0000 (Coordinated Universal Time) --><!--$-->
 <html data-wf-domain="urth-studio.webflow.io" data-wf-page="6a1c3d9d7686060838b279f9"
   data-wf-site="6a1c3d9d7686060838b27a1c" lang="en"><!--$-->
@@ -487,6 +487,16 @@
 
     .project-image {
       position: relative;
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+    }
+
+    .project-image img.parallax-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .category-tag {
