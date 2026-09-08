@@ -88,6 +88,19 @@ body {
   color: #fff;
 }
 
+.hero-top-nav.sticky {
+  position: fixed;
+  top: 0;
+  transform: translateY(-100%);
+  background-color: rgba(17, 17, 17, 0.95);
+  z-index: 9999;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.hero-top-nav.sticky.scrolled {
+  transform: translateY(0);
+}
+
 .hero-top-nav .right-nav .menu-btn {
   background: transparent;
   border: none;
@@ -103,6 +116,7 @@ body {
   z-index: 10;
   text-align: center;
   color: #fff;
+  transform: translateY(-60px);
 }
 
 .hero-subtitle {

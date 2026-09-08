@@ -864,16 +864,16 @@ if($projects_query) {
                   <p fade-in-up-1="" class="text service-description">We create modern, sustainable, and structurally
                     sound architectural blueprints. Our approach focuses on clean lines, natural light, and a seamless
                     integration between the building and its surrounding environment.</p>
-                  <div fade-in-up-2="" class="button-wrapper"><a href="architectural-design.html"
+                  <div fade-in-up-2="" class="button-wrapper"><a href="contact.html"
                       id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
                       class="button w-inline-block">
                       <div class="button-text-wrapper">
                         <div class="button-text-inner">
                           <div class="button-text-item">
-                            <div button-text="" class="button-text">Service Detail</div>
+                            <div button-text="" class="button-text">Explore now</div>
                           </div>
                           <div class="button-text-item">
-                            <div button-text="" class="button-text">Service Detail</div>
+                            <div button-text="" class="button-text">Explore now</div>
                           </div>
                         </div>
                       </div>
@@ -894,16 +894,16 @@ if($projects_query) {
                   <p fade-in-up-1="" class="text">Beyond superficial decorating, we define the spatial layout, material
                     palette, and fixed elements of your interior. We optimize the flow of your space to ensure your home
                     or office feels effortlessly cohesive.</p>
-                  <div fade-in-up-2="" class="button-wrapper"><a href="interior-architecture.html"
+                  <div fade-in-up-2="" class="button-wrapper"><a href="contact.html"
                       id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
                       class="button w-inline-block">
                       <div class="button-text-wrapper">
                         <div class="button-text-inner">
                           <div class="button-text-item">
-                            <div button-text="" class="button-text">Service Detail</div>
+                            <div button-text="" class="button-text">Explore now</div>
                           </div>
                           <div class="button-text-item">
-                            <div button-text="" class="button-text">Service Detail</div>
+                            <div button-text="" class="button-text">Explore now</div>
                           </div>
                         </div>
                       </div>
@@ -924,16 +924,16 @@ if($projects_query) {
                   <p fade-in-up-1="" class="text">To achieve a truly minimalist aesthetic, clutter must be eliminated.
                     We design custom built-ins, bespoke furniture, and select curated decor items that fit your space’s
                     exact proportions and color story.</p>
-                  <div fade-in-up-2="" class="button-wrapper"><a href="custom-furniture.html"
+                  <div fade-in-up-2="" class="button-wrapper"><a href="contact.html"
                       id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
                       class="button w-inline-block">
                       <div class="button-text-wrapper">
                         <div class="button-text-inner">
                           <div class="button-text-item">
-                            <div button-text="" class="button-text">Service Detail</div>
+                            <div button-text="" class="button-text">Explore now</div>
                           </div>
                           <div class="button-text-item">
-                            <div button-text="" class="button-text">Service Detail</div>
+                            <div button-text="" class="button-text">Explore now</div>
                           </div>
                         </div>
                       </div>
@@ -952,16 +952,16 @@ if($projects_query) {
                 </div>
                 <div class="vertical-headline service-cta">
                   <p fade-in-up-1="" class="text">Photorealistic virtual tours and interactive digital previews for high-impact spatial presentation.</p>
-                  <div fade-in-up-2="" class="button-wrapper"><a href="spatial-redesign.html"
+                  <div fade-in-up-2="" class="button-wrapper"><a href="contact.html"
                       id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
                       class="button w-inline-block">
                       <div class="button-text-wrapper">
                         <div class="button-text-inner">
                           <div class="button-text-item">
-                            <div button-text="" class="button-text">Service Detail</div>
+                            <div button-text="" class="button-text">Explore now</div>
                           </div>
                           <div class="button-text-item">
-                            <div button-text="" class="button-text">Service Detail</div>
+                            <div button-text="" class="button-text">Explore now</div>
                           </div>
                         </div>
                       </div>
@@ -980,16 +980,16 @@ if($projects_query) {
                 </div>
                 <div class="vertical-headline service-cta">
                   <p fade-in-up-1="" class="text">High-precision physical scale models crafted for architectural displays and client presentations.</p>
-                  <div fade-in-up-2="" class="button-wrapper"><a href="scaled-miniature-models.html"
+                  <div fade-in-up-2="" class="button-wrapper"><a href="contact.html"
                       id="w-node-_89d72580-7e45-cfb2-d4a1-09ccf56f9d20-f56f9d20" data-wf--button--variant="brown"
                       class="button w-inline-block">
                       <div class="button-text-wrapper">
                         <div class="button-text-inner">
                           <div class="button-text-item">
-                            <div button-text="" class="button-text">Service Detail</div>
+                            <div button-text="" class="button-text">Explore now</div>
                           </div>
                           <div class="button-text-item">
-                            <div button-text="" class="button-text">Service Detail</div>
+                            <div button-text="" class="button-text">Explore now</div>
                           </div>
                         </div>
                       </div>

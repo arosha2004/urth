@@ -29,6 +29,7 @@ $sql = "CREATE TABLE IF NOT EXISTS projects (
     title VARCHAR(255) NOT NULL,
     category VARCHAR(255) DEFAULT 'Architectural Design',
     description TEXT DEFAULT NULL,
+    location VARCHAR(255) DEFAULT NULL,
     link_url VARCHAR(255) NOT NULL,
     image1 VARCHAR(255) NOT NULL,
     image2 VARCHAR(255) NOT NULL,

@@ -6,6 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $conn->real_escape_string($_POST['title']);
     $category = $conn->real_escape_string($_POST['category']);
     $description = $conn->real_escape_string($_POST['description']);
+    $location = $conn->real_escape_string($_POST['location'] ?? 'Sri Lanka');
     
     $upload_dir = '../img/uploads/';
     if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
@@ -22,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $sql = "INSERT INTO projects (title, category, description, link_url, image1, image2, image3) 
-            VALUES ('$title', '$category', '$description', '', '$image1_path', '', '')";
+    $sql = "INSERT INTO projects (title, category, description, location, link_url, image1, image2, image3) 
+            VALUES ('$title', '$category', '$description', '$location', '', '$image1_path', '', '')";
     
     if ($conn->query($sql) === TRUE) {
         $new_id = $conn->insert_id;
@@ -83,6 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label>Category</label>
                 <input type="text" name="category" required>
+            </div>
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" name="location" value="Sri Lanka" required>
             </div>
             <div class="form-group">
                 <label>Description</label>

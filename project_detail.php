@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once 'config.php';
 
 if (!isset($_GET['id'])) {
@@ -136,15 +136,6 @@ window.__WF_REVIEW_BRIDGE = {
       box-sizing: border-box;
       transition: top 0.3s ease;
     }
-    .hero-top-nav.sticky {
-      position: fixed;
-      top: -92px;
-      background-color: rgba(17, 17, 17, 0.95);
-      z-index: 9999;
-    }
-    .hero-top-nav.sticky.scrolled {
-      top: 0;
-    }
     .hero-top-nav .logo a {
       color: #fff;
       text-decoration: none;
@@ -175,6 +166,7 @@ window.__WF_REVIEW_BRIDGE = {
       z-index: 10;
       text-align: center;
       color: white !important;
+      transform: translateY(-60px);
     }
     .hero-subtitle {
       font-size: 13px;
@@ -194,6 +186,31 @@ window.__WF_REVIEW_BRIDGE = {
       color: white !important;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
+    .hero-description-box {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(20, 20, 20, 0.85);
+      padding: 30px 20px;
+      text-align: center;
+      box-sizing: border-box;
+      z-index: 10;
+    }
+    .hero-description-box .desc-text {
+      color: white;
+      font-size: 18px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    .hero-description-box .desc-location {
+      color: #cc6600;
+      font-size: 16px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin-top: 10px;
+    }
     @media (max-width: 768px) {
       .hero-top-nav .center-nav {
         display: none;
@@ -203,22 +220,6 @@ window.__WF_REVIEW_BRIDGE = {
       }
     }
   </style>
-  <script>
-    document.addEventListener("scroll", function() {
-      var nav = document.querySelector('.hero-top-nav');
-      if (!nav) return;
-      if (window.scrollY > 200) {
-        nav.classList.add('sticky');
-      } else {
-        nav.classList.remove('sticky', 'scrolled');
-      }
-      if (window.scrollY > 400) {
-        nav.classList.add('scrolled');
-      } else {
-        nav.classList.remove('scrolled');
-      }
-    });
-  </script>
   <div class="hero-bg">
     <img src="<?= htmlspecialchars($project['image1']) ?>" alt="Hero background" />
   </div>
@@ -248,8 +249,17 @@ window.__WF_REVIEW_BRIDGE = {
   <div class="hero-content">
     <p class="hero-subtitle">URTH. ARCHITECURE</p>
     <h1 class="hero-title"><?= htmlspecialchars($project['title']) ?></h1>
-    <div class="hero-description" style="margin-top: 20px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.5; font-family: 'Plus Jakarta Sans', sans-serif; opacity: 0.9;">
-      <?= nl2br(htmlspecialchars($project['description'] ?? '')) ?>
+  </div>
+  <div class="hero-description-box">
+    <div class="desc-text">
+      <?php if (!empty($project['description'])): ?>
+        <?= nl2br(htmlspecialchars($project['description'])) ?>
+      <?php else: ?>
+        Description added here in white front
+      <?php endif; ?>
+    </div>
+    <div class="desc-location">
+      Location: <?= htmlspecialchars($project['location'] ?? 'Sri Lanka') ?>
     </div>
   </div>
 </header><section class="gallery-section">

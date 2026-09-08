@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $conn->real_escape_string($_POST['title']);
     $category = $conn->real_escape_string($_POST['category']);
     $description = $conn->real_escape_string($_POST['description']);
+    $location = $conn->real_escape_string($_POST['location'] ?? 'Sri Lanka');
     
     $upload_dir = '../img/uploads/';
     if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
@@ -45,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Build update query
-    $updates = ["title='$title'", "category='$category'", "description='$description'"];
+    $updates = ["title='$title'", "category='$category'", "description='$description'", "location='$location'"];
     if ($image1_path) $updates[] = "image1='$image1_path'";
 
     $sql = "UPDATE projects SET " . implode(', ', $updates) . " WHERE id=$id";
@@ -119,6 +120,10 @@ $gallery_result = $conn->query("SELECT * FROM project_images WHERE project_id=$i
             <div class="form-group">
                 <label>Category</label>
                 <input type="text" name="category" value="<?= htmlspecialchars($project['category']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" name="location" value="<?= htmlspecialchars($project['location'] ?? 'Sri Lanka') ?>" required>
             </div>
             <div class="form-group">
                 <label>Description</label>

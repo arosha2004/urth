@@ -39,6 +39,33 @@
       left: 0;
       z-index: -1;
     }
+    
+    .hero-description-box {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(20, 20, 20, 0.85);
+      padding: 30px 20px;
+      text-align: center;
+      box-sizing: border-box;
+      z-index: 10;
+    }
+    .hero-description-box .desc-text {
+      color: white;
+      font-size: 18px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    .hero-description-box .desc-location {
+      color: #cc6600;
+      font-size: 16px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin-top: 10px;
+    }
+
     .hero-title {
       color: white !important;
       font-size: 80px !important;
@@ -98,6 +125,15 @@
     <div class="hero-content">
       <p class="hero-subtitle" style="color: white; letter-spacing: 2px;">URTH. ARCHITECTURE</p>
       <h1 class="hero-title">Poolscape Villa</h1>
+    </div>
+  
+    <div class="hero-description-box">
+      <div class="desc-text">
+        Description added here in white front
+      </div>
+      <div class="desc-location">
+        Location: Sri Lanka
+      </div>
     </div>
   </header>
 

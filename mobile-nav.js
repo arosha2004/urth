@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             toggle.addEventListener('click', (e) => {
                 e.preventDefault();
                 const isOpen = overlay.classList.contains('active');
-                
+
                 if (isOpen) {
                     overlay.classList.remove('active');
                     toggles.forEach(t => t.classList.remove('open'));
@@ -23,5 +23,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+    }
+});
+
+// Sticky Navbar Logic
+document.addEventListener("scroll", function () {
+    // Disable sticky navbar on projects.php
+    if (window.location.pathname.includes('projects.php')) return;
+
+    var nav = document.querySelector('.hero-top-nav');
+    if (!nav) return;
+
+    if (window.scrollY > 10) {
+        if (!nav.classList.contains('sticky')) {
+            nav.classList.add('sticky');
+            // Allow a small delay before adding the scrolled class to trigger the CSS transition
+            setTimeout(() => {
+                if (window.scrollY > 10) {
+                    nav.classList.add('scrolled');
+                }
+            }, 20);
+        }
+    } else {
+        nav.classList.remove('sticky', 'scrolled');
     }
 });
