@@ -58,5 +58,5 @@ if ($conn->query($sql_images) === TRUE) {
 }
 
 $conn->close();
-echo "<a href='index.html'>Return to Home</a>";
+echo "<a href='index.php'>Return to Home</a>";
 ?>

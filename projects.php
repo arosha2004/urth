@@ -692,12 +692,12 @@ if($projects_query) {
 
     <div class="hero-top-nav">
       <div class="logo">
-        <a href="index.html" style="text-decoration: none;">
+        <a href="index.php" style="text-decoration: none;">
           <img src="img/URTH (1).png" alt="Urth Logo" class="navbar-brand-image" style="height: 22px; margin: 0; padding: 0; object-fit: contain; vertical-align: middle; transform: translateY(-2px);">
         </a>
       </div>
       <nav class="center-nav">
-        <a href="index.html">HOME</a>
+        <a href="index.php">HOME</a>
         <a href="about.html">ABOUT</a>
         <a href="projects.php" class="active">PROJECTS</a>
         <a href="contact.html">CONTACT</a>
@@ -723,7 +723,7 @@ if($projects_query) {
 
   <div class="mobile-nav-overlay">
     <nav class="mobile-nav-links">
-      <a href="index.html">HOME</a>
+      <a href="index.php">HOME</a>
       <a href="about.html">ABOUT</a>
       <a href="projects.php">PROJECTS</a>
       <a href="contact.html">CONTACT</a>
