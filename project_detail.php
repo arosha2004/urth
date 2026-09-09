@@ -134,7 +134,16 @@ window.__WF_REVIEW_BRIDGE = {
       align-items: center;
       z-index: 10;
       box-sizing: border-box;
-      transition: top 0.3s ease;
+    }
+    .hero-top-nav.sticky {
+      position: fixed;
+      top: -92px;
+      background-color: rgba(17, 17, 17, 0.95);
+      z-index: 9999;
+      transition: transform 0.3s ease;
+    }
+    .hero-top-nav.sticky.scrolled {
+      transform: translateY(92px);
     }
     .hero-top-nav .logo a {
       color: #fff;
@@ -220,6 +229,22 @@ window.__WF_REVIEW_BRIDGE = {
       }
     }
   </style>
+  <script>
+    document.addEventListener("scroll", function() {
+      var nav = document.querySelector('.hero-top-nav');
+      if (!nav) return;
+      if (window.scrollY > 200) {
+        nav.classList.add('sticky');
+      } else {
+        nav.classList.remove('sticky', 'scrolled');
+      }
+      if (window.scrollY > 400) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+  </script>
   <div class="hero-bg">
     <img src="<?= htmlspecialchars($project['image1']) ?>" alt="Hero background" />
   </div>
