@@ -257,6 +257,7 @@ switch ($msg) {
                                                     data-id="<?= $project['id'] ?>"
                                                     data-title="<?= htmlspecialchars($project['title'], ENT_QUOTES) ?>"
                                                     data-category="<?= htmlspecialchars($project['category'], ENT_QUOTES) ?>"
+                                                    data-location="<?= htmlspecialchars($project['location'] ?? '', ENT_QUOTES) ?>"
                                                     data-description="<?= htmlspecialchars($project['description'] ?? '', ENT_QUOTES) ?>"
                                                     data-image="<?= htmlspecialchars($thumbSrc, ENT_QUOTES) ?>"
                                                     data-gallery="<?= htmlspecialchars(json_encode($project['gallery'], JSON_INVALID_UTF8_SUBSTITUTE) ?: '[]', ENT_QUOTES) ?>"
@@ -328,6 +329,12 @@ switch ($msg) {
                     </select>
                 </div>
 
+                
+                <div class="form-group">
+                    <label for="add_location" class="form-label">Location</label>
+                    <input type="text" id="add_location" name="location" class="form-control" placeholder="e.g. Sri Lanka">
+                </div>
+
                 <div class="form-group">
                     <label for="add_description" class="form-label">Description</label>
                     <textarea id="add_description" name="description" class="form-control" rows="4" placeholder="Enter project description..."></textarea>
@@ -390,6 +397,12 @@ switch ($msg) {
                         <option value="Architectural Design">Architectural Design</option>
                         <option value="Interior Architecture">Interior Architecture</option>
                     </select>
+                </div>
+
+                
+                <div class="form-group">
+                    <label for="edit_location" class="form-label">Location</label>
+                    <input type="text" id="edit_location" name="location" class="form-control" placeholder="e.g. Sri Lanka">
                 </div>
 
                 <div class="form-group">

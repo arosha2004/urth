@@ -185,7 +185,19 @@ window.__WF_REVIEW_BRIDGE = {
         font-size: 40px;
       }
     }
-  </style>
+  
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 40px !important;
+      }
+      .hero-description-box .desc-text {
+        font-size: 15px;
+      }
+      .hero-content {
+        padding: 0 20px;
+      }
+    }
+</style>
   <script>
     document.addEventListener("scroll", function() {
       var nav = document.querySelector('.hero-top-nav');

@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $conn->real_escape_string(trim($_POST['title'] ?? ''));
     $category = $conn->real_escape_string(trim($_POST['category'] ?? ''));
     $description = $conn->real_escape_string(trim($_POST['description'] ?? ''));
+    $location = $conn->real_escape_string(trim($_POST['location'] ?? ''));
 
     if (!empty($title) && !empty($category)) {
         
@@ -34,8 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $image1_path = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80';
         }
 
-        $sql = "INSERT INTO projects (title, category, description, link_url, image1, image2, image3) 
-                VALUES ('$title', '$category', '$description', '', '$image1_path', '', '')";
+        $sql = "INSERT INTO projects (title, category, location, description, link_url, image1, image2, image3) 
+                VALUES ('$title', '$category', '$location', '$description', '', '$image1_path', '', '')";
         
         if ($conn->query($sql) === TRUE) {
             $new_id = $conn->insert_id;

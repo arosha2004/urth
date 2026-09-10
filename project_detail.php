@@ -227,6 +227,12 @@ window.__WF_REVIEW_BRIDGE = {
       .hero-title {
         font-size: 40px;
       }
+      .hero-description-box .desc-text {
+        font-size: 15px;
+      }
+      .hero-content {
+        padding: 0 20px;
+      }
     }
   </style>
   <script>

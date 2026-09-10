@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const title = btn.getAttribute('data-title');
       const category = btn.getAttribute('data-category');
       const description = btn.getAttribute('data-description');
+      const location = btn.getAttribute('data-location');
       const image = btn.getAttribute('data-image');
       const galleryData = btn.getAttribute('data-gallery');
       let gallery = [];
@@ -106,6 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('edit_id').value = id;
       document.getElementById('edit_title').value = title;
       document.getElementById('edit_category').value = category;
+      const locField = document.getElementById('edit_location');
+      if (locField) locField.value = location || '';
+
       const descField = document.getElementById('edit_description');
       if (descField) descField.value = description || '';
       

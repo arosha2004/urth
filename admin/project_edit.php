@@ -13,10 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $conn->real_escape_string(trim($_POST['title'] ?? ''));
     $category = $conn->real_escape_string(trim($_POST['category'] ?? ''));
     $description = $conn->real_escape_string(trim($_POST['description'] ?? ''));
+    $location = $conn->real_escape_string(trim($_POST['location'] ?? ''));
 
     if ($id > 0 && !empty($title) && !empty($category)) {
         
-        $sql = "UPDATE projects SET title = '$title', category = '$category', description = '$description' WHERE id = $id";
+        $sql = "UPDATE projects SET title = '$title', category = '$category', location = '$location', description = '$description' WHERE id = $id";
         $conn->query($sql);
         
         $upload_dir = '../img/uploads/';
