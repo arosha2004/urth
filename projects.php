@@ -242,10 +242,22 @@ if($projects_query) {
   </script>
   <script src="urth_clone/js/review.js"></script>
   <style>
-    /* Stack effect for project items */
-    #project .project-item {
-      position: sticky !important;
-      top: var(--_spacing---semi-large, 40px) !important;
+    /* Stack effect for project items - desktop only */
+    @media (min-width: 992px) {
+      #project .project-item {
+        position: sticky !important;
+        top: var(--_spacing---semi-large, 40px) !important;
+      }
+    }
+
+    /* Mobile view: natural flow to prevent overlapping/cutout of project contents */
+    @media (max-width: 991px) {
+      #project .project-item {
+        position: relative !important;
+        top: auto !important;
+        margin-bottom: 32px !important;
+        align-items: stretch !important;
+      }
     }
 
     
@@ -676,6 +688,50 @@ if($projects_query) {
     .projct-info {
       justify-content: center !important;
       gap: 2rem !important;
+    }
+
+    /* Mobile view: natural flow & full visibility for button */
+    @media (max-width: 991px) {
+      #project .project-item {
+        position: relative !important;
+        top: auto !important;
+        margin-bottom: 32px !important;
+        align-items: stretch !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+      }
+
+      #project .projct-info {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 24px 20px 28px !important;
+        gap: 1.25rem !important;
+        justify-content: flex-start !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+      }
+
+      #project .projct-info .vertical-headline {
+        margin-bottom: 0 !important;
+      }
+
+      #project .projct-info p {
+        margin-bottom: 0 !important;
+      }
+
+      #project .projct-info .button {
+        display: inline-flex !important;
+        align-self: flex-start !important;
+        margin-top: 8px !important;
+        position: relative !important;
+        z-index: 5 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
     }
   </style>
 
@@ -1293,8 +1349,24 @@ if($projects_query) {
       let cachedTops = [];
       let cachedStickyOffsets = [];
 
+      function handleResponsive() {
+        if (window.innerWidth <= 991) {
+          projectItems.forEach(item => {
+            item.style.removeProperty('top');
+            item.style.removeProperty('position');
+          });
+        }
+      }
+      handleResponsive();
+      window.addEventListener('resize', handleResponsive);
+
       function updateTopsCache() {
         if (!sidebarList) return;
+        if (window.innerWidth <= 991) {
+          handleResponsive();
+          return;
+        }
+
         cachedStickyOffsets = [];
         projectItems.forEach(item => {
           cachedStickyOffsets.push(parseInt(window.getComputedStyle(item).top, 10) || 40);
@@ -1401,8 +1473,13 @@ if($projects_query) {
                 item.style.opacity = '1';
                 if (sidebarItem) sidebarItem.style.display = '';
 
-                const topValue = `calc(var(--_spacing---semi-large, 40px) + ${visibleIndex * 30}px)`;
-                item.style.setProperty('top', topValue, 'important');
+                if (window.innerWidth > 991) {
+                  const topValue = `calc(var(--_spacing---semi-large, 40px) + ${visibleIndex * 30}px)`;
+                  item.style.setProperty('top', topValue, 'important');
+                } else {
+                  item.style.removeProperty('top');
+                  item.style.removeProperty('position');
+                }
 
                 visibleIndex++;
               } else {
