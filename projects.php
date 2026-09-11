@@ -250,11 +250,11 @@ if($projects_query) {
       }
     }
 
-    /* Mobile view: natural flow to prevent overlapping/cutout of project contents */
+    /* Mobile view: sticky stack to match desktop */
     @media (max-width: 991px) {
       #project .project-item {
-        position: relative !important;
-        top: auto !important;
+        position: sticky !important;
+        top: var(--_spacing---semi-large, 40px) !important;
         margin-bottom: 32px !important;
         align-items: stretch !important;
       }
@@ -693,8 +693,8 @@ if($projects_query) {
     /* Mobile view: natural flow & full visibility for button */
     @media (max-width: 991px) {
       #project .project-item {
-        position: relative !important;
-        top: auto !important;
+        position: sticky !important;
+        top: var(--_spacing---semi-large, 40px) !important;
         margin-bottom: 32px !important;
         align-items: stretch !important;
         display: flex !important;
@@ -707,8 +707,8 @@ if($projects_query) {
       #project .projct-info {
         width: 100% !important;
         box-sizing: border-box !important;
-        padding: 24px 20px 28px !important;
-        gap: 1.25rem !important;
+        padding: 20px 16px 24px !important;
+        gap: 0.75rem !important;
         justify-content: flex-start !important;
         height: auto !important;
         min-height: auto !important;
@@ -721,6 +721,12 @@ if($projects_query) {
 
       #project .projct-info p {
         margin-bottom: 0 !important;
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
 
       #project .projct-info .button {
