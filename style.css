@@ -451,3 +451,16 @@ html, body {
   display: none !important;
   visibility: hidden !important;
 }
+
+@media (max-width: 768px) {
+  .contact-footer .footer-copyright,
+  .footer-copyright {
+    width: 100% !important;
+  }
+  .contact-footer .footer-copyright p,
+  .footer-copyright p {
+    font-size: clamp(7px, 2.35vw, 9.5px) !important;
+    letter-spacing: 0.06em !important;
+    white-space: nowrap !important;
+  }
+}
