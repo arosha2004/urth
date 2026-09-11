@@ -1312,172 +1312,198 @@
         </div>
 
 
-        <div class="partner-wrapper">
+        <!-- Dynamic Partner Logos Slideshow Bar -->
+        <style>
+          .urth-partner-slideshow {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 10px 0;
+            user-select: none;
+            margin-top: 1rem;
+          }
 
+          .urth-marquee-row {
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            gap: 16px;
+          }
 
-          <div class="partner-inner">
+          .urth-marquee-track {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            gap: 16px;
+            min-width: 100%;
+            will-change: transform;
+          }
 
+          .urth-marquee-left .urth-marquee-track {
+            animation: urthMarqueeScrollLeft 32s linear infinite;
+          }
 
-            <div class="partner-list one">
+          .urth-marquee-right .urth-marquee-track {
+            animation: urthMarqueeScrollRight 34s linear infinite;
+          }
 
+          .urth-marquee-row:hover .urth-marquee-track {
+            animation-play-state: paused;
+          }
 
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd34ff98470072b66f9_Vector-8.svg" loading="lazy"
+          @keyframes urthMarqueeScrollLeft {
+            0% {
+              transform: translate3d(0, 0, 0);
+            }
+            100% {
+              transform: translate3d(calc(-100% - 16px), 0, 0);
+            }
+          }
 
+          @keyframes urthMarqueeScrollRight {
+            0% {
+              transform: translate3d(calc(-100% - 16px), 0, 0);
+            }
+            100% {
+              transform: translate3d(0, 0, 0);
+            }
+          }
 
-                  alt="logoipsum" class="partner-image"></div>
+          .urth-partner-card {
+            flex: 0 0 auto;
+            width: 200px;
+            height: 96px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid rgba(26, 26, 24, 0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 24px;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            cursor: pointer;
+          }
 
+          .urth-partner-card:hover {
+            transform: translateY(-3px);
+            background-color: #ffffff;
+            border-color: rgba(166, 132, 73, 0.4);
+            box-shadow: 0 10px 25px rgba(166, 132, 73, 0.12), 0 3px 8px rgba(0, 0, 0, 0.04);
+          }
 
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd422cd04882517d662_Vector-7.svg" loading="lazy"
+          .urth-partner-img {
+            max-width: 140px;
+            max-height: 48px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            opacity: 0.55;
+            filter: grayscale(100%);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+          }
 
+          .urth-partner-card:hover .urth-partner-img {
+            opacity: 1;
+            filter: grayscale(0%);
+            transform: scale(1.05);
+          }
 
-                  alt="logoipsum" class="partner-image"></div>
+          .urth-slideshow-overlay {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            pointer-events: none;
+            z-index: 2;
+            background: linear-gradient(90deg, #ebebeb 0%, rgba(235, 235, 235, 0) 12%, rgba(235, 235, 235, 0) 88%, #ebebeb 100%);
+          }
 
+          @media (max-width: 767px) {
+            .urth-partner-slideshow {
+              gap: 12px;
+              padding: 4px 0;
+            }
+            .urth-marquee-row {
+              gap: 12px;
+            }
+            .urth-marquee-track {
+              gap: 12px;
+            }
+            .urth-partner-card {
+              width: 145px;
+              height: 70px;
+              padding: 10px 16px;
+              border-radius: 6px;
+            }
+            .urth-partner-img {
+              max-width: 100px;
+              max-height: 34px;
+            }
+            @keyframes urthMarqueeScrollLeft {
+              0% {
+                transform: translate3d(0, 0, 0);
+              }
+              100% {
+                transform: translate3d(calc(-100% - 12px), 0, 0);
+              }
+            }
+            @keyframes urthMarqueeScrollRight {
+              0% {
+                transform: translate3d(calc(-100% - 12px), 0, 0);
+              }
+              100% {
+                transform: translate3d(0, 0, 0);
+              }
+            }
+          }
+        </style>
 
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd409321d9c654b1350_Vector-5.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd4ebd27a60f0842cac_Vector-3.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd359202e0cb2179d63_Vector-1.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
+        <div class="urth-partner-slideshow" id="urthPartnerSlideshow">
+          <!-- Row 1: Leftward Scrolling Ticker -->
+          <div class="urth-marquee-row urth-marquee-left" id="urthPartnerRow1">
+            <div class="urth-marquee-track">
+              <a href="https://example.com/studio-form" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Studio Form"><img src="img/partners/partner_1.svg" alt="Studio Form" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/archstone" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Archstone"><img src="img/partners/partner_2.svg" alt="Archstone" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/nexus-design" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Nexus Design"><img src="img/partners/partner_3.svg" alt="Nexus Design" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/atelier-k" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Atelier K"><img src="img/partners/partner_4.svg" alt="Atelier K" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/modus-living" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Modus Living"><img src="img/partners/partner_5.svg" alt="Modus Living" class="urth-partner-img" loading="lazy"></a>
             </div>
-
-
-            <div class="partner-list one">
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd34ff98470072b66f9_Vector-8.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd422cd04882517d662_Vector-7.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd409321d9c654b1350_Vector-5.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd4ebd27a60f0842cac_Vector-3.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd359202e0cb2179d63_Vector-1.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
+            <div class="urth-marquee-track" aria-hidden="true">
+              <a href="https://example.com/studio-form" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Studio Form"><img src="img/partners/partner_1.svg" alt="Studio Form" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/archstone" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Archstone"><img src="img/partners/partner_2.svg" alt="Archstone" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/nexus-design" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Nexus Design"><img src="img/partners/partner_3.svg" alt="Nexus Design" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/atelier-k" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Atelier K"><img src="img/partners/partner_4.svg" alt="Atelier K" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/modus-living" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Modus Living"><img src="img/partners/partner_5.svg" alt="Modus Living" class="urth-partner-img" loading="lazy"></a>
             </div>
-
-
           </div>
 
-
-          <div class="partner-inner two">
-
-
-            <div class="partner-list two">
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd3a7845a6b6286b98e_Vector.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd373b56cb52ec0d26d_Vector-2.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd3c3e65cd84072afd8_Vector-4.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img
-
-
-                  src="urth_clone/fonts/6a21dcd4ea0ecbe3a03c5f93_a0ff8d09ea76cda80ad0b23bf6768b9e_Vector-6.svg"
-
-
-                  loading="lazy" alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd4ff69c79eac6bf94a_Vector-9.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
+          <!-- Row 2: Rightward Scrolling Ticker -->
+          <div class="urth-marquee-row urth-marquee-right" id="urthPartnerRow2">
+            <div class="urth-marquee-track">
+              <a href="https://example.com/element-co" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Element Co"><img src="img/partners/partner_6.svg" alt="Element Co" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/minimalist-studio" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Minimalist Studio"><img src="img/partners/partner_7.svg" alt="Minimalist Studio" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/habitat-works" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Habitat Works"><img src="img/partners/partner_8.svg" alt="Habitat Works" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/craft-beam" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Craft & Beam"><img src="img/partners/partner_9.svg" alt="Craft & Beam" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/linea-spaces" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Linea Spaces"><img src="img/partners/partner_10.svg" alt="Linea Spaces" class="urth-partner-img" loading="lazy"></a>
             </div>
-
-
-            <div class="partner-list two">
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd3a7845a6b6286b98e_Vector.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd373b56cb52ec0d26d_Vector-2.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd3c3e65cd84072afd8_Vector-4.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img
-
-
-                  src="urth_clone/fonts/6a21dcd4ea0ecbe3a03c5f93_a0ff8d09ea76cda80ad0b23bf6768b9e_Vector-6.svg"
-
-
-                  loading="lazy" alt="logoipsum" class="partner-image"></div>
-
-
-              <div class="partner-item"><img src="urth_clone/fonts/6a21dcd4ff69c79eac6bf94a_Vector-9.svg" loading="lazy"
-
-
-                  alt="logoipsum" class="partner-image"></div>
-
-
+            <div class="urth-marquee-track" aria-hidden="true">
+              <a href="https://example.com/element-co" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Element Co"><img src="img/partners/partner_6.svg" alt="Element Co" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/minimalist-studio" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Minimalist Studio"><img src="img/partners/partner_7.svg" alt="Minimalist Studio" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/habitat-works" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Habitat Works"><img src="img/partners/partner_8.svg" alt="Habitat Works" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/craft-beam" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Craft & Beam"><img src="img/partners/partner_9.svg" alt="Craft & Beam" class="urth-partner-img" loading="lazy"></a>
+              <a href="https://example.com/linea-spaces" target="_blank" rel="noopener noreferrer" class="urth-partner-card" title="Linea Spaces"><img src="img/partners/partner_10.svg" alt="Linea Spaces" class="urth-partner-img" loading="lazy"></a>
             </div>
-
-
           </div>
 
-
-          <div class="partner-overlay"></div>
+          <div class="urth-slideshow-overlay"></div>
+        </div>
 
 
         </div>
@@ -2175,6 +2201,63 @@
   <script src="../mobile-nav.js"></script>
 
 
+
+  <!-- Dynamic Partner Logos Auto-Fetcher -->
+  <script>
+  (function() {
+    async function loadDynamicPartners() {
+      try {
+        const res = await fetch('api/get_partners.php?v=' + Date.now());
+        if (!res.ok) return;
+        const data = await res.json();
+        const partners = data.partners || [];
+        if (!Array.isArray(partners) || partners.length === 0) return;
+
+        const escapeAttr = (s) => (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        const createCard = (p) => {
+          const tag = p.website_url ? 'a' : 'div';
+          const hrefAttr = p.website_url ? ' href="' + escapeAttr(p.website_url) + '" target="_blank" rel="noopener noreferrer"' : '';
+          return '<' + tag + hrefAttr + ' class="urth-partner-card" title="' + escapeAttr(p.name) + '">' +
+                 '<img src="' + escapeAttr(p.logo_url) + '" alt="' + escapeAttr(p.name) + '" class="urth-partner-img" loading="lazy">' +
+                 '</' + tag + '>';
+        };
+
+        const half = Math.ceil(partners.length / 2);
+        const group1 = partners.slice(0, half);
+        const group2 = partners.slice(half).length > 0 ? partners.slice(half) : group1;
+
+        const buildTrack = (items) => {
+          let list = [...items];
+          while (list.length < 5) {
+            list = list.concat(items);
+          }
+          return list.map(createCard).join('');
+        };
+
+        const row1 = document.getElementById('urthPartnerRow1');
+        const row2 = document.getElementById('urthPartnerRow2');
+
+        if (row1) {
+          const track1 = buildTrack(group1);
+          row1.innerHTML = '<div class="urth-marquee-track">' + track1 + '</div><div class="urth-marquee-track" aria-hidden="true">' + track1 + '</div>';
+        }
+        if (row2) {
+          const track2 = buildTrack(group2);
+          row2.innerHTML = '<div class="urth-marquee-track">' + track2 + '</div><div class="urth-marquee-track" aria-hidden="true">' + track2 + '</div>';
+        }
+      } catch (err) {
+        console.warn('Could not refresh partner logos dynamically:', err);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadDynamicPartners);
+    } else {
+      loadDynamicPartners();
+    }
+  })();
+  </script>
 </body>
 
 

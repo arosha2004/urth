@@ -805,3 +805,126 @@ select.form-control {
   border-top: 1px solid var(--border-color);
   margin-top: auto;
 }
+
+/* ==========================================================================
+   Admin Header Navigation Tabs
+   ========================================================================== */
+.admin-nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-elevated);
+  padding: 4px 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.admin-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.admin-nav-link svg {
+  opacity: 0.7;
+  transition: var(--transition);
+}
+
+.admin-nav-link:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.admin-nav-link.active {
+  color: #ffffff;
+  background: var(--gold-primary);
+  box-shadow: 0 2px 10px rgba(166, 132, 73, 0.28);
+}
+
+.admin-nav-link.active svg {
+  opacity: 1;
+}
+
+/* Partner Logo Specific Styles */
+.partner-thumb-box {
+  width: 90px;
+  height: 48px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.partner-thumb-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.partner-thumb-box:hover img {
+  transform: scale(1.08);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.active {
+  background: var(--success-bg);
+  color: #059669;
+}
+
+.status-badge.inactive {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--text-muted);
+}
+
+.order-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+@media (max-width: 991px) {
+  .admin-header {
+    height: auto;
+    padding: 1rem 1.5rem;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .admin-nav-tabs {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
