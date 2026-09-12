@@ -62,7 +62,7 @@ switch ($msg) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Partner Logos — URTH Admin Panel</title>
-    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="stylesheet" href="assets/css/admin.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -356,7 +356,7 @@ switch ($msg) {
         </div>
         <form action="partner_actions.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="action" value="edit">
-            <input type="hidden" name="id" id="edit_partner_id">
+            <input type="hidden" name="partner_id" id="edit_partner_id">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="edit_partner_name" class="form-label">Partner / Brand Name</label>
@@ -412,7 +412,7 @@ switch ($msg) {
         </div>
         <form action="partner_actions.php" method="POST">
             <input type="hidden" name="action" value="delete">
-            <input type="hidden" name="id" id="delete_partner_id">
+            <input type="hidden" name="partner_id" id="delete_partner_id">
             <div class="modal-body">
                 <p style="color: var(--text-secondary); line-height: 1.6;">
                     Are you sure you want to remove <strong id="delete_partner_name" style="color: var(--text-primary);"></strong> from the partner slideshow showcase?

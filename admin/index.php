@@ -76,7 +76,7 @@ switch ($msg) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Projects — URTH Admin Panel</title>
-    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="stylesheet" href="assets/css/admin.css?v=<?= time() ?>">
 </head>
 <body>
 

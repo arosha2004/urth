@@ -64,7 +64,7 @@ switch ($action) {
         break;
 
     case 'edit':
-        $id = (int)($_POST['id'] ?? 0);
+        $id = (int)($_POST['partner_id'] ?? 0);
         $name = trim($_POST['name'] ?? '');
         $website_url = trim($_POST['website_url'] ?? '');
         $display_order = (int)($_POST['display_order'] ?? 0);
@@ -113,7 +113,7 @@ switch ($action) {
         break;
 
     case 'delete':
-        $id = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
+        $id = (int)($_POST['partner_id'] ?? $_GET['partner_id'] ?? $_POST['id'] ?? $_GET['id'] ?? 0);
         if ($id <= 0) {
             header('Location: partners.php?msg=error_invalid');
             exit;
