@@ -704,10 +704,15 @@ if($projects_query) {
         overflow: visible !important;
       }
 
+      #project .project-image {
+        aspect-ratio: 16 / 9 !important;
+        max-height: 220px !important;
+      }
+
       #project .projct-info {
         width: 100% !important;
         box-sizing: border-box !important;
-        padding: 20px 16px 24px !important;
+        padding: 16px 16px 20px !important;
         gap: 0.75rem !important;
         justify-content: flex-start !important;
         height: auto !important;
@@ -724,19 +729,31 @@ if($projects_query) {
         font-size: 14px !important;
         line-height: 1.4 !important;
         display: -webkit-box;
-        -webkit-line-clamp: 4;
+        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
 
       #project .projct-info .button {
         display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         align-self: flex-start !important;
-        margin-top: 8px !important;
+        margin-top: 10px !important;
         position: relative !important;
-        z-index: 5 !important;
+        z-index: 10 !important;
         visibility: visible !important;
         opacity: 1 !important;
+        background-color: #3b2a20 !important;
+        padding: 12px 24px !important;
+        border-radius: 6px !important;
+        pointer-events: auto !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+      }
+
+      #project .projct-info .button .button-text {
+        color: #ffffff !important;
+        font-weight: 500 !important;
       }
 
       .contact-footer .footer-copyright,
