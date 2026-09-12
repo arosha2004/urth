@@ -49,6 +49,10 @@ switch ($msg) {
         $alertMessage = 'Invalid file type. Supported formats: SVG, PNG, JPG, WEBP.';
         $alertType = 'danger';
         break;
+    case 'error_size':
+        $alertMessage = 'The uploaded image is too large. Please upload a smaller file (under 2MB).';
+        $alertType = 'danger';
+        break;
     case 'error_upload':
     case 'error_db':
         $alertMessage = 'An unexpected error occurred. Please try again.';
@@ -154,15 +158,7 @@ switch ($msg) {
                 </div>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-info">
-                    <div class="stat-label">Hidden / Inactive</div>
-                    <div class="stat-value" style="color: var(--text-muted);"><?= $inactivePartners ?></div>
-                </div>
-                <div class="stat-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                </div>
-            </div>
+
         </div>
 
         <!-- Toolbar & Filter Card -->
@@ -244,19 +240,6 @@ switch ($msg) {
 
                                     <td>
                                         <div class="table-actions" style="justify-content: flex-end;">
-                                            <button type="button"
-                                                    class="btn btn-outline btn-sm edit-partner-btn"
-                                                    data-id="<?= $partner['id'] ?>"
-                                                    data-name="<?= htmlspecialchars($partner['name'], ENT_QUOTES) ?>"
-                                                    data-logo="<?= htmlspecialchars($logoSrc, ENT_QUOTES) ?>"
-                                                    data-url="<?= htmlspecialchars($partner['website_url'] ?? '', ENT_QUOTES) ?>"
-                                                    data-order="<?= (int)$partner['display_order'] ?>"
-                                                    data-active="<?= (int)$partner['is_active'] ?>"
-                                                    title="Edit partner details">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                                Edit
-                                            </button>
-
                                             <button type="button"
                                                     class="btn btn-danger btn-sm delete-partner-btn"
                                                     data-id="<?= $partner['id'] ?>"
@@ -347,62 +330,6 @@ switch ($msg) {
     </div>
 </div>
 
-<!-- Modal: Edit Partner -->
-<div id="editPartnerModal" class="modal-overlay">
-    <div class="modal-dialog">
-        <div class="modal-header">
-            <h3 class="modal-title">Edit Partner Logo</h3>
-            <button type="button" class="modal-close" data-modal-close>&times;</button>
-        </div>
-        <form action="partner_actions.php" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="action" value="edit">
-            <input type="hidden" name="partner_id" id="edit_partner_id">
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="edit_partner_name" class="form-label">Partner / Brand Name</label>
-                    <input type="text" id="edit_partner_name" name="name" class="form-control" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Current Logo</label>
-                    <div class="partner-thumb-box" style="width: 140px; height: 64px; margin-bottom: 8px;">
-                        <img id="edit_partner_current_logo" src="" alt="Current Logo">
-                    </div>
-                    <label for="edit_partner_logo" class="form-label">Replace Logo Image (Optional)</label>
-                    <input type="file" id="edit_partner_logo" name="logo_image" class="form-control" accept=".svg,.png,.jpg,.jpeg,.webp">
-                    <div id="edit_logo_preview_wrap" style="display: none; margin-top: 10px;">
-                        <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">New Replacement Preview:</span>
-                        <div class="partner-thumb-box" style="width: 140px; height: 64px;">
-                            <img id="edit_logo_preview" src="" alt="New Preview">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="edit_partner_url" class="form-label">Website URL (Optional)</label>
-                    <input type="url" id="edit_partner_url" name="website_url" class="form-control" placeholder="https://example.com">
-                </div>
-
-                <div class="form-group">
-                    <label for="edit_partner_order" class="form-label">Display Order</label>
-                    <input type="number" id="edit_partner_order" name="display_order" class="form-control" min="0">
-                </div>
-
-                <div class="form-group" style="margin-top: 15px;">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
-                        <input type="checkbox" id="edit_partner_active" name="is_active" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
-                        Display actively in About page slideshow
-                    </label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
-                <button type="submit" class="btn btn-gold">Save Changes</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <!-- Modal: Delete Confirmation -->
 <div id="deletePartnerModal" class="modal-overlay">
     <div class="modal-dialog" style="max-width: 440px;">
@@ -485,53 +412,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 reader.readAsDataURL(this.files[0]);
             } else {
                 addPreviewWrap.style.display = 'none';
-            }
-        });
-    }
-
-    // Open Edit Modal
-    const editModal = document.getElementById('editPartnerModal');
-    document.querySelectorAll('.edit-partner-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const id = btn.getAttribute('data-id');
-            const name = btn.getAttribute('data-name');
-            const logo = btn.getAttribute('data-logo');
-            const url = btn.getAttribute('data-url');
-            const order = btn.getAttribute('data-order');
-            const active = btn.getAttribute('data-active');
-
-            document.getElementById('edit_partner_id').value = id;
-            document.getElementById('edit_partner_name').value = name;
-            document.getElementById('edit_partner_current_logo').src = logo;
-            document.getElementById('edit_partner_url').value = url;
-            document.getElementById('edit_partner_order').value = order;
-            document.getElementById('edit_partner_active').checked = (active === '1');
-
-            // Reset replacement file input & preview
-            const editFileInput = document.getElementById('edit_partner_logo');
-            const editPreviewWrap = document.getElementById('edit_logo_preview_wrap');
-            if (editFileInput) editFileInput.value = '';
-            if (editPreviewWrap) editPreviewWrap.style.display = 'none';
-
-            openModal(editModal);
-        });
-    });
-
-    // Edit Image Replacement Preview
-    const editFileInput = document.getElementById('edit_partner_logo');
-    const editPreviewWrap = document.getElementById('edit_logo_preview_wrap');
-    const editPreviewImg = document.getElementById('edit_logo_preview');
-    if (editFileInput && editPreviewWrap && editPreviewImg) {
-        editFileInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    editPreviewImg.src = e.target.result;
-                    editPreviewWrap.style.display = 'block';
-                };
-                reader.readAsDataURL(this.files[0]);
-            } else {
-                editPreviewWrap.style.display = 'none';
             }
         });
     }
