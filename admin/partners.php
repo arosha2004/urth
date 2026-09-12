@@ -71,7 +71,7 @@ switch ($msg) {
     <!-- Header Navigation Bar -->
     <header class="admin-header">
         <a href="index.php" class="header-brand">
-            <div class="brand-logo-mark">U</div>
+            <img src="../urth_clone/images/6a1c3ef3f96cad36ed74d8cd_favicon.jpg" alt="URTH Logo" style="width: 38px; height: 38px; border-radius: var(--radius-sm); object-fit: cover;">
             <div class="brand-text">
                 <span class="brand-name">URTH</span>
                 <span class="brand-sub">Admin Console</span>
@@ -189,7 +189,7 @@ switch ($msg) {
                             <th style="width: 120px;">Logo</th>
                             <th>Partner Name</th>
                             <th>Website Link</th>
-                            <th style="width: 110px;">Status</th>
+
                             <th style="width: 160px; text-align: right;">Actions</th>
                         </tr>
                     </thead>
@@ -241,19 +241,7 @@ switch ($msg) {
                                             <span style="color: var(--text-muted); font-size: 12px;">No link specified</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
-                                        <?php if ((int)$partner['is_active'] === 1): ?>
-                                            <span class="status-badge active">
-                                                <span style="width: 6px; height: 6px; border-radius: 50%; background: #059669;"></span>
-                                                Active
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="status-badge inactive">
-                                                <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted);"></span>
-                                                Hidden
-                                            </span>
-                                        <?php endif; ?>
-                                    </td>
+
                                     <td>
                                         <div class="table-actions" style="justify-content: flex-end;">
                                             <button type="button"

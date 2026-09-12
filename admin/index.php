@@ -85,7 +85,7 @@ switch ($msg) {
     <!-- Header Navigation Bar -->
     <header class="admin-header">
         <a href="index.php" class="header-brand">
-            <div class="brand-logo-mark">U</div>
+            <img src="../urth_clone/images/6a1c3ef3f96cad36ed74d8cd_favicon.jpg" alt="URTH Logo" style="width: 38px; height: 38px; border-radius: var(--radius-sm); object-fit: cover;">
             <div class="brand-text">
                 <span class="brand-name">URTH</span>
                 <span class="brand-sub">Admin Console</span>

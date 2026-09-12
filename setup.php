@@ -57,6 +57,23 @@ if ($conn->query($sql_images) === TRUE) {
     echo "Error creating project_images table: " . $conn->error . "<br>";
 }
 
+// Create partners table
+$sql_partners = "CREATE TABLE IF NOT EXISTS partners (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    logo_url VARCHAR(255) NOT NULL,
+    website_url VARCHAR(255) DEFAULT NULL,
+    display_order INT(11) DEFAULT 0,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+
+if ($conn->query($sql_partners) === TRUE) {
+    echo "Table partners created successfully or already exists.<br>";
+} else {
+    echo "Error creating partners table: " . $conn->error . "<br>";
+}
+
 $conn->close();
 echo "<a href='index.php'>Return to Home</a>";
 ?>

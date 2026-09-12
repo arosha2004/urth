@@ -34,7 +34,7 @@ for f in files:
     # 2. Update Phone Number link to WhatsApp
     new_content = re.sub(
         r'<a\s+href="tel:0768008687"\s*style="([^"]*)">0768008687</a>',
-        r'<a href="https://wa.me/94768008687" target="_blank" style="\1">0768008687</a>',
+        r'<a href="https://wa.me/94768008687" target="_blank" style="\1">+94768008687</a>',
         content
     )
     if new_content != content:
@@ -44,7 +44,7 @@ for f in files:
     # If the phone number link was already changed to wa.me but without target="_blank" or different format
     new_content = re.sub(
         r'<a\s+href="tel:0768008687">0768008687</a>',
-        r'<a href="https://wa.me/94768008687" target="_blank" style="color: white;">0768008687</a>',
+        r'<a href="https://wa.me/94768008687" target="_blank" style="color: white;">+94768008687</a>',
         content
     )
     if new_content != content:
