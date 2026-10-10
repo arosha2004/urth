@@ -1,0 +1,12 @@
+# Environment variables — NEVER commit real credentials
+.env
+
+# SQLite admin database (contains hashed passwords)
+admin/data/urth_admin.sqlite
+admin/data/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.bak

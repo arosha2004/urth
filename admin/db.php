@@ -34,14 +34,16 @@ try {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )");
 
-    // Ensure default admin user exists
+    // Ensure default admin user exists.
+    // IMPORTANT: Change this password immediately after first login via the DB or an admin reset tool.
+    // The hash below is bcrypt for the placeholder "change-me-on-first-login!" — do NOT use it in production.
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin_users WHERE username = :username");
     $stmt->execute(['username' => 'urthadmin']);
     if ($stmt->fetchColumn() == 0) {
         $insertAdmin = $pdo->prepare("INSERT INTO admin_users (username, password) VALUES (:username, :password)");
         $insertAdmin->execute([
             'username' => 'urthadmin',
-            'password' => password_hash('12345678', PASSWORD_DEFAULT)
+            'password' => password_hash('change-me-on-first-login!', PASSWORD_BCRYPT, ['cost' => 12])
         ]);
     }
 

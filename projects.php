@@ -777,7 +777,7 @@ if($projects_query) {
   <!-- HERO SECTION -->
   <header class="hero-section">
     <div class="hero-bg">
-      <img src="img/urthprojs/EXTERIOR.png" alt="Hero background" />
+      <img src="img/new/PROJECT SHOWCASE.png" alt="Hero background" />
     </div>
 
     <div class="hero-top-nav">

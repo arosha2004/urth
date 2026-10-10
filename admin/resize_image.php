@@ -40,6 +40,13 @@ function resizeImage($source_path, $dest_path, $max_width = 1920, $max_height = 
         $new_width = $new_height * $ratio;
     }
     
+    if ($new_width == $orig_width && $new_height == $orig_height) {
+        if ($source_path !== $dest_path) {
+            return copy($source_path, $dest_path);
+        }
+        return true;
+    }
+    
     // Create new image resource
     $new_image = imagecreatetruecolor(round($new_width), round($new_height));
     
@@ -87,7 +94,7 @@ function resizeImage($source_path, $dest_path, $max_width = 1920, $max_height = 
     $success = false;
     switch ($image_type) {
         case IMAGETYPE_JPEG:
-            $success = imagejpeg($new_image, $dest_path, 85); // 85 quality
+            $success = imagejpeg($new_image, $dest_path, 100); // 100 quality
             break;
         case IMAGETYPE_PNG:
             $success = imagepng($new_image, $dest_path, 8); // Compression level 8
@@ -96,7 +103,7 @@ function resizeImage($source_path, $dest_path, $max_width = 1920, $max_height = 
             $success = imagegif($new_image, $dest_path);
             break;
         case IMAGETYPE_WEBP:
-            $success = imagewebp($new_image, $dest_path, 85);
+            $success = imagewebp($new_image, $dest_path, 100); // 100 quality
             break;
     }
     

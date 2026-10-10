@@ -178,7 +178,7 @@ switch ($msg) {
         <!-- Table Card Section -->
         <div class="table-card">
             <div class="table-responsive">
-                <table class="data-table" id="partnersTable">
+                <table class="custom-table" id="partnersTable">
                     <thead>
                         <tr>
                             <th style="width: 70px;">Order</th>
@@ -239,7 +239,19 @@ switch ($msg) {
                                     </td>
 
                                     <td>
-                                        <div class="table-actions" style="justify-content: flex-end;">
+                                        <div class="table-actions" style="justify-content: flex-end; gap: 8px;">
+                                            <button type="button"
+                                                    class="btn btn-outline btn-sm edit-partner-btn"
+                                                    data-id="<?= $partner['id'] ?>"
+                                                    data-name="<?= htmlspecialchars($partner['name'], ENT_QUOTES) ?>"
+                                                    data-url="<?= htmlspecialchars($partner['website_url'] ?? '', ENT_QUOTES) ?>"
+                                                    data-order="<?= (int)$partner['display_order'] ?>"
+                                                    data-active="<?= (int)$partner['is_active'] ?>"
+                                                    data-logo="<?= htmlspecialchars($logoSrc, ENT_QUOTES) ?>"
+                                                    title="Edit partner logo">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                                Edit
+                                            </button>
                                             <button type="button"
                                                     class="btn btn-danger btn-sm delete-partner-btn"
                                                     data-id="<?= $partner['id'] ?>"
@@ -330,6 +342,58 @@ switch ($msg) {
     </div>
 </div>
 
+<!-- Modal: Edit Partner -->
+<div id="editPartnerModal" class="modal-overlay">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit Partner Logo</h3>
+            <button type="button" class="modal-close" data-modal-close>&times;</button>
+        </div>
+        <form action="partner_actions.php" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="partner_id" id="edit_partner_id">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit_partner_name" class="form-label">Partner / Brand Name</label>
+                    <input type="text" id="edit_partner_name" name="name" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_partner_logo" class="form-label">Update Logo Image (Optional)</label>
+                    <input type="file" id="edit_partner_logo" name="logo_image" class="form-control" accept=".svg,.png,.jpg,.jpeg,.webp">
+                    <div style="margin-top: 10px;">
+                        <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Current Logo (or Selected Preview):</span>
+                        <div class="partner-thumb-box" style="width: 140px; height: 64px;">
+                            <img id="edit_logo_preview" src="" alt="Preview">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_partner_url" class="form-label">Website URL (Optional)</label>
+                    <input type="url" id="edit_partner_url" name="website_url" class="form-control" placeholder="https://example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_partner_order" class="form-label">Display Order</label>
+                    <input type="number" id="edit_partner_order" name="display_order" class="form-control" min="0">
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                        <input type="checkbox" id="edit_partner_active" name="is_active" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
+                        Display actively in About page slideshow
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+                <button type="submit" class="btn btn-gold">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Modal: Delete Confirmation -->
 <div id="deletePartnerModal" class="modal-overlay">
     <div class="modal-dialog" style="max-width: 440px;">
@@ -415,6 +479,36 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Edit Image Live Preview
+    const editFileInput = document.getElementById('edit_partner_logo');
+    const editPreviewImg = document.getElementById('edit_logo_preview');
+    if (editFileInput && editPreviewImg) {
+        editFileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    editPreviewImg.src = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+
+    // Open Edit Modal
+    const editModal = document.getElementById('editPartnerModal');
+    document.querySelectorAll('.edit-partner-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('edit_partner_id').value = btn.getAttribute('data-id');
+            document.getElementById('edit_partner_name').value = btn.getAttribute('data-name');
+            document.getElementById('edit_partner_url').value = btn.getAttribute('data-url');
+            document.getElementById('edit_partner_order').value = btn.getAttribute('data-order');
+            document.getElementById('edit_partner_active').checked = btn.getAttribute('data-active') === '1';
+            document.getElementById('edit_logo_preview').src = btn.getAttribute('data-logo');
+            editFileInput.value = ''; // Reset file input
+            openModal(editModal);
+        });
+    });
 
     // Open Delete Modal
     const deleteModal = document.getElementById('deletePartnerModal');

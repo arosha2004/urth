@@ -1,7 +1,6 @@
 <?php
 /**
  * URTH Admin Panel - Login Screen
- * Credentials: username = urthadmin, password = 12345678
  */
 
 require_once __DIR__ . '/auth.php';

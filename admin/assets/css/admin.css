@@ -901,7 +901,7 @@ select.form-control {
 }
 
 .order-badge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 28px;
@@ -912,6 +912,9 @@ select.form-control {
   font-weight: 700;
   font-size: 12px;
   color: var(--text-primary);
+  text-align: center;
+  line-height: 1;
+  padding: 0;
 }
 
 @media (max-width: 991px) {
@@ -925,6 +928,9 @@ select.form-control {
     order: 3;
     width: 100%;
     justify-content: center;
+  }
+  .table-responsive .custom-table {
+    min-width: 700px;
   }
 }
 
