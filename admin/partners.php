@@ -41,6 +41,10 @@ switch ($msg) {
         $alertMessage = 'Please fill in all required fields.';
         $alertType = 'danger';
         break;
+    case 'error_invalid':
+        $alertMessage = 'Invalid partner record specified.';
+        $alertType = 'danger';
+        break;
     case 'error_file':
         $alertMessage = 'Please select a valid image file for the partner logo.';
         $alertType = 'danger';
@@ -352,6 +356,7 @@ switch ($msg) {
         <form action="partner_actions.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="action" value="edit">
             <input type="hidden" name="partner_id" id="edit_partner_id">
+            <input type="hidden" name="id" id="edit_partner_id_alt">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="edit_partner_name" class="form-label">Partner / Brand Name</label>
@@ -371,7 +376,7 @@ switch ($msg) {
 
                 <div class="form-group">
                     <label for="edit_partner_url" class="form-label">Website URL (Optional)</label>
-                    <input type="url" id="edit_partner_url" name="website_url" class="form-control" placeholder="https://example.com">
+                    <input type="text" id="edit_partner_url" name="website_url" class="form-control" placeholder="https://example.com">
                 </div>
 
                 <div class="form-group">
@@ -404,6 +409,7 @@ switch ($msg) {
         <form action="partner_actions.php" method="POST">
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="partner_id" id="delete_partner_id">
+            <input type="hidden" name="id" id="delete_partner_id_alt">
             <div class="modal-body">
                 <p style="color: var(--text-secondary); line-height: 1.6;">
                     Are you sure you want to remove <strong id="delete_partner_name" style="color: var(--text-primary);"></strong> from the partner slideshow showcase?
@@ -495,31 +501,87 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Open Edit Modal
+    // Edit & Delete Modal Management
     const editModal = document.getElementById('editPartnerModal');
+    const deleteModal = document.getElementById('deletePartnerModal');
+
+    function openEditForElement(targetBtn) {
+        if (!targetBtn) return;
+        const id = targetBtn.getAttribute('data-id') || targetBtn.dataset.id || '';
+        const name = targetBtn.getAttribute('data-name') || targetBtn.dataset.name || '';
+        const url = targetBtn.getAttribute('data-url') || targetBtn.dataset.url || '';
+        const order = targetBtn.getAttribute('data-order') || targetBtn.dataset.order || '0';
+        const active = targetBtn.getAttribute('data-active') || targetBtn.dataset.active || '1';
+        const logo = targetBtn.getAttribute('data-logo') || targetBtn.dataset.logo || '';
+
+        const idField = document.getElementById('edit_partner_id');
+        if (idField) idField.value = id;
+        const idAltField = document.getElementById('edit_partner_id_alt');
+        if (idAltField) idAltField.value = id;
+
+        const nameField = document.getElementById('edit_partner_name');
+        if (nameField) nameField.value = name;
+
+        const urlField = document.getElementById('edit_partner_url');
+        if (urlField) urlField.value = url;
+
+        const orderField = document.getElementById('edit_partner_order');
+        if (orderField) orderField.value = order;
+
+        const activeField = document.getElementById('edit_partner_active');
+        if (activeField) activeField.checked = (active === '1' || active === 1 || active === true);
+
+        const previewImg = document.getElementById('edit_logo_preview');
+        if (previewImg) previewImg.src = logo;
+
+        if (editFileInput) editFileInput.value = '';
+        openModal(editModal);
+    }
+
+    function openDeleteForElement(targetBtn) {
+        if (!targetBtn) return;
+        const id = targetBtn.getAttribute('data-id') || targetBtn.dataset.id || '';
+        const name = targetBtn.getAttribute('data-name') || targetBtn.dataset.name || '';
+
+        const idField = document.getElementById('delete_partner_id');
+        if (idField) idField.value = id;
+        const idAltField = document.getElementById('delete_partner_id_alt');
+        if (idAltField) idAltField.value = id;
+
+        const nameDisplay = document.getElementById('delete_partner_name');
+        if (nameDisplay) nameDisplay.textContent = name;
+
+        openModal(deleteModal);
+    }
+
+    // Direct click listeners
     document.querySelectorAll('.edit-partner-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.getElementById('edit_partner_id').value = btn.getAttribute('data-id');
-            document.getElementById('edit_partner_name').value = btn.getAttribute('data-name');
-            document.getElementById('edit_partner_url').value = btn.getAttribute('data-url');
-            document.getElementById('edit_partner_order').value = btn.getAttribute('data-order');
-            document.getElementById('edit_partner_active').checked = btn.getAttribute('data-active') === '1';
-            document.getElementById('edit_logo_preview').src = btn.getAttribute('data-logo');
-            editFileInput.value = ''; // Reset file input
-            openModal(editModal);
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openEditForElement(e.currentTarget || btn);
         });
     });
 
-    // Open Delete Modal
-    const deleteModal = document.getElementById('deletePartnerModal');
     document.querySelectorAll('.delete-partner-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const id = btn.getAttribute('data-id');
-            const name = btn.getAttribute('data-name');
-            document.getElementById('delete_partner_id').value = id;
-            document.getElementById('delete_partner_name').textContent = name;
-            openModal(deleteModal);
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openDeleteForElement(e.currentTarget || btn);
         });
+    });
+
+    // Delegated click listener on document for maximum reliability
+    document.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.edit-partner-btn');
+        if (editBtn) {
+            openEditForElement(editBtn);
+            return;
+        }
+
+        const deleteBtn = e.target.closest('.delete-partner-btn');
+        if (deleteBtn) {
+            openDeleteForElement(deleteBtn);
+            return;
+        }
     });
 
     // Client-side instant filter/search
