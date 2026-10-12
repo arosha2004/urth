@@ -7,7 +7,6 @@ require_once __DIR__ . '/auth.php';
 require_admin_auth();
 require_once '../config.php';
 
-// Auto-repair partners table: ensure AUTO_INCREMENT PRIMARY KEY exists and all rows have valid positive IDs
 $tblCheck = $conn->query("SHOW TABLES LIKE 'partners'");
 if ($tblCheck && $tblCheck->num_rows > 0) {
     $colCheck = $conn->query("SHOW COLUMNS FROM partners LIKE 'id'");

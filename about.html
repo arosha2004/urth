@@ -67,16 +67,100 @@
   <meta content="Webflow" name="generator"><!--$-->
 
 
-  <link href="urth_clone/css/urth-studio.webflow.shared.c7afc3d60.css?v=2" rel="stylesheet" type="text/css"><!--/$-->
-
+  <link href="urth_clone/css/urth-studio.webflow.shared.c7afc3d60.css?v=4" rel="stylesheet" type="text/css"><!--/$-->
 
   <style>
     html.w-mod-js:not(.w-mod-ix3) :is([long-heading], .value-item-about, .counter.up, .counter.down, .parallax-image, .link-line, [fade-in-down], [fade-in-up-1], [button-text], [fade-in-up-3], [heading-up-1], [fade-in-up-2], [fade-in-up-4], .answer, .faq-icon, .faq-dropdown, .button-hover-bg, .service-image-inner, [data-wf-target*='["6a1c3d9d7686060838b279f9","bbbecb12-4ddc-6540-44b3-bab933ba27d6"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","f6733bf2-2f50-42f6-f382-d5cd3298c8d0"]'], [data-wf-target*='["6a1c3d9d7686060838b279f9","ca255160-7d44-adf6-6977-cf67932046ee"]'], .about-image-two, .wcu-image, .wcu-overlay, .wcu-text-wrapper, .text, .heading-5, .heading-2, .process-headline, .process-item.one, .process-item.two, .process-item.three, .process-item.four, .project-item, .counter-2.down, .counter-2.up, .partner-list.one, .partner-list.two, .testimonial-list, .hero-load-background, .contact-image.two, .contact-image.three, .contact-image.four) {
-
-
       visibility: hidden !important;
+    }
 
-
+    /* Refined Testimonial Cards: Increased height, clear typography, generous spacing */
+    .testimonial-list {
+      min-width: max-content !important;
+      margin-right: 1.5rem !important;
+      grid-column-gap: 1.5rem !important;
+      grid-row-gap: 1.5rem !important;
+      grid-template-columns: repeat(4, 460px) !important;
+      grid-auto-columns: 460px !important;
+      place-items: stretch start !important;
+      display: grid !important;
+    }
+    .testimonial-item {
+      width: 460px !important;
+      min-width: 460px !important;
+      max-width: 460px !important;
+      min-height: 22.5rem !important;
+      height: auto !important;
+      padding: 2.25rem 2rem !important;
+      grid-column-gap: 1.5rem !important;
+      grid-row-gap: 1.5rem !important;
+      border-radius: 6px !important;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+      transition: all .35s ease !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+    }
+    .testimonial-item:hover {
+      background-color: #000000 !important;
+      color: #ffffff !important;
+      transform: translateY(-4px) !important;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12) !important;
+    }
+    .testimonial-item .big-text {
+      font-size: 17px !important;
+      line-height: 1.65 !important;
+      font-weight: 400 !important;
+      letter-spacing: -0.01em !important;
+      color: #1a1a1a !important;
+    }
+    .testimonial-item:hover .big-text {
+      color: #ffffff !important;
+    }
+    .testimonial-item > div:last-child {
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.03em !important;
+      text-transform: uppercase !important;
+      color: #777777 !important;
+      margin-top: 1.5rem !important;
+    }
+    .testimonial-item:hover > div:last-child {
+      color: #c5a880 !important;
+    }
+    @media screen and (max-width: 991px) {
+      .testimonial-list {
+        grid-template-columns: repeat(4, 400px) !important;
+        grid-auto-columns: 400px !important;
+      }
+      .testimonial-item {
+        width: 400px !important;
+        min-width: 400px !important;
+        max-width: 400px !important;
+        min-height: 21rem !important;
+        padding: 2rem 1.75rem !important;
+      }
+      .testimonial-item .big-text {
+        font-size: 16px !important;
+        line-height: 1.6 !important;
+      }
+    }
+    @media screen and (max-width: 767px) {
+      .testimonial-list {
+        grid-template-columns: repeat(4, 330px) !important;
+        grid-auto-columns: 330px !important;
+      }
+      .testimonial-item {
+        width: 330px !important;
+        min-width: 330px !important;
+        max-width: 330px !important;
+        min-height: 19rem !important;
+        padding: 1.75rem 1.5rem !important;
+      }
+      .testimonial-item .big-text {
+        font-size: 15px !important;
+        line-height: 1.55 !important;
+      }
     }
   </style>
 
