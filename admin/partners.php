@@ -7,6 +7,45 @@ require_once __DIR__ . '/auth.php';
 require_admin_auth();
 require_once '../config.php';
 
+// Auto-repair partners table: ensure AUTO_INCREMENT PRIMARY KEY exists and all rows have valid positive IDs
+$tblCheck = $conn->query("SHOW TABLES LIKE 'partners'");
+if ($tblCheck && $tblCheck->num_rows > 0) {
+    $colCheck = $conn->query("SHOW COLUMNS FROM partners LIKE 'id'");
+    $colInfo = $colCheck ? $colCheck->fetch_assoc() : null;
+    $needsSchemaRepair = false;
+
+    if (!$colInfo || stripos($colInfo['Extra'] ?? '', 'auto_increment') === false || ($colInfo['Key'] ?? '') !== 'PRI') {
+        $needsSchemaRepair = true;
+    } else {
+        $zeroCheck = $conn->query("SELECT COUNT(*) AS zero_count FROM partners WHERE id <= 0 OR id IS NULL");
+        if ($zeroCheck && ($zRow = $zeroCheck->fetch_assoc()) && (int)$zRow['zero_count'] > 0) {
+            $needsSchemaRepair = true;
+        }
+    }
+
+    if ($needsSchemaRepair) {
+        try {
+            if ($colInfo && ($colInfo['Key'] ?? '') === 'PRI') {
+                $conn->query("ALTER TABLE partners DROP PRIMARY KEY");
+            }
+            if ($colInfo) {
+                $conn->query("ALTER TABLE partners DROP COLUMN id");
+            }
+            $conn->query("ALTER TABLE partners ADD id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
+        } catch (Throwable $ignore) {}
+    }
+} else {
+    $conn->query("CREATE TABLE IF NOT EXISTS partners (
+        id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        logo_url VARCHAR(255) NOT NULL,
+        website_url VARCHAR(255) DEFAULT NULL,
+        display_order INT(11) DEFAULT 0,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+}
+
 // Fetch all partners ordered by display_order ASC, id DESC
 $result = $conn->query("SELECT * FROM partners ORDER BY display_order ASC, id DESC");
 $partners = [];

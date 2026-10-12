@@ -1,27 +1,6 @@
 <?php
 // setup.php
-$db_host = 'localhost';
-$db_user = 'root';
-$db_pass = ''; // Default XAMPP password is empty
-
-// Create connection
-$conn = new mysqli($db_host, $db_user, $db_pass);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Create database
-$sql = "CREATE DATABASE IF NOT EXISTS urth_db";
-if ($conn->query($sql) === TRUE) {
-    echo "Database urth_db created successfully or already exists.<br>";
-} else {
-    echo "Error creating database: " . $conn->error . "<br>";
-}
-
-// Select the database
-$conn->select_db('urth_db');
+require_once 'config.php';
 
 // Create table
 $sql = "CREATE TABLE IF NOT EXISTS projects (
