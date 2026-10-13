@@ -1,93 +1,168 @@
 <?php
+require_once __DIR__ . '/auth.php';
+require_admin_auth(); // FIX #6: Auth guard was completely missing
+
 require_once '../config.php';
 require_once 'resize_image.php';
+
+// FIX #7 & #10: Allowed MIME types validated server-side
+$allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+/**
+ * Validate and move an uploaded image file.
+ * Returns the absolute saved path on success, '' on failure.
+ */
+function handle_image_upload(array $file, string $upload_dir, string $suffix): string {
+    global $allowed_mime_types;
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return '';
+    }
+
+    // FIX #7: Validate MIME type using finfo (server-side, not client filename)
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime  = $finfo->file($file['tmp_name']);
+    if (!in_array($mime, $allowed_mime_types, true)) {
+        return '';
+    }
+
+    $mime_to_ext = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/gif'  => 'gif',
+        'image/webp' => 'webp',
+    ];
+    $ext      = $mime_to_ext[$mime];
+    $filename = time() . '_' . $suffix . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+
+    // FIX #10: Secure directory permissions (755)
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+
+    $target_file = $upload_dir . $filename;
+    if (move_uploaded_file($file['tmp_name'], $target_file)) {
+        return $target_file;
+    }
+    return '';
+}
 
 if (!isset($_GET['id'])) {
     header('Location: index.php');
     exit;
 }
-$id = (int)$_GET['id'];
+$id = (int) $_GET['id'];
 
 // Handle image deletion
 if (isset($_GET['delete_image'])) {
-    $img_id = (int)$_GET['delete_image'];
-    // get image path to delete file
-    $img_query = $conn->query("SELECT image_path FROM project_images WHERE id=$img_id AND project_id=$id");
-    if ($img_query->num_rows > 0) {
-        $img = $img_query->fetch_assoc();
-        $file_path = '../' . $img['image_path'];
-        if (file_exists($file_path) && !is_dir($file_path)) {
+    $img_id = (int) $_GET['delete_image'];
+
+    // FIX #2 & #8: Use prepared statement; verify ownership before deleting
+    $img_stmt = $conn->prepare("SELECT image_path FROM project_images WHERE id = ? AND project_id = ?");
+    $img_stmt->bind_param('ii', $img_id, $id);
+    $img_stmt->execute();
+    $img_result = $img_stmt->get_result();
+
+    if ($img_result && $img_result->num_rows > 0) {
+        $img = $img_result->fetch_assoc();
+
+        // FIX #8: Ensure the stored path is within the expected uploads directory
+        $real_upload_dir = realpath(__DIR__ . '/../img/uploads');
+        $file_path       = realpath(__DIR__ . '/../' . $img['image_path']);
+
+        if ($file_path !== false
+            && $real_upload_dir !== false
+            && str_starts_with($file_path, $real_upload_dir)
+            && is_file($file_path)
+        ) {
             unlink($file_path);
         }
-        $conn->query("DELETE FROM project_images WHERE id=$img_id AND project_id=$id");
+
+        $del_stmt = $conn->prepare("DELETE FROM project_images WHERE id = ? AND project_id = ?");
+        $del_stmt->bind_param('ii', $img_id, $id);
+        $del_stmt->execute();
     }
     header("Location: edit_project.php?id=$id");
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = $conn->real_escape_string($_POST['title']);
-    $category = $conn->real_escape_string($_POST['category']);
-    $description = $conn->real_escape_string($_POST['description']);
-    $location = $conn->real_escape_string($_POST['location'] ?? 'Sri Lanka');
-    
-    $upload_dir = '../img/uploads/';
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-    
-    // Handle Hero Image (image1)
-    $image1_path = false;
-    if (isset($_FILES['image1']) && $_FILES['image1']['error'] === UPLOAD_ERR_OK) {
-        $filename = time() . '_hero_' . basename($_FILES['image1']['name']);
-        $target_file = $upload_dir . $filename;
-        if (move_uploaded_file($_FILES['image1']['tmp_name'], $target_file)) {
-            resizeImage($target_file, $target_file, 1920, 1080);
-            $image1_path = 'img/uploads/' . $filename;
+    $title       = trim($_POST['title']       ?? '');
+    $category    = trim($_POST['category']    ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $location    = trim($_POST['location']    ?? 'Sri Lanka');
+
+    $upload_dir  = '../img/uploads/';
+    $image1_path = null; // null means "don't update"
+
+    // Handle Hero Image
+    if (isset($_FILES['image1']) && $_FILES['image1']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $saved_path = handle_image_upload($_FILES['image1'], $upload_dir, 'hero');
+        if ($saved_path !== '') {
+            resizeImage($saved_path, $saved_path, 1920, 1080);
+            $image1_path = 'img/uploads/' . basename($saved_path);
         }
     }
 
-    // Build update query
-    $updates = ["title='$title'", "category='$category'", "description='$description'", "location='$location'"];
-    if ($image1_path) $updates[] = "image1='$image1_path'";
+    // FIX #2: Use prepared statements — build query safely
+    if ($image1_path !== null) {
+        $stmt = $conn->prepare(
+            "UPDATE projects SET title = ?, category = ?, description = ?, location = ?, image1 = ? WHERE id = ?"
+        );
+        $stmt->bind_param('sssssi', $title, $category, $description, $location, $image1_path, $id);
+    } else {
+        $stmt = $conn->prepare(
+            "UPDATE projects SET title = ?, category = ?, description = ?, location = ? WHERE id = ?"
+        );
+        $stmt->bind_param('ssssi', $title, $category, $description, $location, $id);
+    }
 
-    $sql = "UPDATE projects SET " . implode(', ', $updates) . " WHERE id=$id";
-    
-    if ($conn->query($sql) === TRUE) {
-        
+    if ($stmt->execute()) {
         // Handle Gallery Images Upload
         if (isset($_FILES['gallery_images'])) {
-            $total = count($_FILES['gallery_images']['name']);
+            $total = min(count($_FILES['gallery_images']['name']), 12);
             for ($i = 0; $i < $total; $i++) {
-                if ($_FILES['gallery_images']['error'][$i] === UPLOAD_ERR_OK) {
-                    $filename = time() . '_' . $i . '_gal_' . basename($_FILES['gallery_images']['name'][$i]);
-                    $target_file = $upload_dir . $filename;
-                    if (move_uploaded_file($_FILES['gallery_images']['tmp_name'][$i], $target_file)) {
-                        // Resize gallery image to max 800x800
-                        resizeImage($target_file, $target_file, 800, 800);
-                        $rel_path = 'img/uploads/' . $filename;
-                        
-                        $stmt = $conn->prepare("INSERT INTO project_images (project_id, image_path) VALUES (?, ?)");
-                        $stmt->bind_param("is", $id, $rel_path);
-                        $stmt->execute();
-                    }
+                $file_entry = [
+                    'name'     => $_FILES['gallery_images']['name'][$i],
+                    'tmp_name' => $_FILES['gallery_images']['tmp_name'][$i],
+                    'error'    => $_FILES['gallery_images']['error'][$i],
+                    'size'     => $_FILES['gallery_images']['size'][$i],
+                    'type'     => $_FILES['gallery_images']['type'][$i],
+                ];
+                $saved_path = handle_image_upload($file_entry, $upload_dir, 'gal');
+                if ($saved_path !== '') {
+                    resizeImage($saved_path, $saved_path, 800, 800);
+                    $rel_path = 'img/uploads/' . basename($saved_path);
+
+                    $img_stmt = $conn->prepare("INSERT INTO project_images (project_id, image_path) VALUES (?, ?)");
+                    $img_stmt->bind_param('is', $id, $rel_path);
+                    $img_stmt->execute();
                 }
             }
         }
-        
+
         header('Location: index.php');
         exit;
     } else {
-        $error = "Error: " . $conn->error;
+        $error = "Database update failed. Please try again.";
     }
 }
 
-$result = $conn->query("SELECT * FROM projects WHERE id=$id");
+// FIX #2: Use prepared statement to fetch project
+$proj_stmt = $conn->prepare("SELECT * FROM projects WHERE id = ?");
+$proj_stmt->bind_param('i', $id);
+$proj_stmt->execute();
+$result  = $proj_stmt->get_result();
 $project = $result->fetch_assoc();
 if (!$project) {
     header('Location: index.php');
     exit;
 }
 
-$gallery_result = $conn->query("SELECT * FROM project_images WHERE project_id=$id");
+$gal_stmt = $conn->prepare("SELECT * FROM project_images WHERE project_id = ?");
+$gal_stmt->bind_param('i', $id);
+$gal_stmt->execute();
+$gallery_result = $gal_stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -111,7 +186,10 @@ $gallery_result = $conn->query("SELECT * FROM project_images WHERE project_id=$i
 <body>
     <div class="container">
         <h2>Edit Project</h2>
-        <?php if(isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
+        <?php if (isset($error)): ?>
+            <!-- FIX #15: Escape error output to prevent XSS -->
+            <p style='color:red;'><?= htmlspecialchars($error) ?></p>
+        <?php endif; ?>
         <form action="" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label>Project Title</label>
@@ -132,31 +210,31 @@ $gallery_result = $conn->query("SELECT * FROM project_images WHERE project_id=$i
             <div class="form-group">
                 <label>Hero Image</label>
                 <input type="file" name="image1" accept="image/*">
-                <?php if($project['image1']): ?>
+                <?php if ($project['image1']): ?>
                     <img src="../<?= htmlspecialchars($project['image1']) ?>" class="current-img">
                 <?php endif; ?>
             </div>
-            
+
             <hr style="margin: 20px 0;">
-            
+
             <div class="form-group">
                 <label>Add New Gallery Images (Multiple)</label>
                 <input type="file" name="gallery_images[]" accept="image/*" multiple>
             </div>
-            
+
             <div class="form-group">
                 <label>Current Gallery Images</label>
                 <div class="gallery-preview">
                     <?php while ($gimg = $gallery_result->fetch_assoc()): ?>
                         <div class="gallery-item">
                             <img src="../<?= htmlspecialchars($gimg['image_path']) ?>">
-                            <a href="?id=<?= $id ?>&delete_image=<?= $gimg['id'] ?>" class="btn-danger" onclick="return confirm('Delete this image?')">Delete</a>
+                            <a href="?id=<?= $id ?>&delete_image=<?= (int)$gimg['id'] ?>" class="btn-danger" onclick="return confirm('Delete this image?')">Delete</a>
                         </div>
                     <?php endwhile; ?>
-                    <?php if ($gallery_result->num_rows == 0) echo "<p>No gallery images yet.</p>"; ?>
+                    <?php if ($gallery_result->num_rows === 0) echo "<p>No gallery images yet.</p>"; ?>
                 </div>
             </div>
-            
+
             <button type="submit" class="btn">Update Project</button>
             <a href="index.php" style="margin-left: 10px;">Cancel</a>
         </form>

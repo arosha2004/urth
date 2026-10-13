@@ -13,17 +13,22 @@ if (is_admin_logged_in()) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    if (empty($username) || empty($password)) {
-        $error = 'Please enter both username and password.';
+    // FIX #11: Validate CSRF token before processing credentials
+    if (!validate_csrf_token()) {
+        $error = 'Invalid or expired form submission. Please try again.';
     } else {
-        if (authenticate_admin($username, $password)) {
-            header('Location: index.php?msg=login_success');
-            exit;
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        if (empty($username) || empty($password)) {
+            $error = 'Please enter both username and password.';
         } else {
-            $error = 'Invalid credentials. Please check your username and password.';
+            if (authenticate_admin($username, $password)) {
+                header('Location: index.php?msg=login_success');
+                exit;
+            } else {
+                $error = 'Invalid credentials. Please check your username and password.';
+            }
         }
     }
 }
@@ -60,6 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form action="login.php" method="POST" autocomplete="off">
+            <!-- FIX #11: CSRF token hidden field -->
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token()) ?>">
             <div class="form-group">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" id="username" name="username" class="form-control" placeholder="Enter username (e.g. urthadmin)" required autofocus value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">

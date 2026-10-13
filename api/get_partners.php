@@ -4,7 +4,20 @@
  */
 
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
+
+// FIX #14: Replace wildcard CORS with an explicit whitelist
+$allowed_origins = [
+    'https://urthspaces.com',
+    'https://www.urthspaces.com',
+    'http://localhost',
+    'http://127.0.0.1',
+];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowed_origins, true)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+}
+
 header('Cache-Control: no-cache, must-revalidate');
 
 require_once __DIR__ . '/../config.php';

@@ -80,7 +80,7 @@ switch ($action) {
         }
 
         if (!is_dir($upload_dir)) {
-            @mkdir($upload_dir, 0777, true);
+            @mkdir($upload_dir, 0755, true); // FIX #10: 0755 not 0777
         }
 
         $safe_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $file_info['filename']);
@@ -90,17 +90,7 @@ switch ($action) {
         if (move_uploaded_file($_FILES['logo_image']['tmp_name'], $target_path)) {
             $logo_url = 'img/partners/' . $filename;
 
-            $name_esc = $conn->real_escape_string($name);
-            $logo_esc = $conn->real_escape_string($logo_url);
-            $url_esc = $conn->real_escape_string($website_url);
-
-            $insertSql = "INSERT INTO partners (name, logo_url, website_url, display_order, is_active) VALUES ('$name_esc', '$logo_esc', '$url_esc', $display_order, $is_active)";
-            if ($conn->query($insertSql)) {
-                header('Location: partners.php?msg=added');
-                exit;
-            }
-
-            // Prepared statement fallback
+            // FIX #4: Use prepared statement — no string interpolation in SQL
             $stmt = $conn->prepare("INSERT INTO partners (name, logo_url, website_url, display_order, is_active) VALUES (?, ?, ?, ?, ?)");
             if ($stmt) {
                 $stmt->bind_param("sssii", $name, $logo_url, $website_url, $display_order, $is_active);
@@ -154,7 +144,7 @@ switch ($action) {
             }
 
             if (!is_dir($upload_dir)) {
-                @mkdir($upload_dir, 0777, true);
+                @mkdir($upload_dir, 0755, true); // FIX #10: 0755 not 0777
             }
 
             $safe_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $file_info['filename']);
@@ -164,26 +154,26 @@ switch ($action) {
             if (move_uploaded_file($_FILES['logo_image']['tmp_name'], $target_path)) {
                 $logo_url = 'img/partners/' . $filename;
 
-                // Delete old custom uploaded logo if present (avoiding mysqlnd get_result dependency)
-                $oldRes = $conn->query("SELECT logo_url FROM partners WHERE id = " . (int)$id);
-                if ($oldRes && $row = $oldRes->fetch_assoc()) {
-                    $file_to_delete = '../' . ($row['logo_url'] ?? '');
-                    if (file_exists($file_to_delete) && preg_match('/^img\/partners\/partner_\d{9,}_/', $row['logo_url'] ?? '')) {
-                        @unlink($file_to_delete);
+                // Delete old custom uploaded logo if present
+                $oldStmt = $conn->prepare("SELECT logo_url FROM partners WHERE id = ?");
+                if ($oldStmt) {
+                    $oldStmt->bind_param("i", $id);
+                    $oldStmt->execute();
+                    $oldRes = $oldStmt->get_result();
+                    if ($oldRes && $row = $oldRes->fetch_assoc()) {
+                        $file_to_delete = realpath(__DIR__ . '/../' . ($row['logo_url'] ?? ''));
+                        $real_partners_dir = realpath(__DIR__ . '/../img/partners');
+                        if ($file_to_delete !== false
+                            && $real_partners_dir !== false
+                            && str_starts_with($file_to_delete, $real_partners_dir)
+                            && is_file($file_to_delete)
+                        ) {
+                            @unlink($file_to_delete);
+                        }
                     }
                 }
 
-                $name_esc = $conn->real_escape_string($name);
-                $logo_esc = $conn->real_escape_string($logo_url);
-                $url_esc = $conn->real_escape_string($website_url);
-
-                $updateSql = "UPDATE partners SET name = '$name_esc', logo_url = '$logo_esc', website_url = '$url_esc', display_order = $display_order, is_active = $is_active WHERE id = $id";
-                if ($conn->query($updateSql)) {
-                    header('Location: partners.php?msg=updated');
-                    exit;
-                }
-
-                // Prepared fallback
+                // FIX #4: Prepared statement — no string interpolation
                 $stmt = $conn->prepare("UPDATE partners SET name = ?, logo_url = ?, website_url = ?, display_order = ?, is_active = ? WHERE id = ?");
                 if ($stmt) {
                     $stmt->bind_param("sssiii", $name, $logo_url, $website_url, $display_order, $is_active, $id);
@@ -201,16 +191,7 @@ switch ($action) {
             }
         } else {
             // Update without changing image
-            $name_esc = $conn->real_escape_string($name);
-            $url_esc = $conn->real_escape_string($website_url);
-
-            $updateSql = "UPDATE partners SET name = '$name_esc', website_url = '$url_esc', display_order = $display_order, is_active = $is_active WHERE id = $id";
-            if ($conn->query($updateSql)) {
-                header('Location: partners.php?msg=updated');
-                exit;
-            }
-
-            // Prepared fallback
+            // FIX #4: Prepared statement — no string interpolation
             $stmt = $conn->prepare("UPDATE partners SET name = ?, website_url = ?, display_order = ?, is_active = ? WHERE id = ?");
             if ($stmt) {
                 $stmt->bind_param("ssiii", $name, $website_url, $display_order, $is_active, $id);
@@ -231,23 +212,26 @@ switch ($action) {
             exit;
         }
 
-        // Clean up custom uploaded file if needed (portable without mysqlnd)
-        $oldRes = $conn->query("SELECT logo_url FROM partners WHERE id = " . (int)$id);
-        if ($oldRes && $row = $oldRes->fetch_assoc()) {
-            $file_to_delete = '../' . ($row['logo_url'] ?? '');
-            if (file_exists($file_to_delete) && preg_match('/^img\/partners\/partner_\d{9,}_/', $row['logo_url'] ?? '')) {
-                @unlink($file_to_delete);
+        // FIX #4 & #8: Use prepared stmt + realpath-based path validation
+        $oldStmt = $conn->prepare("SELECT logo_url FROM partners WHERE id = ?");
+        if ($oldStmt) {
+            $oldStmt->bind_param("i", $id);
+            $oldStmt->execute();
+            $oldRes = $oldStmt->get_result();
+            if ($oldRes && $row = $oldRes->fetch_assoc()) {
+                $file_to_delete    = realpath(__DIR__ . '/../' . ($row['logo_url'] ?? ''));
+                $real_partners_dir = realpath(__DIR__ . '/../img/partners');
+                if ($file_to_delete !== false
+                    && $real_partners_dir !== false
+                    && str_starts_with($file_to_delete, $real_partners_dir)
+                    && is_file($file_to_delete)
+                ) {
+                    @unlink($file_to_delete);
+                }
             }
         }
 
-        // Execute delete directly (safe against SQLi since $id is cast to int)
-        $delResult = $conn->query("DELETE FROM partners WHERE id = " . (int)$id);
-        if ($delResult) {
-            header('Location: partners.php?msg=deleted');
-            exit;
-        }
-
-        // Prepared fallback
+        // FIX #4: Use prepared statement only — no raw query
         $del_stmt = $conn->prepare("DELETE FROM partners WHERE id = ?");
         if ($del_stmt) {
             $del_stmt->bind_param("i", $id);

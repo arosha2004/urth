@@ -15,17 +15,23 @@ try {
     // Set charset to ensure proper encoding
     $conn->set_charset("utf8mb4");
 } catch (Throwable $e) {
-    // We avoid sending a 500 status code because browsers like Chrome hide the error text if the response is too short.
-    echo "<div style='border: 1px solid red; padding: 20px; font-family: sans-serif;'>";
-    echo "<h3>Database Connection Failed</h3>";
-    echo "<p><strong>Error Message:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
-    echo "<p><strong>Troubleshooting for Hostinger:</strong></p>";
-    echo "<ul>";
-    echo "<li>Ensure DB_HOST, DB_USER, DB_PASS, and DB_NAME environment variables are set in your hosting control panel.</li>";
-    echo "<li>Double-check that the password is exactly correct.</li>";
-    echo "<li>Make sure you have <strong>added the user to the database</strong> in Hostinger's MySQL Databases section and granted <strong>All Privileges</strong>. Creating them separately isn't enough; they must be linked.</li>";
-    echo "</ul>";
-    echo "</div>";
+    // FIX #13: Never expose raw DB error details to the browser in production.
+    // Log the real error server-side; show a safe message to the user.
+    error_log('DB connection failed: ' . $e->getMessage());
+    $is_local = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true);
+    if ($is_local) {
+        // Detailed output only for local/developer access
+        echo "<div style='border: 1px solid red; padding: 20px; font-family: sans-serif;'>";
+        echo "<h3>Database Connection Failed</h3>";
+        echo "<p><strong>Error:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+        echo "<p>Check DB_HOST, DB_USER, DB_PASS, DB_NAME environment variables.</p>";
+        echo "</div>";
+    } else {
+        echo "<div style='border: 1px solid red; padding: 20px; font-family: sans-serif;'>";
+        echo "<h3>Service Unavailable</h3>";
+        echo "<p>The site is temporarily unable to connect to the database. Please try again later.</p>";
+        echo "</div>";
+    }
     die();
 }
 ?>

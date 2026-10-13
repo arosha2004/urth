@@ -1,110 +1,128 @@
 <?php
+require_once __DIR__ . '/auth.php';
+require_admin_auth(); // FIX #5: Authentication guard was missing entirely
+
 require_once '../config.php';
 require_once 'resize_image.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = $conn->real_escape_string($_POST['title']);
-    $category = $conn->real_escape_string($_POST['category']);
-    $description = $conn->real_escape_string($_POST['description']);
-    $location = $conn->real_escape_string($_POST['location'] ?? 'Sri Lanka');
-    
-    $upload_dir = '../img/uploads/';
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-    
-    $image1_path = '';
+// FIX #7 & #10: Allowed MIME types validated server-side; upload dir uses 0755
+$allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+$allowed_exts       = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-    // Handle Hero Image
-    if (isset($_FILES['image1']) && $_FILES['image1']['error'] === UPLOAD_ERR_OK) {
-        $filename = time() . '_hero_' . basename($_FILES['image1']['name']);
-        $target_file = $upload_dir . $filename;
-        if (move_uploaded_file($_FILES['image1']['tmp_name'], $target_file)) {
-            resizeImage($target_file, $target_file, 1920, 1080);
-            $image1_path = 'img/uploads/' . $filename;
-        }
+/**
+ * Validate and move an uploaded image file.
+ * Returns the relative web path on success, '' on failure.
+ */
+function handle_image_upload(array $file, string $upload_dir, string $suffix): string {
+    global $allowed_mime_types, $allowed_exts;
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return '';
     }
 
-    $sql = "INSERT INTO projects (title, category, description, location, link_url, image1, image2, image3) 
-            VALUES ('$title', '$category', '$description', '$location', '', '$image1_path', '', '')";
-    
-    if ($conn->query($sql) === TRUE) {
-        $new_id = $conn->insert_id;
-        
-        // Set dynamic link_url
-        $conn->query("UPDATE projects SET link_url='project_detail.php?id=$new_id' WHERE id=$new_id");
-        
-        // Handle Gallery Images
-        if (isset($_FILES['gallery_images'])) {
-            $total = count($_FILES['gallery_images']['name']);
-            for ($i = 0; $i < $total; $i++) {
-                if ($_FILES['gallery_images']['error'][$i] === UPLOAD_ERR_OK) {
-                    $filename = time() . '_' . $i . '_gal_' . basename($_FILES['gallery_images']['name'][$i]);
-                    $target_file = $upload_dir . $filename;
-                    if (move_uploaded_file($_FILES['gallery_images']['tmp_name'][$i], $target_file)) {
-                        resizeImage($target_file, $target_file, 800, 800);
-                        $rel_path = 'img/uploads/' . $filename;
-                        
-                        $stmt = $conn->prepare("INSERT INTO project_images (project_id, image_path) VALUES (?, ?)");
-                        $stmt->bind_param("is", $new_id, $rel_path);
-                        $stmt->execute();
+    // FIX #7: Validate MIME type using finfo (server-side, not client filename)
+    $finfo    = new finfo(FILEINFO_MIME_TYPE);
+    $mime     = $finfo->file($file['tmp_name']);
+    if (!in_array($mime, $allowed_mime_types, true)) {
+        return '';
+    }
+
+    // Derive a safe extension from the validated MIME type
+    $mime_to_ext = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/gif'  => 'gif',
+        'image/webp' => 'webp',
+    ];
+    $ext      = $mime_to_ext[$mime];
+    $filename = time() . '_' . $suffix . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+
+    // FIX #10: Ensure directory exists with secure permissions (755)
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+
+    $target_file = $upload_dir . $filename;
+    if (move_uploaded_file($file['tmp_name'], $target_file)) {
+        return $target_file;
+    }
+    return '';
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $title       = trim($_POST['title']       ?? '');
+    $category    = trim($_POST['category']    ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $location    = trim($_POST['location']    ?? '');
+
+    if (!empty($title) && !empty($category)) {
+
+        $upload_dir  = '../img/uploads/';
+        $image1_path = '';
+
+        // Handle Hero Image
+        if (isset($_FILES['image1'])) {
+            $saved_path = handle_image_upload($_FILES['image1'], $upload_dir, 'hero');
+            if ($saved_path !== '') {
+                resizeImage($saved_path, $saved_path, 1920, 1080);
+                $image1_path = 'img/uploads/' . basename($saved_path);
+            }
+        }
+
+        if (empty($image1_path)) {
+            $image1_path = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80';
+        }
+
+        // FIX #1: Use prepared statements — no more string interpolation in SQL
+        $stmt = $conn->prepare(
+            "INSERT INTO projects (title, category, location, description, link_url, image1, image2, image3)
+             VALUES (?, ?, ?, ?, '', ?, '', '')"
+        );
+        $stmt->bind_param('sssss', $title, $category, $location, $description, $image1_path);
+
+        if ($stmt->execute()) {
+            $new_id = $conn->insert_id;
+
+            // Set dynamic link_url via prepared statement
+            $upd = $conn->prepare("UPDATE projects SET link_url = ? WHERE id = ?");
+            $link_url = 'project_detail.php?id=' . $new_id;
+            $upd->bind_param('si', $link_url, $new_id);
+            $upd->execute();
+
+            // Handle Gallery Images (max 12)
+            if (isset($_FILES['gallery_images'])) {
+                $total = min(count($_FILES['gallery_images']['name']), 12);
+                for ($i = 0; $i < $total; $i++) {
+                    $file_entry = [
+                        'name'     => $_FILES['gallery_images']['name'][$i],
+                        'tmp_name' => $_FILES['gallery_images']['tmp_name'][$i],
+                        'error'    => $_FILES['gallery_images']['error'][$i],
+                        'size'     => $_FILES['gallery_images']['size'][$i],
+                        'type'     => $_FILES['gallery_images']['type'][$i],
+                    ];
+                    $saved_path = handle_image_upload($file_entry, $upload_dir, 'gal');
+                    if ($saved_path !== '') {
+                        resizeImage($saved_path, $saved_path, 800, 800);
+                        $rel_path = 'img/uploads/' . basename($saved_path);
+
+                        $img_stmt = $conn->prepare("INSERT INTO project_images (project_id, image_path) VALUES (?, ?)");
+                        $img_stmt->bind_param('is', $new_id, $rel_path);
+                        $img_stmt->execute();
                     }
                 }
             }
+
+            header('Location: index.php?msg=added');
+            exit;
+        } else {
+            header('Location: index.php?msg=error_invalid');
+            exit;
         }
-        
-        header('Location: index.php');
-        exit;
     } else {
-        $error = "Error: " . $sql . "<br>" . $conn->error;
+        header('Location: index.php?msg=error_missing');
+        exit;
     }
 }
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Add Project</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 5px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="file"], textarea { width: 100%; padding: 8px; box-sizing: border-box; }
-        .btn { padding: 8px 12px; background: #333; color: #fff; border: none; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Add New Project</h2>
-        <?php if(isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
-        <form action="" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Project Title</label>
-                <input type="text" name="title" required>
-            </div>
-            <div class="form-group">
-                <label>Category</label>
-                <input type="text" name="category" required>
-            </div>
-            <div class="form-group">
-                <label>Location</label>
-                <input type="text" name="location" value="Sri Lanka" required>
-            </div>
-            <div class="form-group">
-                <label>Description</label>
-                <textarea name="description" rows="4" required></textarea>
-            </div>
-            <div class="form-group">
-                <label>Hero Image</label>
-                <input type="file" name="image1" accept="image/*" required>
-            </div>
-            <hr style="margin: 20px 0;">
-            <div class="form-group">
-                <label>Gallery Images (Multiple)</label>
-                <input type="file" name="gallery_images[]" accept="image/*" multiple>
-            </div>
-            <button type="submit" class="btn">Save Project</button>
-            <a href="index.php" style="margin-left: 10px;">Cancel</a>
-        </form>
-    </div>
-</body>
-</html>
+
+header('Location: index.php');
+exit;

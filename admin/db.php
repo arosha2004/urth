@@ -6,7 +6,13 @@
 
 $dataDir = __DIR__ . '/data';
 if (!file_exists($dataDir)) {
-    mkdir($dataDir, 0777, true);
+    mkdir($dataDir, 0750, true); // FIX #9: 0750 — not world-readable
+}
+
+// FIX #9: Block direct HTTP access to the SQLite database file
+$htaccess = $dataDir . '/.htaccess';
+if (!file_exists($htaccess)) {
+    file_put_contents($htaccess, "Require all denied\n# Deny from all\n");
 }
 
 $dbPath = $dataDir . '/urth_admin.sqlite';

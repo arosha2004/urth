@@ -40,6 +40,8 @@ function authenticate_admin(string $username, string $password): bool {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
+        // FIX #12: Regenerate session ID after login to prevent session fixation
+        session_regenerate_id(true);
         $_SESSION['admin_logged_in'] = true;
         $_SESSION['admin_username'] = $user['username'];
         return true;
@@ -61,4 +63,25 @@ function logout_admin(): void {
         );
     }
     session_destroy();
+}
+
+/**
+ * Generate and store a CSRF token in the session.
+ * FIX #11: Provides CSRF protection for forms.
+ */
+function generate_csrf_token(): string {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * Validate the CSRF token submitted with a POST request.
+ * FIX #11: Call this at the top of any POST handler.
+ */
+function validate_csrf_token(): bool {
+    $submitted = $_POST['csrf_token'] ?? '';
+    $stored    = $_SESSION['csrf_token'] ?? '';
+    return !empty($stored) && hash_equals($stored, $submitted);
 }
