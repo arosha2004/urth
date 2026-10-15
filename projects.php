@@ -791,7 +791,7 @@ if($projects_query) {
         <a href="about.html">ABOUT</a>
         <a href="projects.php" class="active">PROJECTS</a>
         <a href="contact.html">CONTACT</a>
-        <a href="#">SHOP</a>
+        <a href="shop.php">SHOP</a>
       </nav>
       <div class="right-nav" style="width: 80px;">
 
@@ -817,7 +817,7 @@ if($projects_query) {
       <a href="about.html">ABOUT</a>
       <a href="projects.php">PROJECTS</a>
       <a href="contact.html">CONTACT</a>
-      <a href="#">SHOP</a>
+      <a href="shop.php">SHOP</a>
     </nav>
   </div>
   <section id="project" class="section">
@@ -1535,5 +1535,4 @@ if($projects_query) {
 </body>
 
 </html><!--/$-->
-
 

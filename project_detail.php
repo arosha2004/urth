@@ -84,7 +84,7 @@ window.__WF_REVIEW_BRIDGE = {
       <a href="urth_clone/about.html">ABOUT</a>
       <a href="projects.php">PROJECTS</a>
       <a href="contact.html">CONTACT</a>
-      <a href="#">SHOP</a>
+      <a href="shop.php">SHOP</a>
     </nav>
   </div>
 <header class="hero-section">
@@ -265,7 +265,7 @@ window.__WF_REVIEW_BRIDGE = {
       <a href="urth_clone/about.html">ABOUT</a>
       <a href="projects.php" class="active">PROJECTS</a>
       <a href="contact.html">CONTACT</a>
-      <a href="#">SHOP</a>
+      <a href="shop.php">SHOP</a>
     </nav>
     <div class="right-nav" style="width: 80px;">
 
@@ -481,5 +481,4 @@ window.__WF_REVIEW_BRIDGE = {
 
   <script src="mobile-nav.js"></script>
 </body></html><!--/$-->
-
 

@@ -49,7 +49,7 @@ if($projects_query) {
       <a href="about.html">ABOUT</a>
       <a href="projects.php">PROJECTS</a>
       <a href="contact.html">CONTACT</a>
-      <a href="#">SHOP</a>
+      <a href="shop.php">SHOP</a>
     </nav>
   </div>
 
@@ -110,7 +110,7 @@ if($projects_query) {
       <a href="about.html" class="footer-nav__link" id="nav-about">About</a>
       <a href="projects.php" class="footer-nav__link" id="nav-projects">Projects</a>
       <a href="contact.html" class="footer-nav__link" id="nav-contact">Contact</a>
-      <a href="#" class="footer-nav__link" id="nav-shop">Shop</a>
+      <a href="shop.php" class="footer-nav__link" id="nav-shop">Shop</a>
     </nav>
 
     <div class="footer-socials">
