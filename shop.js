@@ -18,6 +18,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const storageKey = 'urth-shop-enquiry-bag';
   let activeFilter = 'All';
   let enquiryBag = loadBag();
+  const hero = document.querySelector('.shop-hero');
+
+  requestAnimationFrame(() => hero.classList.add('is-ready'));
+
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-entering');
+        entry.target.addEventListener('animationend', () => {
+          entry.target.classList.remove('is-entering');
+        }, { once: true });
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -35px 0px' });
+
+    cards.forEach((card, index) => {
+      card.style.setProperty('--card-delay', `${(index % 4) * 75}ms`);
+      revealObserver.observe(card);
+    });
+  }
+
+  function animateVisibleCards() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    cards.forEach((card, index) => {
+      if (card.hidden) return;
+      card.classList.remove('is-entering');
+      card.style.setProperty('--card-delay', `${(index % 4) * 55}ms`);
+      void card.offsetWidth;
+      card.classList.add('is-entering');
+      card.addEventListener('animationend', () => {
+        card.classList.remove('is-entering');
+      }, { once: true });
+    });
+  }
 
   function loadBag() {
     try {
@@ -40,7 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateBag() {
     bagCounts.forEach(count => {
+      const previousCount = count.textContent;
       count.textContent = String(enquiryBag.length);
+      if (count.classList.contains('bag-count') && previousCount !== String(enquiryBag.length)) {
+        count.classList.remove('is-updated');
+        void count.offsetWidth;
+        count.classList.add('is-updated');
+      }
     });
     bagItems.replaceChildren();
 
@@ -106,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     visibleCount.textContent = String(shown);
     emptyResults.hidden = shown !== 0;
+    animateVisibleCards();
   }
 
   function openPanel() {
