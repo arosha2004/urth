@@ -1,6 +1,7 @@
 <?php
 /**
- * URTH Admin Panel - Product Actions Handler (Add, Edit, Delete, Toggle Status)
+ * URTH Admin Panel - Product & Category Actions Handler
+ * Handles Product CRUD, Inventory, Booking, Categories CRUD, Duplication & Publish/Hide
  */
 
 ob_start();
@@ -9,7 +10,7 @@ require_once __DIR__ . '/auth.php';
 require_admin_auth();
 require_once '../config.php';
 
-// Ensure products table exists and seed if empty
+// Ensure tables exist
 $tableCheck = $conn->query("SHOW TABLES LIKE 'products'");
 if (!$tableCheck || $tableCheck->num_rows === 0) {
     require_once __DIR__ . '/../setup_shop.php';
@@ -25,7 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST) && isset($_SERVER['CO
 }
 
 $upload_dir = '../img/shop/uploads/';
+$deliverables_dir = '../uploads/deliverables/';
 $allowed_exts = ['svg', 'png', 'jpg', 'jpeg', 'webp', 'avif'];
+$allowed_deliverable_exts = ['zip', 'rar', 'pdf', 'brushset', 'dwg', 'dxf', 'rfa', 'blend', 'epub'];
 
 // Utility to create slug from product name
 function slugify(string $text): string {
@@ -48,7 +51,6 @@ function ensure_category_exists($conn, string $rawCategory, string $customCatego
         $category = 'Furniture & Objects';
     }
 
-    // Ensure product_categories table exists
     $conn->query("CREATE TABLE IF NOT EXISTS product_categories (
         id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL UNIQUE,
@@ -80,8 +82,11 @@ function ensure_category_exists($conn, string $rawCategory, string $customCatego
     return $category;
 }
 
-
 switch ($action) {
+
+    // ==========================================
+    // 1. ADD PRODUCT
+    // ==========================================
     case 'add':
         if (!validate_csrf_token()) {
             header('Location: products.php?msg=error_csrf');
@@ -104,7 +109,7 @@ switch ($action) {
         $is_active = isset($_POST['is_active']) ? 1 : 0;
         $is_featured = isset($_POST['is_featured']) ? 1 : 0;
         $availability = trim($_POST['availability'] ?? 'available');
-        if (!in_array($availability, ['available', 'made_to_order', 'coming_soon', 'unavailable'])) {
+        if (!in_array($availability, ['available', 'made_to_order', 'coming_soon', 'unavailable', 'quote_only', 'booking_open', 'fully_booked'])) {
             $availability = 'available';
         }
         $product_label = trim($_POST['product_label'] ?? '');
@@ -121,12 +126,11 @@ switch ($action) {
 
         $slug = slugify($name);
 
-        // Auto-generate SKU if blank
         if (empty($sku)) {
             $sku = 'PR' . strtoupper(substr(md5(uniqid('', true)), 0, 4));
         }
 
-        // Process image
+        // Process primary image
         $image_url = 'img/shop/prod-1.jpg'; // fallback
         if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPLOAD_ERR_OK) {
             $file_info = pathinfo($_FILES['product_image']['name']);
@@ -153,6 +157,30 @@ switch ($action) {
             }
         } elseif (!empty($_POST['custom_image_path'])) {
             $image_url = trim($_POST['custom_image_path']);
+        }
+
+        // Inventory, Stock & Booking Capacity
+        $stock_quantity = isset($_POST['stock_quantity']) && $_POST['stock_quantity'] !== '' ? (int)$_POST['stock_quantity'] : 10;
+        $low_stock_threshold = isset($_POST['low_stock_threshold']) && $_POST['low_stock_threshold'] !== '' ? (int)$_POST['low_stock_threshold'] : 2;
+        $booking_capacity = isset($_POST['booking_capacity']) ? (int)$_POST['booking_capacity'] : 0;
+        $booked_count = isset($_POST['booked_count']) ? (int)$_POST['booked_count'] : 0;
+        $allow_backorder = isset($_POST['allow_backorder']) ? 1 : 0;
+        $lead_time = trim($_POST['lead_time'] ?? '');
+
+        // Digital Deliverable file or protected link
+        $digital_access_link = trim($_POST['digital_access_link'] ?? '');
+        $digital_deliverable_file = trim($_POST['digital_deliverable_file'] ?? '');
+
+        if (isset($_FILES['deliverable_upload']) && $_FILES['deliverable_upload']['error'] === UPLOAD_ERR_OK) {
+            $d_info = pathinfo($_FILES['deliverable_upload']['name']);
+            $d_ext = strtolower($d_info['extension'] ?? '');
+            if (in_array($d_ext, array_merge($allowed_exts, $allowed_deliverable_exts))) {
+                if (!is_dir($deliverables_dir)) @mkdir($deliverables_dir, 0755, true);
+                $d_filename = 'deliv_' . time() . '_' . substr(preg_replace('/[^a-zA-Z0-9_-]/', '_', $d_info['filename']), 0, 30) . '.' . $d_ext;
+                if (move_uploaded_file($_FILES['deliverable_upload']['tmp_name'], $deliverables_dir . $d_filename)) {
+                    $digital_deliverable_file = 'uploads/deliverables/' . $d_filename;
+                }
+            }
         }
 
         // Product type and detailed metadata fields
@@ -197,7 +225,7 @@ switch ($action) {
         $deliverables = trim($_POST['deliverables'] ?? '');
         $included_revisions = trim($_POST['included_revisions'] ?? '');
 
-        // Gallery images: parse from textarea and uploaded gallery files
+        // Gallery images
         $galleryList = [];
         if (!empty($image_url)) {
             $galleryList[] = $image_url;
@@ -212,7 +240,6 @@ switch ($action) {
                 }
             }
         }
-        // Check uploaded gallery files
         if (isset($_FILES['gallery_files']) && is_array($_FILES['gallery_files']['name'])) {
             $fileCount = count($_FILES['gallery_files']['name']);
             for ($fi = 0; $fi < $fileCount; $fi++) {
@@ -239,7 +266,9 @@ switch ($action) {
             file_formats, software_compatibility, permitted_use, preview_images,
             book_format, sample_pages, book_dimensions,
             course_topics, course_format, course_duration, access_period, live_dates,
-            session_scope, session_duration, customer_info_needed, deliverables, included_revisions
+            session_scope, session_duration, customer_info_needed, deliverables, included_revisions,
+            stock_quantity, low_stock_threshold, booking_capacity, booked_count, allow_backorder, lead_time,
+            digital_deliverable_file, digital_access_link
         ) VALUES (
             ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?,
@@ -248,16 +277,20 @@ switch ($action) {
             ?, ?, ?, ?,
             ?, ?, ?,
             ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?,
+            ?, ?
         )";
 
         $stmt = $conn->prepare($insertSql);
         if ($stmt) {
             // Types:
-            // 1-9: sssddssss (name, slug, sku, price, sale_price, currency, category, description, image)
-            // 10-16: iiisssi (popularity, display_order, is_active, is_featured, availability, product_label, price_on_request)
+            // 1-9: sssddssss
+            // 10-16: iiisssi
             // 17-47: 31 strings (s)
-            $types = "sssddssssiiisssi" . str_repeat("s", 31);
+            // 48-53: iiiiis (stock_quantity, low_stock_threshold, booking_capacity, booked_count, allow_backorder, lead_time)
+            // 54-55: ss (digital_deliverable_file, digital_access_link)
+            $types = "sssddssssiiisssi" . str_repeat("s", 31) . "iiiiis" . "ss";
             $stmt->bind_param(
                 $types,
                 $name, $slug, $sku, $price, $sale_price, $currency, $category, $description, $image_url,
@@ -267,7 +300,9 @@ switch ($action) {
                 $file_formats, $software_compatibility, $permitted_use, $preview_images,
                 $book_format, $sample_pages, $book_dimensions,
                 $course_topics, $course_format, $course_duration, $access_period, $live_dates,
-                $session_scope, $session_duration, $customer_info_needed, $deliverables, $included_revisions
+                $session_scope, $session_duration, $customer_info_needed, $deliverables, $included_revisions,
+                $stock_quantity, $low_stock_threshold, $booking_capacity, $booked_count, $allow_backorder, $lead_time,
+                $digital_deliverable_file, $digital_access_link
             );
             if ($stmt->execute()) {
                 header('Location: products.php?msg=added');
@@ -278,6 +313,9 @@ switch ($action) {
         header('Location: products.php?msg=error_db');
         exit;
 
+    // ==========================================
+    // 2. EDIT PRODUCT
+    // ==========================================
     case 'edit':
         if (!validate_csrf_token()) {
             header('Location: products.php?msg=error_csrf');
@@ -305,7 +343,7 @@ switch ($action) {
         $is_active = isset($_POST['is_active']) ? 1 : 0;
         $is_featured = isset($_POST['is_featured']) ? 1 : 0;
         $availability = trim($_POST['availability'] ?? 'available');
-        if (!in_array($availability, ['available', 'made_to_order', 'coming_soon', 'unavailable'])) {
+        if (!in_array($availability, ['available', 'made_to_order', 'coming_soon', 'unavailable', 'quote_only', 'booking_open', 'fully_booked'])) {
             $availability = 'available';
         }
         $product_label = trim($_POST['product_label'] ?? '');
@@ -322,7 +360,6 @@ switch ($action) {
 
         $slug = slugify($name);
 
-        // Fetch current product to retain image if not updated
         $curStmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
         $curStmt->bind_param("i", $id);
         $curStmt->execute();
@@ -355,7 +392,6 @@ switch ($action) {
             $target_path = $upload_dir . $filename;
 
             if (move_uploaded_file($_FILES['product_image']['tmp_name'], $target_path)) {
-                // Remove old uploaded file if it was in uploads/
                 if (!empty($curProduct['image']) && strpos($curProduct['image'], 'img/shop/uploads/') !== false) {
                     $old_file = '../' . ltrim($curProduct['image'], '/');
                     if (file_exists($old_file)) {
@@ -369,6 +405,30 @@ switch ($action) {
             }
         } elseif (!empty($_POST['custom_image_path'])) {
             $image_url = trim($_POST['custom_image_path']);
+        }
+
+        // Inventory & Booking
+        $stock_quantity = isset($_POST['stock_quantity']) && $_POST['stock_quantity'] !== '' ? (int)$_POST['stock_quantity'] : (int)($curProduct['stock_quantity'] ?? 10);
+        $low_stock_threshold = isset($_POST['low_stock_threshold']) && $_POST['low_stock_threshold'] !== '' ? (int)$_POST['low_stock_threshold'] : (int)($curProduct['low_stock_threshold'] ?? 2);
+        $booking_capacity = isset($_POST['booking_capacity']) ? (int)$_POST['booking_capacity'] : (int)($curProduct['booking_capacity'] ?? 0);
+        $booked_count = isset($_POST['booked_count']) ? (int)$_POST['booked_count'] : (int)($curProduct['booked_count'] ?? 0);
+        $allow_backorder = isset($_POST['allow_backorder']) ? 1 : 0;
+        $lead_time = trim($_POST['lead_time'] ?? ($curProduct['lead_time'] ?? ''));
+
+        // Deliverables
+        $digital_access_link = trim($_POST['digital_access_link'] ?? ($curProduct['digital_access_link'] ?? ''));
+        $digital_deliverable_file = trim($_POST['digital_deliverable_file'] ?? ($curProduct['digital_deliverable_file'] ?? ''));
+
+        if (isset($_FILES['deliverable_upload']) && $_FILES['deliverable_upload']['error'] === UPLOAD_ERR_OK) {
+            $d_info = pathinfo($_FILES['deliverable_upload']['name']);
+            $d_ext = strtolower($d_info['extension'] ?? '');
+            if (in_array($d_ext, array_merge($allowed_exts, $allowed_deliverable_exts))) {
+                if (!is_dir($deliverables_dir)) @mkdir($deliverables_dir, 0755, true);
+                $d_filename = 'deliv_' . time() . '_' . substr(preg_replace('/[^a-zA-Z0-9_-]/', '_', $d_info['filename']), 0, 30) . '.' . $d_ext;
+                if (move_uploaded_file($_FILES['deliverable_upload']['tmp_name'], $deliverables_dir . $d_filename)) {
+                    $digital_deliverable_file = 'uploads/deliverables/' . $d_filename;
+                }
+            }
         }
 
         // Product type and detailed metadata fields
@@ -433,7 +493,6 @@ switch ($action) {
                 $galleryList = array_values(array_unique(array_merge($galleryList, $existingGal)));
             }
         }
-        // Process uploaded gallery files
         if (isset($_FILES['gallery_files']) && is_array($_FILES['gallery_files']['name'])) {
             $fileCount = count($_FILES['gallery_files']['name']);
             for ($fi = 0; $fi < $fileCount; $fi++) {
@@ -460,13 +519,21 @@ switch ($action) {
             file_formats = ?, software_compatibility = ?, permitted_use = ?, preview_images = ?,
             book_format = ?, sample_pages = ?, book_dimensions = ?,
             course_topics = ?, course_format = ?, course_duration = ?, access_period = ?, live_dates = ?,
-            session_scope = ?, session_duration = ?, customer_info_needed = ?, deliverables = ?, included_revisions = ?
+            session_scope = ?, session_duration = ?, customer_info_needed = ?, deliverables = ?, included_revisions = ?,
+            stock_quantity = ?, low_stock_threshold = ?, booking_capacity = ?, booked_count = ?, allow_backorder = ?, lead_time = ?,
+            digital_deliverable_file = ?, digital_access_link = ?
             WHERE id = ?";
 
         $stmt = $conn->prepare($updateSql);
         if ($stmt) {
-            // Types: 1-9: sssddssss, 10-16: iiisssi, 17-47: 31 strings (s), 48: id (i)
-            $types = "sssddssssiiisssi" . str_repeat("s", 31) . "i";
+            // Types:
+            // 1-9: sssddssss
+            // 10-16: iiisssi
+            // 17-47: 31 strings (s)
+            // 48-53: iiiiis
+            // 54-55: ss
+            // 56: id (i)
+            $types = "sssddssssiiisssi" . str_repeat("s", 31) . "iiiiis" . "ss" . "i";
             $stmt->bind_param(
                 $types,
                 $name, $slug, $sku, $price, $sale_price, $currency, $category, $description, $image_url,
@@ -477,6 +544,8 @@ switch ($action) {
                 $book_format, $sample_pages, $book_dimensions,
                 $course_topics, $course_format, $course_duration, $access_period, $live_dates,
                 $session_scope, $session_duration, $customer_info_needed, $deliverables, $included_revisions,
+                $stock_quantity, $low_stock_threshold, $booking_capacity, $booked_count, $allow_backorder, $lead_time,
+                $digital_deliverable_file, $digital_access_link,
                 $id
             );
             if ($stmt->execute()) {
@@ -488,6 +557,97 @@ switch ($action) {
         header('Location: products.php?msg=error_db');
         exit;
 
+    // ==========================================
+    // 3. DUPLICATE PRODUCT
+    // ==========================================
+    case 'duplicate':
+        if (!validate_csrf_token()) {
+            header('Location: products.php?msg=error_csrf');
+            exit;
+        }
+
+        if ($id <= 0) {
+            header('Location: products.php?msg=error_invalid');
+            exit;
+        }
+
+        $res = $conn->query("SELECT * FROM products WHERE id = " . $id);
+        $prod = $res ? $res->fetch_assoc() : null;
+        if (!$prod) {
+            header('Location: products.php?msg=error_invalid');
+            exit;
+        }
+
+        unset($prod['id'], $prod['created_at'], $prod['updated_at']);
+        $prod['name'] = $prod['name'] . ' (Copy)';
+        $prod['slug'] = slugify($prod['name']) . '-' . time();
+        $prod['sku'] = 'PR' . strtoupper(substr(md5(uniqid('', true)), 0, 4));
+        $prod['display_order'] = ((int)$prod['display_order']) + 1;
+        $prod['is_active'] = 0; // default to hidden so staff can review
+
+        $cols = array_keys($prod);
+        $fieldsList = implode(", ", $cols);
+        $placeholders = implode(", ", array_fill(0, count($cols), "?"));
+
+        $dupStmt = $conn->prepare("INSERT INTO products ({$fieldsList}) VALUES ({$placeholders})");
+        if ($dupStmt) {
+            $types = str_repeat("s", count($cols));
+            $values = array_values($prod);
+            $dupStmt->bind_param($types, ...$values);
+            if ($dupStmt->execute()) {
+                header('Location: products.php?msg=duplicated');
+                exit;
+            }
+        }
+
+        header('Location: products.php?msg=error_db');
+        exit;
+
+    // ==========================================
+    // 4. TOGGLE ACTIVE (PUBLISH / HIDE)
+    // ==========================================
+    case 'toggle_status':
+        if ($id <= 0) {
+            header('Location: products.php?msg=error_invalid');
+            exit;
+        }
+
+        $stmt = $conn->prepare("UPDATE products SET is_active = (1 - is_active) WHERE id = ?");
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) {
+                header('Location: products.php?msg=status_updated');
+                exit;
+            }
+        }
+
+        header('Location: products.php?msg=error_db');
+        exit;
+
+    // ==========================================
+    // 5. TOGGLE FEATURED
+    // ==========================================
+    case 'toggle_featured':
+        if ($id <= 0) {
+            header('Location: products.php?msg=error_invalid');
+            exit;
+        }
+
+        $stmt = $conn->prepare("UPDATE products SET is_featured = (1 - is_featured) WHERE id = ?");
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+            if ($stmt->execute()) {
+                header('Location: products.php?msg=featured_updated');
+                exit;
+            }
+        }
+
+        header('Location: products.php?msg=error_db');
+        exit;
+
+    // ==========================================
+    // 6. DELETE PRODUCT
+    // ==========================================
     case 'delete':
         if (!validate_csrf_token()) {
             header('Location: products.php?msg=error_csrf');
@@ -499,7 +659,6 @@ switch ($action) {
             exit;
         }
 
-        // Fetch image to delete if it's in uploads
         $delStmt = $conn->prepare("SELECT image FROM products WHERE id = ?");
         $delStmt->bind_param("i", $id);
         $delStmt->execute();
@@ -526,17 +685,31 @@ switch ($action) {
         header('Location: products.php?msg=error_db');
         exit;
 
-    case 'toggle_status':
-        if ($id <= 0) {
-            header('Location: products.php?msg=error_invalid');
+    // ==========================================
+    // 7. CATEGORY MANAGEMENT: ADD
+    // ==========================================
+    case 'category_add':
+        if (!validate_csrf_token()) {
+            header('Location: products.php?msg=error_csrf');
             exit;
         }
 
-        $stmt = $conn->prepare("UPDATE products SET is_active = (1 - is_active) WHERE id = ?");
-        if ($stmt) {
-            $stmt->bind_param("i", $id);
-            if ($stmt->execute()) {
-                header('Location: products.php?msg=status_updated');
+        $catName = trim($_POST['cat_name'] ?? '');
+        $catDesc = trim($_POST['cat_description'] ?? '');
+        $catOrder = (int)($_POST['cat_display_order'] ?? 0);
+
+        if (empty($catName)) {
+            header('Location: products.php?msg=cat_empty');
+            exit;
+        }
+
+        $catSlug = slugify($catName);
+
+        $catStmt = $conn->prepare("INSERT INTO product_categories (name, slug, description, display_order) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE description = VALUES(description), display_order = VALUES(display_order)");
+        if ($catStmt) {
+            $catStmt->bind_param("sssi", $catName, $catSlug, $catDesc, $catOrder);
+            if ($catStmt->execute()) {
+                header('Location: products.php?msg=cat_added');
                 exit;
             }
         }
@@ -544,17 +717,87 @@ switch ($action) {
         header('Location: products.php?msg=error_db');
         exit;
 
-    case 'toggle_featured':
-        if ($id <= 0) {
+    // ==========================================
+    // 8. CATEGORY MANAGEMENT: EDIT
+    // ==========================================
+    case 'category_edit':
+        if (!validate_csrf_token()) {
+            header('Location: products.php?msg=error_csrf');
+            exit;
+        }
+
+        $catId = (int)($_POST['cat_id'] ?? 0);
+        $catName = trim($_POST['cat_name'] ?? '');
+        $catDesc = trim($_POST['cat_description'] ?? '');
+        $catOrder = (int)($_POST['cat_display_order'] ?? 0);
+
+        if ($catId <= 0 || empty($catName)) {
+            header('Location: products.php?msg=cat_empty');
+            exit;
+        }
+
+        $chkOld = $conn->prepare("SELECT name FROM product_categories WHERE id = ?");
+        $chkOld->bind_param("i", $catId);
+        $chkOld->execute();
+        $oldRes = $chkOld->get_result();
+        $oldRow = $oldRes ? $oldRes->fetch_assoc() : null;
+        $chkOld->close();
+
+        $catSlug = slugify($catName);
+
+        $catStmt = $conn->prepare("UPDATE product_categories SET name = ?, slug = ?, description = ?, display_order = ? WHERE id = ?");
+        if ($catStmt) {
+            $catStmt->bind_param("sssii", $catName, $catSlug, $catDesc, $catOrder, $catId);
+            if ($catStmt->execute()) {
+                if ($oldRow && $oldRow['name'] !== $catName) {
+                    $uProd = $conn->prepare("UPDATE products SET category = ? WHERE category = ?");
+                    $uProd->bind_param("ss", $catName, $oldRow['name']);
+                    $uProd->execute();
+                    $uProd->close();
+                }
+                header('Location: products.php?msg=cat_updated');
+                exit;
+            }
+        }
+
+        header('Location: products.php?msg=error_db');
+        exit;
+
+    // ==========================================
+    // 9. CATEGORY MANAGEMENT: DELETE
+    // ==========================================
+    case 'category_delete':
+        if (!validate_csrf_token()) {
+            header('Location: products.php?msg=error_csrf');
+            exit;
+        }
+
+        $catId = (int)($_POST['cat_id'] ?? 0);
+        if ($catId <= 0) {
             header('Location: products.php?msg=error_invalid');
             exit;
         }
 
-        $stmt = $conn->prepare("UPDATE products SET is_featured = (1 - is_featured) WHERE id = ?");
-        if ($stmt) {
-            $stmt->bind_param("i", $id);
-            if ($stmt->execute()) {
-                header('Location: products.php?msg=featured_updated');
+        $chkOld = $conn->prepare("SELECT name FROM product_categories WHERE id = ?");
+        $chkOld->bind_param("i", $catId);
+        $chkOld->execute();
+        $oldRes = $chkOld->get_result();
+        $oldRow = $oldRes ? $oldRes->fetch_assoc() : null;
+        $chkOld->close();
+
+        if ($oldRow) {
+            $fallbackCat = 'Furniture & Objects';
+            $uProd = $conn->prepare("UPDATE products SET category = ? WHERE category = ?");
+            $uProd->bind_param("ss", $fallbackCat, $oldRow['name']);
+            $uProd->execute();
+            $uProd->close();
+        }
+
+        $delStmt = $conn->prepare("DELETE FROM product_categories WHERE id = ?");
+        if ($delStmt) {
+            $delStmt->bind_param("i", $catId);
+            if ($delStmt->execute()) {
+                header('Location: products.php?msg=cat_deleted');
                 exit;
             }
         }
