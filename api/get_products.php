@@ -25,7 +25,7 @@ try {
     $category = isset($_GET['category']) ? trim($_GET['category']) : '';
     $sort = isset($_GET['sort']) ? trim($_GET['sort']) : 'default';
 
-    $sql = "SELECT id, name, slug, sku, price, sale_price, currency, category, description, image, popularity, display_order, is_featured, availability, product_label, price_on_request, created_at FROM products WHERE is_active = 1";
+    $sql = "SELECT * FROM products WHERE is_active = 1";
     
     if (!empty($category) && $category !== 'all') {
         $categorySafe = $conn->real_escape_string($category);
@@ -62,6 +62,18 @@ try {
             $priceOnRequest = (int)($row['price_on_request'] ?? 0) === 1 || ($priceFloat <= 0 && $row['price_on_request'] !== null);
             $availability = !empty($row['availability']) ? strtolower($row['availability']) : 'available';
 
+            // Decode gallery images
+            $gallery = [];
+            if (!empty($row['gallery_images'])) {
+                $decoded = json_decode($row['gallery_images'], true);
+                if (is_array($decoded)) {
+                    $gallery = $decoded;
+                }
+            }
+            if (empty($gallery) && !empty($row['image'])) {
+                $gallery = [$row['image']];
+            }
+
             $products[] = [
                 'id' => (string)$row['id'],
                 'slug' => $row['slug'],
@@ -75,12 +87,43 @@ try {
                 'category' => $row['category'] ?? 'Furniture & Objects',
                 'description' => $row['description'] ?? '',
                 'image' => $row['image'],
+                'gallery_images' => $gallery,
                 'popularity' => (int)$row['popularity'],
                 'display_order' => (int)$row['display_order'],
                 'is_featured' => (int)($row['is_featured'] ?? 0),
                 'availability' => $availability,
                 'product_label' => $row['product_label'] ?? '',
                 'price_on_request' => $priceOnRequest ? 1 : 0,
+                'product_type' => $row['product_type'] ?? 'furniture_object',
+                'options_label' => $row['options_label'] ?? 'Option',
+                'options_list' => $row['options_list'] ?? '',
+                'what_included' => $row['what_included'] ?? '',
+                'delivery_time' => $row['delivery_time'] ?? '',
+                'delivery_info' => $row['delivery_info'] ?? '',
+                'cancellation_refund' => $row['cancellation_refund'] ?? '',
+                'dimensions' => $row['dimensions'] ?? '',
+                'materials' => $row['materials'] ?? '',
+                'finishes' => $row['finishes'] ?? '',
+                'customisation' => $row['customisation'] ?? '',
+                'production_time' => $row['production_time'] ?? '',
+                'delivery_area' => $row['delivery_area'] ?? '',
+                'file_formats' => $row['file_formats'] ?? '',
+                'software_compatibility' => $row['software_compatibility'] ?? '',
+                'permitted_use' => $row['permitted_use'] ?? '',
+                'preview_images' => $row['preview_images'] ?? '',
+                'book_format' => $row['book_format'] ?? '',
+                'sample_pages' => $row['sample_pages'] ?? '',
+                'book_dimensions' => $row['book_dimensions'] ?? '',
+                'course_topics' => $row['course_topics'] ?? '',
+                'course_format' => $row['course_format'] ?? '',
+                'course_duration' => $row['course_duration'] ?? '',
+                'access_period' => $row['access_period'] ?? '',
+                'live_dates' => $row['live_dates'] ?? '',
+                'session_scope' => $row['session_scope'] ?? '',
+                'session_duration' => $row['session_duration'] ?? '',
+                'customer_info_needed' => $row['customer_info_needed'] ?? '',
+                'deliverables' => $row['deliverables'] ?? '',
+                'included_revisions' => $row['included_revisions'] ?? '',
                 'date' => substr($row['created_at'], 0, 10),
             ];
         }

@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       return `
         <li class="product-item" data-id="${p.id}">
-          <a href="javascript:void(0)" class="product-thumb-link" onclick="window.openProductModal('${p.id}')">
+          <a href="product.php?id=${encodeURIComponent(p.id)}" class="product-thumb-link">
             <div class="product-image-box">
               <img src="${p.image}" alt="${p.name}" loading="lazy" width="300" height="300">
             </div>

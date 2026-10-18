@@ -223,7 +223,7 @@ if ($catResult) {
               elseif ($fAvail === 'unavailable') $fAvailText = 'Unavailable';
             ?>
             <div class="product-item" data-id="<?= htmlspecialchars($fp['id']) ?>">
-              <a href="javascript:void(0)" class="product-thumb-link" onclick="window.openProductModal('<?= htmlspecialchars($fp['id']) ?>')">
+              <a href="product.php?id=<?= htmlspecialchars($fp['id']) ?>" class="product-thumb-link">
                 <div class="product-image-box">
                   <img src="<?= htmlspecialchars($fp['image']) ?>" alt="<?= htmlspecialchars($fp['name']) ?>" loading="lazy" width="300" height="300">
                 </div>
@@ -388,7 +388,7 @@ if ($catResult) {
             elseif ($avail === 'unavailable') $availText = 'Unavailable';
           ?>
           <li class="product-item" data-id="<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>">
-            <a href="javascript:void(0)" class="product-thumb-link" onclick="window.openProductModal('<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>')">
+            <a href="product.php?id=<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" class="product-thumb-link">
               <div class="product-image-box">
                 <img src="<?= htmlspecialchars($p['image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($p['name'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy" width="300" height="300">
               </div>

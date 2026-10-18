@@ -155,9 +155,120 @@ switch ($action) {
             $image_url = trim($_POST['custom_image_path']);
         }
 
-        $stmt = $conn->prepare("INSERT INTO products (name, slug, sku, price, sale_price, currency, category, description, image, popularity, display_order, is_active, is_featured, availability, product_label, price_on_request) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        // Product type and detailed metadata fields
+        $product_type = trim($_POST['product_type'] ?? 'furniture_object');
+        if (!in_array($product_type, ['furniture_object', 'digital_asset', 'book_planner', 'course_workshop', 'design_session'])) {
+            $product_type = 'furniture_object';
+        }
+
+        $what_included = trim($_POST['what_included'] ?? '');
+        $options_label = trim($_POST['options_label'] ?? 'Option');
+        $options_list = trim($_POST['options_list'] ?? '');
+        $delivery_time = trim($_POST['delivery_time'] ?? '');
+        $delivery_info = trim($_POST['delivery_info'] ?? '');
+        $cancellation_refund = trim($_POST['cancellation_refund'] ?? '');
+
+        // Type specific fields
+        $dimensions = trim($_POST['dimensions'] ?? '');
+        $materials = trim($_POST['materials'] ?? '');
+        $finishes = trim($_POST['finishes'] ?? '');
+        $customisation = trim($_POST['customisation'] ?? '');
+        $production_time = trim($_POST['production_time'] ?? '');
+        $delivery_area = trim($_POST['delivery_area'] ?? '');
+
+        $file_formats = trim($_POST['file_formats'] ?? '');
+        $software_compatibility = trim($_POST['software_compatibility'] ?? '');
+        $permitted_use = trim($_POST['permitted_use'] ?? '');
+        $preview_images = trim($_POST['preview_images'] ?? '');
+
+        $book_format = trim($_POST['book_format'] ?? '');
+        $sample_pages = trim($_POST['sample_pages'] ?? '');
+        $book_dimensions = trim($_POST['book_dimensions'] ?? '');
+
+        $course_topics = trim($_POST['course_topics'] ?? '');
+        $course_format = trim($_POST['course_format'] ?? '');
+        $course_duration = trim($_POST['course_duration'] ?? '');
+        $access_period = trim($_POST['access_period'] ?? '');
+        $live_dates = trim($_POST['live_dates'] ?? '');
+
+        $session_scope = trim($_POST['session_scope'] ?? '');
+        $session_duration = trim($_POST['session_duration'] ?? '');
+        $customer_info_needed = trim($_POST['customer_info_needed'] ?? '');
+        $deliverables = trim($_POST['deliverables'] ?? '');
+        $included_revisions = trim($_POST['included_revisions'] ?? '');
+
+        // Gallery images: parse from textarea and uploaded gallery files
+        $galleryList = [];
+        if (!empty($image_url)) {
+            $galleryList[] = $image_url;
+        }
+        $rawGalleryText = trim($_POST['gallery_images_text'] ?? '');
+        if (!empty($rawGalleryText)) {
+            $lines = preg_split('/[\r\n,]+/', $rawGalleryText);
+            foreach ($lines as $line) {
+                $cleanLine = trim($line);
+                if (!empty($cleanLine) && !in_array($cleanLine, $galleryList, true)) {
+                    $galleryList[] = $cleanLine;
+                }
+            }
+        }
+        // Check uploaded gallery files
+        if (isset($_FILES['gallery_files']) && is_array($_FILES['gallery_files']['name'])) {
+            $fileCount = count($_FILES['gallery_files']['name']);
+            for ($fi = 0; $fi < $fileCount; $fi++) {
+                if ($_FILES['gallery_files']['error'][$fi] === UPLOAD_ERR_OK) {
+                    $gExt = strtolower(pathinfo($_FILES['gallery_files']['name'][$fi], PATHINFO_EXTENSION));
+                    if (in_array($gExt, $allowed_exts)) {
+                        if (!is_dir($upload_dir)) @mkdir($upload_dir, 0755, true);
+                        $gFileName = 'gal_' . time() . '_' . $fi . '_' . rand(100, 999) . '.' . $gExt;
+                        $gTarget = $upload_dir . $gFileName;
+                        if (move_uploaded_file($_FILES['gallery_files']['tmp_name'][$fi], $gTarget)) {
+                            $galleryList[] = 'img/shop/uploads/' . $gFileName;
+                        }
+                    }
+                }
+            }
+        }
+        $gallery_images = json_encode(array_values(array_unique($galleryList)));
+
+        $insertSql = "INSERT INTO products (
+            name, slug, sku, price, sale_price, currency, category, description, image,
+            popularity, display_order, is_active, is_featured, availability, product_label, price_on_request,
+            product_type, what_included, options_label, options_list, delivery_time, delivery_info, cancellation_refund, gallery_images,
+            dimensions, materials, finishes, customisation, production_time, delivery_area,
+            file_formats, software_compatibility, permitted_use, preview_images,
+            book_format, sample_pages, book_dimensions,
+            course_topics, course_format, course_duration, access_period, live_dates,
+            session_scope, session_duration, customer_info_needed, deliverables, included_revisions
+        ) VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?,
+            ?, ?, ?,
+            ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?
+        )";
+
+        $stmt = $conn->prepare($insertSql);
         if ($stmt) {
-            $stmt->bind_param("sssddssssiiisssi", $name, $slug, $sku, $price, $sale_price, $currency, $category, $description, $image_url, $popularity, $display_order, $is_active, $is_featured, $availability, $product_label, $price_on_request);
+            // Types:
+            // 1-9: sssddssss (name, slug, sku, price, sale_price, currency, category, description, image)
+            // 10-16: iiisssi (popularity, display_order, is_active, is_featured, availability, product_label, price_on_request)
+            // 17-47: 31 strings (s)
+            $types = "sssddssssiiisssi" . str_repeat("s", 31);
+            $stmt->bind_param(
+                $types,
+                $name, $slug, $sku, $price, $sale_price, $currency, $category, $description, $image_url,
+                $popularity, $display_order, $is_active, $is_featured, $availability, $product_label, $price_on_request,
+                $product_type, $what_included, $options_label, $options_list, $delivery_time, $delivery_info, $cancellation_refund, $gallery_images,
+                $dimensions, $materials, $finishes, $customisation, $production_time, $delivery_area,
+                $file_formats, $software_compatibility, $permitted_use, $preview_images,
+                $book_format, $sample_pages, $book_dimensions,
+                $course_topics, $course_format, $course_duration, $access_period, $live_dates,
+                $session_scope, $session_duration, $customer_info_needed, $deliverables, $included_revisions
+            );
             if ($stmt->execute()) {
                 header('Location: products.php?msg=added');
                 exit;
@@ -212,7 +323,7 @@ switch ($action) {
         $slug = slugify($name);
 
         // Fetch current product to retain image if not updated
-        $curStmt = $conn->prepare("SELECT image FROM products WHERE id = ?");
+        $curStmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
         $curStmt->bind_param("i", $id);
         $curStmt->execute();
         $curRes = $curStmt->get_result();
@@ -260,9 +371,114 @@ switch ($action) {
             $image_url = trim($_POST['custom_image_path']);
         }
 
-        $stmt = $conn->prepare("UPDATE products SET name = ?, slug = ?, sku = ?, price = ?, sale_price = ?, currency = ?, category = ?, description = ?, image = ?, popularity = ?, display_order = ?, is_active = ?, is_featured = ?, availability = ?, product_label = ?, price_on_request = ? WHERE id = ?");
+        // Product type and detailed metadata fields
+        $product_type = trim($_POST['product_type'] ?? ($curProduct['product_type'] ?? 'furniture_object'));
+        if (!in_array($product_type, ['furniture_object', 'digital_asset', 'book_planner', 'course_workshop', 'design_session'])) {
+            $product_type = 'furniture_object';
+        }
+
+        $what_included = trim($_POST['what_included'] ?? '');
+        $options_label = trim($_POST['options_label'] ?? 'Option');
+        $options_list = trim($_POST['options_list'] ?? '');
+        $delivery_time = trim($_POST['delivery_time'] ?? '');
+        $delivery_info = trim($_POST['delivery_info'] ?? '');
+        $cancellation_refund = trim($_POST['cancellation_refund'] ?? '');
+
+        // Type specific fields
+        $dimensions = trim($_POST['dimensions'] ?? '');
+        $materials = trim($_POST['materials'] ?? '');
+        $finishes = trim($_POST['finishes'] ?? '');
+        $customisation = trim($_POST['customisation'] ?? '');
+        $production_time = trim($_POST['production_time'] ?? '');
+        $delivery_area = trim($_POST['delivery_area'] ?? '');
+
+        $file_formats = trim($_POST['file_formats'] ?? '');
+        $software_compatibility = trim($_POST['software_compatibility'] ?? '');
+        $permitted_use = trim($_POST['permitted_use'] ?? '');
+        $preview_images = trim($_POST['preview_images'] ?? '');
+
+        $book_format = trim($_POST['book_format'] ?? '');
+        $sample_pages = trim($_POST['sample_pages'] ?? '');
+        $book_dimensions = trim($_POST['book_dimensions'] ?? '');
+
+        $course_topics = trim($_POST['course_topics'] ?? '');
+        $course_format = trim($_POST['course_format'] ?? '');
+        $course_duration = trim($_POST['course_duration'] ?? '');
+        $access_period = trim($_POST['access_period'] ?? '');
+        $live_dates = trim($_POST['live_dates'] ?? '');
+
+        $session_scope = trim($_POST['session_scope'] ?? '');
+        $session_duration = trim($_POST['session_duration'] ?? '');
+        $customer_info_needed = trim($_POST['customer_info_needed'] ?? '');
+        $deliverables = trim($_POST['deliverables'] ?? '');
+        $included_revisions = trim($_POST['included_revisions'] ?? '');
+
+        // Gallery images
+        $galleryList = [];
+        if (!empty($image_url)) {
+            $galleryList[] = $image_url;
+        }
+        $rawGalleryText = trim($_POST['gallery_images_text'] ?? '');
+        if (!empty($rawGalleryText)) {
+            $lines = preg_split('/[\r\n,]+/', $rawGalleryText);
+            foreach ($lines as $line) {
+                $cleanLine = trim($line);
+                if (!empty($cleanLine) && !in_array($cleanLine, $galleryList, true)) {
+                    $galleryList[] = $cleanLine;
+                }
+            }
+        } elseif (!empty($curProduct['gallery_images'])) {
+            $existingGal = json_decode($curProduct['gallery_images'], true);
+            if (is_array($existingGal)) {
+                $galleryList = array_values(array_unique(array_merge($galleryList, $existingGal)));
+            }
+        }
+        // Process uploaded gallery files
+        if (isset($_FILES['gallery_files']) && is_array($_FILES['gallery_files']['name'])) {
+            $fileCount = count($_FILES['gallery_files']['name']);
+            for ($fi = 0; $fi < $fileCount; $fi++) {
+                if ($_FILES['gallery_files']['error'][$fi] === UPLOAD_ERR_OK) {
+                    $gExt = strtolower(pathinfo($_FILES['gallery_files']['name'][$fi], PATHINFO_EXTENSION));
+                    if (in_array($gExt, $allowed_exts)) {
+                        if (!is_dir($upload_dir)) @mkdir($upload_dir, 0755, true);
+                        $gFileName = 'gal_' . time() . '_' . $fi . '_' . rand(100, 999) . '.' . $gExt;
+                        $gTarget = $upload_dir . $gFileName;
+                        if (move_uploaded_file($_FILES['gallery_files']['tmp_name'][$fi], $gTarget)) {
+                            $galleryList[] = 'img/shop/uploads/' . $gFileName;
+                        }
+                    }
+                }
+            }
+        }
+        $gallery_images = json_encode(array_values(array_unique($galleryList)));
+
+        $updateSql = "UPDATE products SET 
+            name = ?, slug = ?, sku = ?, price = ?, sale_price = ?, currency = ?, category = ?, description = ?, image = ?,
+            popularity = ?, display_order = ?, is_active = ?, is_featured = ?, availability = ?, product_label = ?, price_on_request = ?,
+            product_type = ?, what_included = ?, options_label = ?, options_list = ?, delivery_time = ?, delivery_info = ?, cancellation_refund = ?, gallery_images = ?,
+            dimensions = ?, materials = ?, finishes = ?, customisation = ?, production_time = ?, delivery_area = ?,
+            file_formats = ?, software_compatibility = ?, permitted_use = ?, preview_images = ?,
+            book_format = ?, sample_pages = ?, book_dimensions = ?,
+            course_topics = ?, course_format = ?, course_duration = ?, access_period = ?, live_dates = ?,
+            session_scope = ?, session_duration = ?, customer_info_needed = ?, deliverables = ?, included_revisions = ?
+            WHERE id = ?";
+
+        $stmt = $conn->prepare($updateSql);
         if ($stmt) {
-            $stmt->bind_param("sssddssssiiisssii", $name, $slug, $sku, $price, $sale_price, $currency, $category, $description, $image_url, $popularity, $display_order, $is_active, $is_featured, $availability, $product_label, $price_on_request, $id);
+            // Types: 1-9: sssddssss, 10-16: iiisssi, 17-47: 31 strings (s), 48: id (i)
+            $types = "sssddssssiiisssi" . str_repeat("s", 31) . "i";
+            $stmt->bind_param(
+                $types,
+                $name, $slug, $sku, $price, $sale_price, $currency, $category, $description, $image_url,
+                $popularity, $display_order, $is_active, $is_featured, $availability, $product_label, $price_on_request,
+                $product_type, $what_included, $options_label, $options_list, $delivery_time, $delivery_info, $cancellation_refund, $gallery_images,
+                $dimensions, $materials, $finishes, $customisation, $production_time, $delivery_area,
+                $file_formats, $software_compatibility, $permitted_use, $preview_images,
+                $book_format, $sample_pages, $book_dimensions,
+                $course_topics, $course_format, $course_duration, $access_period, $live_dates,
+                $session_scope, $session_duration, $customer_info_needed, $deliverables, $included_revisions,
+                $id
+            );
             if ($stmt->execute()) {
                 header('Location: products.php?msg=updated');
                 exit;

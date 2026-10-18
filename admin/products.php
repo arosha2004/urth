@@ -375,7 +375,13 @@ switch ($msg) {
                                         </a>
                                     </td>
                                     <td>
-                                        <div class="table-actions" style="justify-content: flex-end; gap: 6px;">
+                                            <a href="../product.php?id=<?= $prod['id'] ?>"
+                                               target="_blank"
+                                               class="btn btn-outline btn-sm"
+                                               title="View shareable public product page">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                                View Page
+                                            </a>
                                             <button type="button"
                                                     class="btn btn-outline btn-sm edit-product-btn"
                                                     title="Edit product details">
@@ -419,125 +425,335 @@ switch ($msg) {
 
 <!-- Modal: Add New Product -->
 <div id="addProductModal" class="modal-overlay">
-    <div class="modal-dialog" style="max-width: 640px;">
+    <div class="modal-dialog" style="max-width: 840px; max-height: 90vh; display: flex; flex-direction: column;">
         <div class="modal-header">
-            <h3 class="modal-title">Add New Shop Product</h3>
+            <div>
+                <h3 class="modal-title">Add New Shop Product</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Create catalog product and configure shareable individual product page details</p>
+            </div>
             <button type="button" class="modal-close" data-modal-close>&times;</button>
         </div>
-        <form action="product_actions.php" method="POST" enctype="multipart/form-data">
+        <form action="product_actions.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; overflow: hidden; height: 100%;">
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
             
-            <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
-                    <div class="form-group">
-                        <label for="add_product_name" class="form-label">Product Name *</label>
-                        <input type="text" id="add_product_name" name="name" class="form-control" placeholder="e.g. Bertt Side Table" required>
+            <div class="modal-body" style="overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 20px;">
+                
+                <!-- Section 1: Basic Information -->
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+                    <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-primary); margin-bottom: 12px; font-weight: 700;">1. Core Product Details</h4>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label for="add_product_name" class="form-label">Product Title *</label>
+                            <input type="text" id="add_product_name" name="name" class="form-control" placeholder="e.g. Bertt Side Table" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_product_sku" class="form-label">SKU (Catalog Code)</label>
+                            <input type="text" id="add_product_sku" name="sku" class="form-control" placeholder="e.g. PR104">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="add_product_sku" class="form-label">SKU (Item Code)</label>
-                        <input type="text" id="add_product_sku" name="sku" class="form-control" placeholder="e.g. PR104">
-                    </div>
-                </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-                    <div class="form-group">
-                        <label for="add_product_price" class="form-label">Price (£) *</label>
-                        <input type="number" step="0.01" min="0" id="add_product_price" name="price" class="form-control" placeholder="83.40" required>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px;">
+                        <div class="form-group">
+                            <label for="add_product_price" class="form-label">Price (£) *</label>
+                            <input type="number" step="0.01" min="0" id="add_product_price" name="price" class="form-control" placeholder="83.40" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_product_sale_price" class="form-label">Sale Price (£)</label>
+                            <input type="number" step="0.01" min="0" id="add_product_sale_price" name="sale_price" class="form-control" placeholder="Optional discount">
+                        </div>
+                        <div class="form-group">
+                            <label for="add_product_category" class="form-label">Catalog Category *</label>
+                            <select id="add_product_category" name="category" class="form-control" required>
+                                <option value="" disabled>-- Select Category --</option>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?= htmlspecialchars($cat) ?>" <?= $cat === 'Furniture & Objects' ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($cat) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                                <option value="__custom__">+ Add New Category...</option>
+                            </select>
+                            <div id="add_custom_category_wrap" style="display: none; margin-top: 6px;">
+                                <input type="text" id="add_custom_category" name="custom_category" class="form-control" placeholder="Enter new category name...">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="add_product_sale_price" class="form-label">Sale Price (£)</label>
-                        <input type="number" step="0.01" min="0" id="add_product_sale_price" name="sale_price" class="form-control" placeholder="Optional">
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="add_product_desc" class="form-label">Full Product Description</label>
+                        <textarea id="add_product_desc" name="description" class="form-control" rows="3" placeholder="Provide design inspiration, architectural context, craftsmanship details..."></textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="add_product_category" class="form-label">Category *</label>
-                        <select id="add_product_category" name="category" class="form-control" required>
-                            <option value="" disabled>-- Select Category --</option>
-                            <?php foreach ($categories as $cat): ?>
-                                <option value="<?= htmlspecialchars($cat) ?>" <?= $cat === 'Furniture & Objects' ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($cat) ?>
-                                </option>
-                            <?php endforeach; ?>
-                            <option value="__custom__">+ Add New Category...</option>
-                        </select>
-                        <div id="add_custom_category_wrap" style="display: none; margin-top: 6px;">
-                            <input type="text" id="add_custom_category" name="custom_category" class="form-control" placeholder="Enter new category name...">
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="add_product_image" class="form-label">Primary Cover Image *</label>
+                        <input type="file" id="add_product_image" name="product_image" class="form-control" accept=".jpg,.jpeg,.png,.webp,.avif,.svg">
+                        <div style="margin-top: 6px;">
+                            <input type="text" name="custom_image_path" class="form-control" placeholder="Or specify existing image path/URL: img/shop/prod-1.jpg" style="font-size: 12px;">
+                        </div>
+                        <div id="add_image_preview_wrap" style="display: none; margin-top: 10px;">
+                            <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Selected Cover Preview:</span>
+                            <div class="product-admin-thumb" style="width: 80px; height: 80px;">
+                                <img id="add_image_preview" src="" alt="Preview">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="add_product_desc" class="form-label">Product Description &amp; Specifications</label>
-                    <textarea id="add_product_desc" name="description" class="form-control" rows="3" placeholder="Handcrafted minimalist timber table with refined detailing and brushed brass accents..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="add_product_image" class="form-label">Product Image (Upload File)</label>
-                    <input type="file" id="add_product_image" name="product_image" class="form-control" accept=".jpg,.jpeg,.png,.webp,.avif,.svg">
-                    <div style="margin-top: 6px;">
-                        <input type="text" name="custom_image_path" class="form-control" placeholder="Or specify an existing path/URL: img/shop/prod-1.jpg" style="font-size: 12px;">
+                <!-- Section 2: Product Type & Specialized Details -->
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-primary); margin: 0; font-weight: 700;">2. Product Type &amp; Specific Attributes</h4>
+                        <span style="font-size: 11px; color: var(--text-muted);">Adapts the page layout to the selected product category</span>
                     </div>
-                    <div id="add_image_preview_wrap" style="display: none; margin-top: 10px;">
-                        <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Selected Image Preview:</span>
-                        <div class="product-admin-thumb" style="width: 80px; height: 80px;">
-                            <img id="add_image_preview" src="" alt="Preview">
+
+                    <div class="form-group">
+                        <label for="add_product_type" class="form-label" style="font-weight: 600;">Product Type *</label>
+                        <select id="add_product_type" name="product_type" class="form-control" style="border-color: var(--gold-primary); background-color: var(--gold-subtle); font-weight: 600;">
+                            <option value="furniture_object" selected>Furniture or Object (Dimensions, Materials, Finishes, Customisation, Production Time, Delivery Area)</option>
+                            <option value="digital_asset">Digital Asset (File Formats, Software Compatibility, Preview Images, Permitted Use)</option>
+                            <option value="book_planner">Book or Planner (Digital/Printed Format, Sample Pages, Dimensions)</option>
+                            <option value="course_workshop">Course or Workshop (Topics, Format, Duration, Access Period, Live Dates / Time Zone)</option>
+                            <option value="design_session">Design Session (Scope, Duration, Required Customer Info, Deliverables, Included Revisions)</option>
+                        </select>
+                    </div>
+
+                    <!-- Type Subgroup: Furniture or Object -->
+                    <div id="add_type_group_furniture_object" class="type-fields-group" style="margin-top: 14px; background: rgba(166,132,73,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 12px; font-weight: 700; color: var(--gold-primary); display: block; margin-bottom: 10px;">Furniture &amp; Objects Specifications</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">Dimensions</label>
+                                <input type="text" name="dimensions" class="form-control" placeholder="e.g. Diameter: 420mm | Height: 520mm | Weight: 9.8kg">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Materials</label>
+                                <input type="text" name="materials" class="form-control" placeholder="e.g. Solid European White Oak, Brushed Spun Brass, Eco-Bio Wax">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Finishes Available</label>
+                                <input type="text" name="finishes" class="form-control" placeholder="e.g. Natural Matte Oak, Smoked Walnut, Ebonized Ash">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Production Time</label>
+                                <input type="text" name="production_time" class="form-control" placeholder="e.g. 3–4 weeks handcrafted in our workshop">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Customisation Details</label>
+                                <input type="text" name="customisation" class="form-control" placeholder="e.g. Bespoke heights, alternate timber species, and stain matching available">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Delivery Area</label>
+                                <input type="text" name="delivery_area" class="form-control" placeholder="e.g. UK Nationwide White-Glove delivery &amp; Worldwide crate freight">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type Subgroup: Digital Asset -->
+                    <div id="add_type_group_digital_asset" class="type-fields-group" style="display: none; margin-top: 14px; background: rgba(59,130,246,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #2563eb; display: block; margin-bottom: 10px;">Digital Asset Specifications</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">File Formats</label>
+                                <input type="text" name="file_formats" class="form-control" placeholder="e.g. .BRUSHSET, .DWG, .DXF, .RFA, .PNG (4K), .PDF">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Software Compatibility</label>
+                                <input type="text" name="software_compatibility" class="form-control" placeholder="e.g. Procreate 5.2+, AutoCAD 2020+, Revit 2022+, Blender">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Permitted Use / License Scope</label>
+                                <input type="text" name="permitted_use" class="form-control" placeholder="e.g. Commercial and personal architectural presentations. Reselling prohibited.">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Preview Images &amp; Demos</label>
+                                <input type="text" name="preview_images" class="form-control" placeholder="e.g. 12 high-resolution render samples included in download">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type Subgroup: Book or Planner -->
+                    <div id="add_type_group_book_planner" class="type-fields-group" style="display: none; margin-top: 14px; background: rgba(16,185,129,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #059669; display: block; margin-bottom: 10px;">Book &amp; Planner Specifications</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">Digital / Printed Format</label>
+                                <input type="text" name="book_format" class="form-control" placeholder="e.g. Casebound Hardcover Linen &amp; Interactive Digital PDF">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Sample Pages Preview</label>
+                                <input type="text" name="sample_pages" class="form-control" placeholder="e.g. 42 sample pages preview available in table of contents">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 10px;">
+                            <label class="form-label">Dimensions &amp; Page Details</label>
+                            <input type="text" name="book_dimensions" class="form-control" placeholder="e.g. 240 x 170 mm (Standard Royal), 210 pages, 140gsm uncoated FSC paper">
+                        </div>
+                    </div>
+
+                    <!-- Type Subgroup: Course or Workshop -->
+                    <div id="add_type_group_course_workshop" class="type-fields-group" style="display: none; margin-top: 14px; background: rgba(168,85,247,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #7c3aed; display: block; margin-bottom: 10px;">Course &amp; Workshop Specifications</span>
+                        <div class="form-group">
+                            <label class="form-label">Topics / Curriculum Highlights</label>
+                            <textarea name="course_topics" class="form-control" rows="2" placeholder="e.g. 1. Spatial Flow &amp; Sightlines, 2. Light Choreography, 3. Architectural Joinery Detailing"></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Course Format</label>
+                                <input type="text" name="course_format" class="form-control" placeholder="e.g. Live Zoom Interactive Webinar + 4K Recorded Archive">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Duration</label>
+                                <input type="text" name="course_duration" class="form-control" placeholder="e.g. 4 Weeks (4x 90-minute live masterclasses + weekly critiques)">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Access Period</label>
+                                <input type="text" name="access_period" class="form-control" placeholder="e.g. Lifetime unrestricted access to recording portal &amp; templates">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Dates &amp; Time Zone for Live Events</label>
+                                <input type="text" name="live_dates" class="form-control" placeholder="e.g. Every Saturday 14:00 – 15:30 GMT (London Time)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type Subgroup: Design Session -->
+                    <div id="add_type_group_design_session" class="type-fields-group" style="display: none; margin-top: 14px; background: rgba(234,88,12,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #ea580c; display: block; margin-bottom: 10px;">Design Session Specifications</span>
+                        <div class="form-group">
+                            <label class="form-label">Consultation Scope</label>
+                            <textarea name="session_scope" class="form-control" rows="2" placeholder="e.g. Full review of residential spatial layouts, daylighting, joinery placement, and furniture planning"></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Session Duration</label>
+                                <input type="text" name="session_duration" class="form-control" placeholder="e.g. 90-minute live 1-on-1 video call + 3 hours of architect study">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Included Revisions</label>
+                                <input type="text" name="included_revisions" class="form-control" placeholder="e.g. Up to 2 iterative design revisions within 14 days of dossier">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Required Customer Information</label>
+                                <textarea name="customer_info_needed" class="form-control" rows="2" placeholder="e.g. Existing room dimensions/floor plan, daylight photos, target budget, inspiration boards"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Final Deliverables</label>
+                                <textarea name="deliverables" class="form-control" rows="2" placeholder="e.g. Scaled 2D plan (PDF), Material &amp; color scheme palette, Clickable shopping list, Video replay"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div class="form-group">
-                        <label for="add_product_availability" class="form-label">Availability Status *</label>
-                        <select id="add_product_availability" name="availability" class="form-control" required>
-                            <option value="available" selected>Available</option>
-                            <option value="made_to_order">Made to order</option>
-                            <option value="coming_soon">Coming soon (cannot accept payment)</option>
-                            <option value="unavailable">Unavailable (sold out)</option>
-                        </select>
+                <!-- Section 3: Delivery, Inclusions & Shareable Page Details -->
+                <div>
+                    <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-primary); margin-bottom: 12px; font-weight: 700;">3. Options, Inclusions &amp; Policies</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px;">
+                        <div class="form-group">
+                            <label for="add_options_label" class="form-label">Available Option Label</label>
+                            <input type="text" id="add_options_label" name="options_label" class="form-control" placeholder="e.g. Finish, Size, Format, License">
+                        </div>
+                        <div class="form-group">
+                            <label for="add_options_list" class="form-label">Available Options (Comma-separated)</label>
+                            <input type="text" id="add_options_list" name="options_list" class="form-control" placeholder="e.g. Natural White Oak, Smoked Oiled Walnut, Ebonized Ash">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="add_product_label" class="form-label">Product Format Label</label>
-                        <select id="add_product_label" name="product_label" class="form-control">
-                            <option value="">-- No Label --</option>
-                            <option value="Digital">Digital</option>
-                            <option value="Printed">Printed</option>
-                            <option value="Made to order">Made to order</option>
-                            <option value="Online course">Online course</option>
-                            <option value="Consultation">Consultation</option>
-                        </select>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="add_what_included" class="form-label">What is Included (List with bullets or newlines)</label>
+                        <textarea id="add_what_included" name="what_included" class="form-control" rows="3" placeholder="• 1x Bertt Solid Oak Table&#10;• Studio certificate of authenticity&#10;• Protective beeswax care kit"></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="add_delivery_time" class="form-label">Expected Delivery or Preparation Time</label>
+                        <input type="text" id="add_delivery_time" name="delivery_time" class="form-control" placeholder="e.g. Preparation: 2–3 business days | Made to order: 3–4 weeks handcrafted lead time">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                        <div class="form-group">
+                            <label for="add_delivery_info" class="form-label">Delivery &amp; Shipping Policy</label>
+                            <textarea id="add_delivery_info" name="delivery_info" class="form-control" rows="2" placeholder="e.g. White-glove UK courier delivery in reinforced wooden crate. Worldwide freight options available."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_cancellation_refund" class="form-label">Cancellation &amp; Refund Information</label>
+                            <textarea id="add_cancellation_refund" name="cancellation_refund" class="form-control" rows="2" placeholder="e.g. 14-day return policy for standard models in original packaging. Bespoke finishes subject to restocking fee."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label class="form-label">Additional Product Image Gallery</label>
+                        <input type="file" name="gallery_files[]" multiple class="form-control" accept=".jpg,.jpeg,.png,.webp,.avif,.svg">
+                        <div style="margin-top: 6px;">
+                            <textarea name="gallery_images_text" class="form-control" rows="2" placeholder="Or enter additional image URLs/paths separated by commas: img/shop/prod-2.jpg, img/shop/prod-3.jpg" style="font-size: 12px;"></textarea>
+                        </div>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div class="form-group">
-                        <label for="add_product_order" class="form-label">Display Order</label>
-                        <input type="number" id="add_product_order" name="display_order" class="form-control" value="<?= $totalProducts + 1 ?>" min="0">
+                <!-- Section 4: Catalog Visibility & Sorting -->
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label for="add_product_availability" class="form-label">Availability *</label>
+                            <select id="add_product_availability" name="availability" class="form-control" required>
+                                <option value="available" selected>Available</option>
+                                <option value="made_to_order">Made to order</option>
+                                <option value="coming_soon">Coming soon (cannot accept payment)</option>
+                                <option value="unavailable">Unavailable (sold out)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_product_label" class="form-label">Format Badge</label>
+                            <select id="add_product_label" name="product_label" class="form-control">
+                                <option value="">-- No Label --</option>
+                                <option value="Digital">Digital</option>
+                                <option value="Printed">Printed</option>
+                                <option value="Made to order">Made to order</option>
+                                <option value="Online course">Online course</option>
+                                <option value="Consultation">Consultation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add_product_order" class="form-label">Display Order</label>
+                            <input type="number" id="add_product_order" name="display_order" class="form-control" value="<?= $totalProducts + 1 ?>" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="add_product_popularity" class="form-label">Popularity</label>
+                            <input type="number" id="add_product_popularity" name="popularity" class="form-control" value="5" min="1" max="10">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="add_product_popularity" class="form-label">Popularity Rating</label>
-                        <input type="number" id="add_product_popularity" name="popularity" class="form-control" value="5" min="1" max="10">
+
+                    <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                            <input type="checkbox" id="add_product_featured" name="is_featured" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
+                            ★ Featured in Shop Hero Carousel
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                            <input type="checkbox" id="add_product_price_on_request" name="price_on_request" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
+                            Price on request (hide numeric price)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                            <input type="checkbox" name="is_active" value="1" checked style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
+                            Display actively in shop catalog
+                        </label>
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
-                        <input type="checkbox" id="add_product_featured" name="is_featured" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
-                        ★ Featured Product Area
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
-                        <input type="checkbox" id="add_product_price_on_request" name="price_on_request" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
-                        Price on request (hide numerical price)
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
-                        <input type="checkbox" name="is_active" value="1" checked style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
-                        Display actively in shop catalog
-                    </label>
-                </div>
             </div>
             
-            <div class="modal-footer">
+            <div class="modal-footer" style="padding: 14px 24px; border-top: 1px solid var(--border-color); background: var(--bg-card-solid);">
                 <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
-                <button type="submit" class="btn btn-gold">Add Product</button>
+                <button type="submit" class="btn btn-gold">Publish Product</button>
             </div>
         </form>
     </div>
@@ -545,124 +761,334 @@ switch ($msg) {
 
 <!-- Modal: Edit Product -->
 <div id="editProductModal" class="modal-overlay">
-    <div class="modal-dialog" style="max-width: 640px;">
+    <div class="modal-dialog" style="max-width: 840px; max-height: 90vh; display: flex; flex-direction: column;">
         <div class="modal-header">
-            <h3 class="modal-title">Edit Shop Product</h3>
+            <div>
+                <h3 class="modal-title">Edit Shop Product</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Modify product attributes and shareable individual page details</p>
+            </div>
             <button type="button" class="modal-close" data-modal-close>&times;</button>
         </div>
-        <form action="product_actions.php" method="POST" enctype="multipart/form-data">
+        <form action="product_actions.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; overflow: hidden; height: 100%;">
             <input type="hidden" name="action" value="edit">
             <input type="hidden" name="product_id" id="edit_product_id">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
             
-            <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
-                    <div class="form-group">
-                        <label for="edit_product_name" class="form-label">Product Name *</label>
-                        <input type="text" id="edit_product_name" name="name" class="form-control" required>
+            <div class="modal-body" style="overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 20px;">
+                
+                <!-- Section 1: Basic Information -->
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+                    <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-primary); margin-bottom: 12px; font-weight: 700;">1. Core Product Details</h4>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label for="edit_product_name" class="form-label">Product Title *</label>
+                            <input type="text" id="edit_product_name" name="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_product_sku" class="form-label">SKU (Catalog Code)</label>
+                            <input type="text" id="edit_product_sku" name="sku" class="form-control">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit_product_sku" class="form-label">SKU (Item Code)</label>
-                        <input type="text" id="edit_product_sku" name="sku" class="form-control">
-                    </div>
-                </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-                    <div class="form-group">
-                        <label for="edit_product_price" class="form-label">Price (£) *</label>
-                        <input type="number" step="0.01" min="0" id="edit_product_price" name="price" class="form-control" required>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px;">
+                        <div class="form-group">
+                            <label for="edit_product_price" class="form-label">Price (£) *</label>
+                            <input type="number" step="0.01" min="0" id="edit_product_price" name="price" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_product_sale_price" class="form-label">Sale Price (£)</label>
+                            <input type="number" step="0.01" min="0" id="edit_product_sale_price" name="sale_price" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_product_category" class="form-label">Catalog Category *</label>
+                            <select id="edit_product_category" name="category" class="form-control" required>
+                                <option value="" disabled>-- Select Category --</option>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?= htmlspecialchars($cat) ?>">
+                                        <?= htmlspecialchars($cat) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                                <option value="__custom__">+ Add New Category...</option>
+                            </select>
+                            <div id="edit_custom_category_wrap" style="display: none; margin-top: 6px;">
+                                <input type="text" id="edit_custom_category" name="custom_category" class="form-control" placeholder="Enter new category name...">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit_product_sale_price" class="form-label">Sale Price (£)</label>
-                        <input type="number" step="0.01" min="0" id="edit_product_sale_price" name="sale_price" class="form-control">
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="edit_product_desc" class="form-label">Full Product Description</label>
+                        <textarea id="edit_product_desc" name="description" class="form-control" rows="3"></textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="edit_product_category" class="form-label">Category *</label>
-                        <select id="edit_product_category" name="category" class="form-control" required>
-                            <option value="" disabled>-- Select Category --</option>
-                            <?php foreach ($categories as $cat): ?>
-                                <option value="<?= htmlspecialchars($cat) ?>">
-                                    <?= htmlspecialchars($cat) ?>
-                                </option>
-                            <?php endforeach; ?>
-                            <option value="__custom__">+ Add New Category...</option>
-                        </select>
-                        <div id="edit_custom_category_wrap" style="display: none; margin-top: 6px;">
-                            <input type="text" id="edit_custom_category" name="custom_category" class="form-control" placeholder="Enter new category name...">
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="edit_product_image" class="form-label">Primary Cover Image (Optional to update)</label>
+                        <input type="file" id="edit_product_image" name="product_image" class="form-control" accept=".jpg,.jpeg,.png,.webp,.avif,.svg">
+                        <div style="margin-top: 6px;">
+                            <input type="text" id="edit_custom_image_path" name="custom_image_path" class="form-control" placeholder="Or edit image path/URL" style="font-size: 12px;">
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Current / Selected Image Preview:</span>
+                            <div class="product-admin-thumb" style="width: 80px; height: 80px;">
+                                <img id="edit_image_preview" src="" alt="Preview">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="edit_product_desc" class="form-label">Product Description &amp; Specifications</label>
-                    <textarea id="edit_product_desc" name="description" class="form-control" rows="3"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="edit_product_image" class="form-label">Update Image (Optional)</label>
-                    <input type="file" id="edit_product_image" name="product_image" class="form-control" accept=".jpg,.jpeg,.png,.webp,.avif,.svg">
-                    <div style="margin-top: 6px;">
-                        <input type="text" id="edit_custom_image_path" name="custom_image_path" class="form-control" placeholder="Or edit image path/URL" style="font-size: 12px;">
+                <!-- Section 2: Product Type & Specialized Details -->
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-primary); margin: 0; font-weight: 700;">2. Product Type &amp; Specific Attributes</h4>
+                        <span style="font-size: 11px; color: var(--text-muted);">Adapts the page layout to the selected product category</span>
                     </div>
-                    <div style="margin-top: 10px;">
-                        <span style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Current / Selected Image Preview:</span>
-                        <div class="product-admin-thumb" style="width: 80px; height: 80px;">
-                            <img id="edit_image_preview" src="" alt="Preview">
+
+                    <div class="form-group">
+                        <label for="edit_product_type" class="form-label" style="font-weight: 600;">Product Type *</label>
+                        <select id="edit_product_type" name="product_type" class="form-control" style="border-color: var(--gold-primary); background-color: var(--gold-subtle); font-weight: 600;">
+                            <option value="furniture_object">Furniture or Object (Dimensions, Materials, Finishes, Customisation, Production Time, Delivery Area)</option>
+                            <option value="digital_asset">Digital Asset (File Formats, Software Compatibility, Preview Images, Permitted Use)</option>
+                            <option value="book_planner">Book or Planner (Digital/Printed Format, Sample Pages, Dimensions)</option>
+                            <option value="course_workshop">Course or Workshop (Topics, Format, Duration, Access Period, Live Dates / Time Zone)</option>
+                            <option value="design_session">Design Session (Scope, Duration, Required Customer Info, Deliverables, Included Revisions)</option>
+                        </select>
+                    </div>
+
+                    <!-- Type Subgroup: Furniture or Object -->
+                    <div id="edit_type_group_furniture_object" class="type-fields-group" style="margin-top: 14px; background: rgba(166,132,73,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 12px; font-weight: 700; color: var(--gold-primary); display: block; margin-bottom: 10px;">Furniture &amp; Objects Specifications</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">Dimensions</label>
+                                <input type="text" id="edit_dimensions" name="dimensions" class="form-control" placeholder="e.g. Diameter: 420mm | Height: 520mm">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Materials</label>
+                                <input type="text" id="edit_materials" name="materials" class="form-control" placeholder="e.g. Solid European White Oak, Brushed Spun Brass">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Finishes Available</label>
+                                <input type="text" id="edit_finishes" name="finishes" class="form-control" placeholder="e.g. Natural Matte Oak, Smoked Walnut">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Production Time</label>
+                                <input type="text" id="edit_production_time" name="production_time" class="form-control" placeholder="e.g. 3–4 weeks handcrafted in our workshop">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Customisation Details</label>
+                                <input type="text" id="edit_customisation" name="customisation" class="form-control" placeholder="e.g. Bespoke heights, alternate timber species">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Delivery Area</label>
+                                <input type="text" id="edit_delivery_area" name="delivery_area" class="form-control" placeholder="e.g. UK Nationwide White-Glove delivery &amp; Worldwide crate freight">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type Subgroup: Digital Asset -->
+                    <div id="edit_type_group_digital_asset" class="type-fields-group" style="display: none; margin-top: 14px; background: rgba(59,130,246,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #2563eb; display: block; margin-bottom: 10px;">Digital Asset Specifications</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">File Formats</label>
+                                <input type="text" id="edit_file_formats" name="file_formats" class="form-control" placeholder="e.g. .BRUSHSET, .DWG, .DXF, .RFA, .PNG">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Software Compatibility</label>
+                                <input type="text" id="edit_software_compatibility" name="software_compatibility" class="form-control" placeholder="e.g. Procreate 5.2+, AutoCAD 2020+, Revit 2022+">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Permitted Use / License Scope</label>
+                                <input type="text" id="edit_permitted_use" name="permitted_use" class="form-control" placeholder="e.g. Commercial and personal architectural presentations">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Preview Images &amp; Demos</label>
+                                <input type="text" id="edit_preview_images" name="preview_images" class="form-control" placeholder="e.g. 12 high-resolution render samples included">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type Subgroup: Book or Planner -->
+                    <div id="edit_type_group_book_planner" class="type-fields-group" style="display: none; margin-top: 14px; background: rgba(16,185,129,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #059669; display: block; margin-bottom: 10px;">Book &amp; Planner Specifications</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">Digital / Printed Format</label>
+                                <input type="text" id="edit_book_format" name="book_format" class="form-control" placeholder="e.g. Casebound Hardcover Linen &amp; Interactive PDF">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Sample Pages Preview</label>
+                                <input type="text" id="edit_sample_pages" name="sample_pages" class="form-control" placeholder="e.g. 42 sample pages preview available">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 10px;">
+                            <label class="form-label">Dimensions &amp; Page Details</label>
+                            <input type="text" id="edit_book_dimensions" name="book_dimensions" class="form-control" placeholder="e.g. 240 x 170 mm, 210 pages, 140gsm paper">
+                        </div>
+                    </div>
+
+                    <!-- Type Subgroup: Course or Workshop -->
+                    <div id="edit_type_group_course_workshop" class="type-fields-group" style="display: none; margin-top: 14px; background: rgba(168,85,247,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #7c3aed; display: block; margin-bottom: 10px;">Course &amp; Workshop Specifications</span>
+                        <div class="form-group">
+                            <label class="form-label">Topics / Curriculum Highlights</label>
+                            <textarea id="edit_course_topics" name="course_topics" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Course Format</label>
+                                <input type="text" id="edit_course_format" name="course_format" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Duration</label>
+                                <input type="text" id="edit_course_duration" name="course_duration" class="form-control">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Access Period</label>
+                                <input type="text" id="edit_access_period" name="access_period" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Dates &amp; Time Zone for Live Events</label>
+                                <input type="text" id="edit_live_dates" name="live_dates" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type Subgroup: Design Session -->
+                    <div id="edit_type_group_design_session" class="type-fields-group" style="display: none; margin-top: 14px; background: rgba(234,88,12,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #ea580c; display: block; margin-bottom: 10px;">Design Session Specifications</span>
+                        <div class="form-group">
+                            <label class="form-label">Consultation Scope</label>
+                            <textarea id="edit_session_scope" name="session_scope" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Session Duration</label>
+                                <input type="text" id="edit_session_duration" name="session_duration" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Included Revisions</label>
+                                <input type="text" id="edit_included_revisions" name="included_revisions" class="form-control">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+                            <div class="form-group">
+                                <label class="form-label">Required Customer Information</label>
+                                <textarea id="edit_customer_info_needed" name="customer_info_needed" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Final Deliverables</label>
+                                <textarea id="edit_deliverables" name="deliverables" class="form-control" rows="2"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div class="form-group">
-                        <label for="edit_product_availability" class="form-label">Availability Status *</label>
-                        <select id="edit_product_availability" name="availability" class="form-control" required>
-                            <option value="available">Available</option>
-                            <option value="made_to_order">Made to order</option>
-                            <option value="coming_soon">Coming soon (cannot accept payment)</option>
-                            <option value="unavailable">Unavailable (sold out)</option>
-                        </select>
+                <!-- Section 3: Delivery, Inclusions & Shareable Page Details -->
+                <div>
+                    <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-primary); margin-bottom: 12px; font-weight: 700;">3. Options, Inclusions &amp; Policies</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px;">
+                        <div class="form-group">
+                            <label for="edit_options_label" class="form-label">Available Option Label</label>
+                            <input type="text" id="edit_options_label" name="options_label" class="form-control" placeholder="e.g. Finish, Size, Format, License">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_options_list" class="form-label">Available Options (Comma-separated)</label>
+                            <input type="text" id="edit_options_list" name="options_list" class="form-control" placeholder="e.g. Natural White Oak, Smoked Oiled Walnut, Ebonized Ash">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit_product_label" class="form-label">Product Format Label</label>
-                        <select id="edit_product_label" name="product_label" class="form-control">
-                            <option value="">-- No Label --</option>
-                            <option value="Digital">Digital</option>
-                            <option value="Printed">Printed</option>
-                            <option value="Made to order">Made to order</option>
-                            <option value="Online course">Online course</option>
-                            <option value="Consultation">Consultation</option>
-                        </select>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="edit_what_included" class="form-label">What is Included (List with bullets or newlines)</label>
+                        <textarea id="edit_what_included" name="what_included" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="edit_delivery_time" class="form-label">Expected Delivery or Preparation Time</label>
+                        <input type="text" id="edit_delivery_time" name="delivery_time" class="form-control">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                        <div class="form-group">
+                            <label for="edit_delivery_info" class="form-label">Delivery &amp; Shipping Policy</label>
+                            <textarea id="edit_delivery_info" name="delivery_info" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_cancellation_refund" class="form-label">Cancellation &amp; Refund Information</label>
+                            <textarea id="edit_cancellation_refund" name="cancellation_refund" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label class="form-label">Additional Product Image Gallery</label>
+                        <input type="file" name="gallery_files[]" multiple class="form-control" accept=".jpg,.jpeg,.png,.webp,.avif,.svg">
+                        <div style="margin-top: 6px;">
+                            <textarea id="edit_gallery_images_text" name="gallery_images_text" class="form-control" rows="2" placeholder="Image URLs or paths separated by commas: img/shop/prod-2.jpg, img/shop/prod-3.jpg" style="font-size: 12px;"></textarea>
+                        </div>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div class="form-group">
-                        <label for="edit_product_order" class="form-label">Display Order</label>
-                        <input type="number" id="edit_product_order" name="display_order" class="form-control" min="0">
+                <!-- Section 4: Catalog Visibility & Sorting -->
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label for="edit_product_availability" class="form-label">Availability *</label>
+                            <select id="edit_product_availability" name="availability" class="form-control" required>
+                                <option value="available">Available</option>
+                                <option value="made_to_order">Made to order</option>
+                                <option value="coming_soon">Coming soon (cannot accept payment)</option>
+                                <option value="unavailable">Unavailable (sold out)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_product_label" class="form-label">Format Badge</label>
+                            <select id="edit_product_label" name="product_label" class="form-control">
+                                <option value="">-- No Label --</option>
+                                <option value="Digital">Digital</option>
+                                <option value="Printed">Printed</option>
+                                <option value="Made to order">Made to order</option>
+                                <option value="Online course">Online course</option>
+                                <option value="Consultation">Consultation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_product_order" class="form-label">Display Order</label>
+                            <input type="number" id="edit_product_order" name="display_order" class="form-control" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_product_popularity" class="form-label">Popularity</label>
+                            <input type="number" id="edit_product_popularity" name="popularity" class="form-control" min="1" max="10">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit_product_popularity" class="form-label">Popularity Rating</label>
-                        <input type="number" id="edit_product_popularity" name="popularity" class="form-control" min="1" max="10">
+
+                    <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                            <input type="checkbox" id="edit_product_featured" name="is_featured" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
+                            ★ Featured in Shop Hero Carousel
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                            <input type="checkbox" id="edit_product_price_on_request" name="price_on_request" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
+                            Price on request (hide numeric price)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
+                            <input type="checkbox" id="edit_product_active" name="is_active" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
+                            Display actively in shop catalog
+                        </label>
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
-                        <input type="checkbox" id="edit_product_featured" name="is_featured" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
-                        ★ Featured Product Area
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
-                        <input type="checkbox" id="edit_product_price_on_request" name="price_on_request" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
-                        Price on request (hide numerical price)
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500;">
-                        <input type="checkbox" id="edit_product_active" name="is_active" value="1" style="width: 16px; height: 16px; accent-color: var(--gold-primary);">
-                        Display actively in shop catalog
-                    </label>
-                </div>
             </div>
             
-            <div class="modal-footer">
+            <div class="modal-footer" style="padding: 14px 24px; border-top: 1px solid var(--border-color); background: var(--bg-card-solid);">
                 <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
                 <button type="submit" class="btn btn-gold">Save Changes</button>
             </div>
@@ -757,6 +1183,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Product Type Switching Logic
+    const typeKeys = ['furniture_object', 'digital_asset', 'book_planner', 'course_workshop', 'design_session'];
+    function switchProductType(prefix, type) {
+        const selected = type || 'furniture_object';
+        typeKeys.forEach(k => {
+            const el = document.querySelector(`#${prefix}_type_group_${k}`);
+            if (el) {
+                el.style.display = (k === selected) ? 'block' : 'none';
+            }
+        });
+    }
+
+    const addTypeSelect = document.querySelector('#add_product_type');
+    if (addTypeSelect) {
+        addTypeSelect.addEventListener('change', () => {
+            switchProductType('add', addTypeSelect.value);
+        });
+    }
+
+    const editTypeSelect = document.querySelector('#edit_product_type');
+    if (editTypeSelect) {
+        editTypeSelect.addEventListener('change', () => {
+            switchProductType('edit', editTypeSelect.value);
+        });
+    }
+
     if (openAddBtn && addModal) {
         openAddBtn.addEventListener('click', () => {
             if (addCatSelect) {
@@ -767,6 +1219,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     addCustomInput.value = '';
                 }
             }
+            if (addTypeSelect) {
+                addTypeSelect.value = 'furniture_object';
+                switchProductType('add', 'furniture_object');
+            }
             const addAvail = document.querySelector('#add_product_availability');
             if (addAvail) addAvail.value = 'available';
             const addLabel = document.querySelector('#add_product_label');
@@ -775,6 +1231,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (addFeat) addFeat.checked = false;
             const addPor = document.querySelector('#add_product_price_on_request');
             if (addPor) addPor.checked = false;
+            
+            // Clear inputs inside addModal
+            addModal.querySelectorAll('input[type="text"], textarea').forEach(inp => {
+                if (!['csrf_token', 'action'].includes(inp.name)) inp.value = '';
+            });
+            if (addImgPreview) addImgPreview.src = '';
+            if (addImgWrap) addImgWrap.style.display = 'none';
+
             openModal(addModal);
         });
     }
@@ -893,6 +1357,67 @@ document.addEventListener('DOMContentLoaded', () => {
             if (editFeat) editFeat.checked = parseInt(prod.is_featured, 10) === 1;
             const editPor = document.querySelector('#edit_product_price_on_request');
             if (editPor) editPor.checked = parseInt(prod.price_on_request, 10) === 1;
+
+            // Product Type and Dynamic Fields
+            const pType = prod.product_type || 'furniture_object';
+            if (editTypeSelect) {
+                editTypeSelect.value = pType;
+                switchProductType('edit', pType);
+            }
+
+            // General metadata
+            const setVal = (sel, val) => { const el = document.querySelector(sel); if (el) el.value = val || ''; };
+            setVal('#edit_options_label', prod.options_label || 'Option');
+            setVal('#edit_options_list', prod.options_list || '');
+            setVal('#edit_what_included', prod.what_included || '');
+            setVal('#edit_delivery_time', prod.delivery_time || '');
+            setVal('#edit_delivery_info', prod.delivery_info || '');
+            setVal('#edit_cancellation_refund', prod.cancellation_refund || '');
+
+            // Gallery images text
+            let galleryText = '';
+            if (prod.gallery_images) {
+                try {
+                    const galArr = typeof prod.gallery_images === 'string' ? JSON.parse(prod.gallery_images) : prod.gallery_images;
+                    if (Array.isArray(galArr)) galleryText = galArr.join(', ');
+                } catch(e) {
+                    galleryText = prod.gallery_images;
+                }
+            }
+            setVal('#edit_gallery_images_text', galleryText);
+
+            // Furniture
+            setVal('#edit_dimensions', prod.dimensions);
+            setVal('#edit_materials', prod.materials);
+            setVal('#edit_finishes', prod.finishes);
+            setVal('#edit_customisation', prod.customisation);
+            setVal('#edit_production_time', prod.production_time);
+            setVal('#edit_delivery_area', prod.delivery_area);
+
+            // Digital Asset
+            setVal('#edit_file_formats', prod.file_formats);
+            setVal('#edit_software_compatibility', prod.software_compatibility);
+            setVal('#edit_permitted_use', prod.permitted_use);
+            setVal('#edit_preview_images', prod.preview_images);
+
+            // Book or Planner
+            setVal('#edit_book_format', prod.book_format);
+            setVal('#edit_sample_pages', prod.sample_pages);
+            setVal('#edit_book_dimensions', prod.book_dimensions);
+
+            // Course or Workshop
+            setVal('#edit_course_topics', prod.course_topics);
+            setVal('#edit_course_format', prod.course_format);
+            setVal('#edit_course_duration', prod.course_duration);
+            setVal('#edit_access_period', prod.access_period);
+            setVal('#edit_live_dates', prod.live_dates);
+
+            // Design Session
+            setVal('#edit_session_scope', prod.session_scope);
+            setVal('#edit_session_duration', prod.session_duration);
+            setVal('#edit_customer_info_needed', prod.customer_info_needed);
+            setVal('#edit_deliverables', prod.deliverables);
+            setVal('#edit_included_revisions', prod.included_revisions);
 
             const imgPath = prod.image ? (!/^https?:\/\//i.test(prod.image) ? '../' + prod.image.replace(/^\/+/, '') : prod.image) : '';
             if (editImgPreview) editImgPreview.src = imgPath;

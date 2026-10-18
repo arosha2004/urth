@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
             </td>
             <td>
-              <a href="shop.php" class="cart-prod-title">${item.name}</a>
+              <a href="product.php?id=${encodeURIComponent(item.id)}" class="cart-prod-title">${item.name}</a>
               <span class="cart-prod-sku">SKU: ${item.sku || 'PR' + item.id}</span>
             </td>
             <td>
