@@ -1,189 +1,577 @@
 <?php
-$products = [
-    [
-        'id' => 'cedar-lounge',
-        'name' => 'Cedar Lounge',
-        'category' => 'Seating',
-        'image' => 'img/about_service1.jpg',
-        'alt' => 'Warm, sunlit living room with contemporary lounge seating',
-    ],
-    [
-        'id' => 'morrow-chair',
-        'name' => 'Morrow Chair',
-        'category' => 'Seating',
-        'image' => 'img/about_service2.jpg',
-        'alt' => 'Calm contemporary living room with a timber coffee table',
-    ],
-    [
-        'id' => 'sola-side-table',
-        'name' => 'Sola Side Table',
-        'category' => 'Tables',
-        'image' => 'img/about_service3.jpg',
-        'alt' => 'Minimal living room with a round timber side table',
-    ],
-    [
-        'id' => 'arc-floor-light',
-        'name' => 'Arc Floor Light',
-        'category' => 'Lighting',
-        'image' => 'img/about_featured_villa.jpg',
-        'alt' => 'Quiet living space with sculptural floor lighting',
-    ],
-    [
-        'id' => 'form-coffee-table',
-        'name' => 'Form Coffee Table',
-        'category' => 'Tables',
-        'image' => 'img/about_service4.jpg',
-        'alt' => 'Minimal interior with a low coffee table and natural timber',
-    ],
-    [
-        'id' => 'stillwater-vase',
-        'name' => 'Stillwater Vessel',
-        'category' => 'Objects',
-        'image' => 'img/about_dark_highlight.jpg',
-        'alt' => 'Natural materials and considered details in a modern interior',
-    ],
-    [
-        'id' => 'nara-stool',
-        'name' => 'Nara Stool',
-        'category' => 'Seating',
-        'image' => 'img/about_hero.jpg',
-        'alt' => 'Warm, minimal interior with natural finishes',
-    ],
-    [
-        'id' => 'oasis-study',
-        'name' => 'Oasis Study Model',
-        'category' => 'Objects',
-        'image' => 'img/miniature_model.jpg',
-        'alt' => 'Architectural model displayed in a bright studio',
-    ],
-];
+require_once __DIR__ . '/config.php';
+
+// Auto-check table existence and setup if needed
+$tblCheck = $conn->query("SHOW TABLES LIKE 'products'");
+if (!$tblCheck || $tblCheck->num_rows === 0) {
+    require_once __DIR__ . '/setup_shop.php';
+}
+
+// Fetch active products from MySQL database
+$result = $conn->query("SELECT * FROM products WHERE is_active = 1 ORDER BY display_order ASC, id ASC");
+$products = [];
+$featuredProducts = [];
+$allProductsData = [];
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $priceFloat = (float)$row['price'];
+        $curr = !empty($row['currency']) ? $row['currency'] : '£';
+        $salePriceFloat = $row['sale_price'] !== null ? (float)$row['sale_price'] : null;
+        $priceOnRequest = (int)($row['price_on_request'] ?? 0) === 1 || ($priceFloat <= 0 && $row['price_on_request'] !== null);
+        $availability = !empty($row['availability']) ? strtolower($row['availability']) : 'available';
+
+        $formattedPrice = $priceOnRequest ? 'Price on request' : ($curr . number_format($priceFloat, 2));
+        $formattedSalePrice = ($priceOnRequest || $salePriceFloat === null) ? null : ($curr . number_format($salePriceFloat, 2));
+
+        $p = [
+            'id' => (string)$row['id'],
+            'slug' => $row['slug'] ?? ('product-' . $row['id']),
+            'name' => $row['name'],
+            'sku' => $row['sku'] ?? ('PR' . str_pad($row['id'], 3, '0', STR_PAD_LEFT)),
+            'price' => $priceFloat,
+            'sale_price' => $salePriceFloat,
+            'formattedPrice' => $formattedPrice,
+            'formattedSalePrice' => $formattedSalePrice,
+            'currency' => $curr,
+            'category' => $row['category'] ?? 'Furniture & Objects',
+            'description' => $row['description'] ?? '',
+            'image' => $row['image'],
+            'popularity' => (int)$row['popularity'],
+            'display_order' => (int)$row['display_order'],
+            'is_featured' => (int)($row['is_featured'] ?? 0),
+            'availability' => $availability,
+            'product_label' => $row['product_label'] ?? '',
+            'price_on_request' => $priceOnRequest ? 1 : 0,
+            'date' => substr($row['created_at'] ?? date('Y-m-d'), 0, 10),
+        ];
+        $products[] = $p;
+        $allProductsData[] = $p;
+        if ($p['is_featured'] === 1) {
+            $featuredProducts[] = $p;
+        }
+    }
+}
+// Fallback if no products are explicitly marked featured
+if (empty($featuredProducts) && !empty($products)) {
+    $featuredProducts = array_slice($products, 0, 4);
+}
+$totalProducts = count($products);
+$initialCount = min(8, $totalProducts);
+
+// Fetch categories dynamically
+$catResult = $conn->query("
+    SELECT c.name, c.slug, c.description, c.display_order,
+           COUNT(p.id) AS product_count
+    FROM product_categories c
+    LEFT JOIN products p ON (p.category = c.name AND p.is_active = 1)
+    GROUP BY c.id, c.name, c.slug, c.description, c.display_order
+    ORDER BY c.display_order ASC, c.name ASC
+");
+$categoriesList = [];
+if ($catResult) {
+    while ($c = $catResult->fetch_assoc()) {
+        $categoriesList[] = [
+            'name' => $c['name'],
+            'slug' => $c['slug'],
+            'description' => $c['description'],
+            'product_count' => (int)$c['product_count']
+        ];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Explore considered furniture and objects for thoughtful, everyday living by URTH.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="An Amazing Collection Modern Furniture. Explore the curated architecture, furniture, and lighting collection at URTH.">
   <title>Shop — URTH</title>
   <link rel="icon" type="image/png" href="img/favicon-512.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="mobile-nav.css">
-  <link rel="stylesheet" href="shop.css">
+  <link rel="stylesheet" href="shop.css?v=<?= time() ?>">
 </head>
 <body>
-  <header class="shop-hero">
-    <div class="shop-hero-image" aria-hidden="true"></div>
-    <div class="shop-hero-shade" aria-hidden="true"></div>
-    <div class="hero-top-nav shop-nav">
-      <a class="shop-wordmark" href="index.php" aria-label="URTH home">URTH<span>.</span></a>
-      <nav class="center-nav" aria-label="Main navigation">
-        <a href="index.php">Home</a>
-        <a href="about.html">About</a>
-        <a href="projects.php">Projects</a>
-        <a href="contact.html">Contact</a>
-        <a href="shop.php" aria-current="page">Shop</a>
-      </nav>
-      <div class="shop-nav-actions">
-        <button class="bag-toggle" type="button" aria-controls="enquiry-panel" aria-expanded="false">
-          Enquiry bag <span class="bag-count" aria-live="polite">0</span>
-        </button>
-        <button class="mobile-nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
-    <div class="mobile-nav-overlay" aria-hidden="true">
-      <nav class="mobile-nav-links" aria-label="Mobile navigation">
-        <a href="index.php">Home</a>
-        <a href="about.html">About</a>
-        <a href="projects.php">Projects</a>
-        <a href="contact.html">Contact</a>
-        <a href="shop.php" aria-current="page">Shop</a>
-      </nav>
-    </div>
-    <div class="shop-hero-copy">
-      <p class="eyebrow">URTH OBJECTS</p>
-      <h1>Considered pieces<br>for everyday living.</h1>
-      <p>Quiet forms. Natural materials. Made to belong.</p>
-    </div>
-  </header>
 
-  <main class="shop-main">
-    <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a href="index.php">Home</a><span aria-hidden="true">/</span><span>Shop</span>
+  <!-- ==========================================================================
+       HERO TOP NAV (EXACT NAVBAR USED IN OTHER PAGES)
+       ========================================================================== -->
+  <div class="hero-top-nav">
+    <div class="logo">
+      <a href="index.php" style="text-decoration: none;">
+        <img src="img/URTH (1).png" alt="Urth Logo" class="navbar-brand-image" style="height: 22px; margin: 0; padding: 0; object-fit: contain; vertical-align: middle; transform: translateY(-2px);">
+      </a>
+    </div>
+
+    <nav class="center-nav">
+      <a href="index.php">HOME</a>
+      <a href="about.html">ABOUT</a>
+      <a href="projects.php">PROJECTS</a>
+      <a href="contact.html">CONTACT</a>
+      <a href="shop.php" class="active">SHOP</a>
     </nav>
 
-    <section class="catalog" aria-labelledby="catalog-title">
-      <div class="catalog-heading">
-        <div>
-          <p class="eyebrow">THE URTH EDIT</p>
-          <h2 id="catalog-title">Shop the collection</h2>
-          <p class="catalog-intro">Thoughtful furniture and objects, selected for a slower kind of living.</p>
-        </div>
-      </div>
+    <div class="right-nav">
+      <button type="button" class="cart-trigger-btn" id="cartTrigger" aria-label="View Shopping Cart">
+        <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
 
-      <div class="catalog-toolbar">
-        <div class="category-filters" role="group" aria-label="Filter products by category">
-          <button class="filter-button is-active" type="button" data-filter="All" aria-pressed="true">All pieces</button>
-          <button class="filter-button" type="button" data-filter="Seating" aria-pressed="false">Seating</button>
-          <button class="filter-button" type="button" data-filter="Tables" aria-pressed="false">Tables</button>
-          <button class="filter-button" type="button" data-filter="Lighting" aria-pressed="false">Lighting</button>
-          <button class="filter-button" type="button" data-filter="Objects" aria-pressed="false">Objects</button>
-        </div>
-        <div class="catalog-tools">
-          <p class="result-count" aria-live="polite"><span id="visible-count"><?= count($products) ?></span> pieces</p>
-          <label class="sort-control">
-            <span class="visually-hidden">Sort products</span>
-            <select id="product-sort">
-              <option value="featured">Featured</option>
-              <option value="name-asc">Name: A to Z</option>
-              <option value="name-desc">Name: Z to A</option>
-            </select>
-          </label>
-        </div>
-      </div>
+      <button class="mobile-nav-toggle" aria-label="Toggle Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
 
-      <div class="product-grid" id="product-grid">
-        <?php foreach ($products as $product): ?>
-          <article class="product-card" data-product-id="<?= htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8') ?>" data-name="<?= htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8') ?>" data-category="<?= htmlspecialchars($product['category'], ENT_QUOTES, 'UTF-8') ?>">
-            <div class="product-image-wrap">
-              <img src="<?= htmlspecialchars($product['image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($product['alt'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
-              <span class="product-category"><?= htmlspecialchars($product['category'], ENT_QUOTES, 'UTF-8') ?></span>
-              <button class="add-to-bag" type="button" aria-label="Add <?= htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8') ?> to enquiry bag">Add to enquiry</button>
+  <div class="mobile-nav-overlay">
+    <nav class="mobile-nav-links">
+      <a href="index.php">HOME</a>
+      <a href="about.html">ABOUT</a>
+      <a href="projects.php">PROJECTS</a>
+      <a href="contact.html">CONTACT</a>
+      <a href="shop.php" class="active">SHOP</a>
+    </nav>
+  </div>
+
+  <!-- ==========================================================================
+       HERO BANNER
+       ========================================================================== -->
+  <section class="top-banner big fullheight light" id="topBanner">
+    <span class="overlay"></span>
+    <img src="img/shop/shop-banner.jpg" alt="URTH Studio Shop" class="s-img-switch banner-bg" />
+    <div class="content">
+      <h1 class="title">Curated Artifacts, Tools<br>&amp; Design Consultations</h1>
+      <p class="description">
+        A deliberate repository curated by URTH Architecture Studio &mdash; bridging physical handcrafted furniture, downloadable architectural toolkits and personalized spatial consultations. Designed to enrich spatial practices and creative environments.
+      </p>
+    </div>
+  </section>
+
+  
+  <main class="shop-container" id="shopMain">
+    <nav class="woocommerce-breadcrumb" aria-label="Breadcrumb">
+      <a href="index.php">Home</a> <span class="sep">/</span> <span class="current">Shop</span>
+    </nav>
+
+    <section class="shop-categories-showcase" aria-label="Five Core Categories">
+      <div class="categories-showcase-header">
+        <span class="showcase-eyebrow">EXPLORE BY DISCIPLINE</span>
+        <h3 class="showcase-title">Five Curated Categories</h3>
+      </div>
+      <div class="categories-showcase-grid">
+        <?php
+          $categoryDetails = [
+            'digital-tools' => ['num' => '01', 'name' => 'Digital Tools', 'desc' => 'Procreate brushes, presentation templates, CAD blocks, Revit families & 3D textures.'],
+            'books-planners' => ['num' => '02', 'name' => 'Books & Planners', 'desc' => 'Design booklets, home planning workbooks, renovation trackers & architectural publications.'],
+            'furniture-objects' => ['num' => '03', 'name' => 'Furniture & Objects', 'desc' => 'Signature bespoke timber furniture, custom homeware, architectural art & prints.'],
+            'learn' => ['num' => '04', 'name' => 'Learn', 'desc' => 'Recorded courses, live workshops, architectural webinars & studio masterclasses.'],
+            'design-sessions' => ['num' => '05', 'name' => 'Design Sessions', 'desc' => 'Space reviews, room refresh consultations & fixed-scope design packages.']
+          ];
+          
+          foreach ($categoryDetails as $slug => $meta):
+            $cnt = 0;
+            foreach ($categoriesList as $cl) {
+              if ($cl['slug'] === $slug || strtolower($cl['name']) === strtolower($meta['name'])) {
+                $cnt = (int)$cl['product_count'];
+                break;
+              }
+            }
+        ?>
+          <a href="#catalogHeading" class="category-card-link" onclick="window.setCategory('<?= htmlspecialchars($slug) ?>'); return true;">
+            <div class="category-card-top">
+              <span class="category-card-num"><?= $meta['num'] ?></span>
+              <span class="category-card-count"><?= $cnt ?> <?= $cnt === 1 ? 'Item' : 'Items' ?></span>
             </div>
-            <div class="product-details">
-              <h3><?= htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8') ?></h3>
-              <p>Price on request</p>
+            <h4 class="category-card-title"><?= htmlspecialchars($meta['name']) ?></h4>
+            <p class="category-card-desc"><?= htmlspecialchars($meta['desc']) ?></p>
+            <div class="category-card-action">
+              <span>View Collection</span>
+              <span aria-hidden="true">&rarr;</span>
             </div>
-          </article>
+          </a>
         <?php endforeach; ?>
       </div>
-      <p class="empty-results" id="empty-results" hidden>No pieces match this selection.</p>
     </section>
+
+    <!-- Featured Products Area (Studio Selection) -->
+    <?php if (!empty($featuredProducts)): ?>
+      <section class="featured-products-section" id="featuredProductsSection">
+        <div class="section-heading-wrap">
+          <div>
+            <span class="section-eyebrow">STUDIO SELECTION</span>
+            <h2 class="section-title">Featured Products</h2>
+          </div>
+          <p class="section-subtext">Signature items and master resources hand-selected by our principal designers.</p>
+        </div>
+        <div class="featured-products-grid">
+          <?php foreach ($featuredProducts as $fp): ?>
+            <?php
+              $fAvail = strtolower($fp['availability'] ?? 'available');
+              $fAvailClass = 'avail-' . str_replace('_', '-', $fAvail);
+              $fAvailText = 'Available';
+              if ($fAvail === 'made_to_order') $fAvailText = 'Made to Order';
+              elseif ($fAvail === 'coming_soon') $fAvailText = 'Coming Soon';
+              elseif ($fAvail === 'unavailable') $fAvailText = 'Unavailable';
+            ?>
+            <div class="product-item" data-id="<?= htmlspecialchars($fp['id']) ?>">
+              <a href="javascript:void(0)" class="product-thumb-link" onclick="window.openProductModal('<?= htmlspecialchars($fp['id']) ?>')">
+                <div class="product-image-box">
+                  <img src="<?= htmlspecialchars($fp['image']) ?>" alt="<?= htmlspecialchars($fp['name']) ?>" loading="lazy" width="300" height="300">
+                </div>
+                <span class="product-cat-tag"><?= htmlspecialchars($fp['category']) ?></span>
+                <h3 class="woocommerce-loop-product__title"><?= htmlspecialchars($fp['name']) ?></h3>
+                <?php if (!empty($fp['price_on_request'])): ?>
+                  <span class="price-on-request">Price on request</span>
+                <?php elseif (!empty($fp['sale_price'])): ?>
+                  <span class="price">
+                    <del style="opacity: 0.5; margin-right: 5px;"><?= htmlspecialchars($fp['formattedPrice']) ?></del>
+                    <ins style="text-decoration: none; font-weight: 700;"><?= htmlspecialchars($fp['formattedSalePrice']) ?></ins>
+                  </span>
+                <?php else: ?>
+                  <span class="price"><?= htmlspecialchars($fp['formattedPrice']) ?></span>
+                <?php endif; ?>
+              </a>
+              <?php if ($fAvail === 'coming_soon'): ?>
+                <button type="button" class="button btn-coming-soon" disabled aria-disabled="true" title="Coming soon — payment not accepted for upcoming items">
+                  COMING SOON
+                </button>
+              <?php elseif ($fAvail === 'unavailable'): ?>
+                <button type="button" class="button btn-unavailable" disabled aria-disabled="true">
+                  UNAVAILABLE
+                </button>
+              <?php elseif (!empty($fp['price_on_request'])): ?>
+                <button type="button" class="button btn-inquire" onclick="window.inquireProduct('<?= htmlspecialchars($fp['id']) ?>')">
+                  INQUIRE ON WHATSAPP
+                </button>
+              <?php else: ?>
+                <button type="button" class="button add_to_cart_button" data-id="<?= htmlspecialchars($fp['id']) ?>">
+                  ADD TO CART
+                </button>
+              <?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </section>
+    <?php endif; ?>
+
+    <!-- Short Explanation of the Ordering Process -->
+    <section class="ordering-process-section" id="orderingProcess">
+      <div class="section-heading-wrap centered">
+        <span class="section-eyebrow">ORDERING DIRECT WITH THE STUDIO</span>
+        <h2 class="section-title">How To Order With URTH</h2>
+        <p class="section-subtext">A tailored, direct experience designed for collectors, creative professionals, and private clients.</p>
+      </div>
+      <div class="process-steps-grid">
+        <div class="process-step-card">
+          <div class="step-num">01</div>
+          <h3 class="step-title">Select &amp; Curate</h3>
+          <p class="step-desc">Browse our downloadable digital toolkits, bespoke timber furniture, published research workbooks, or private consultation sessions.</p>
+        </div>
+        <div class="process-step-card">
+          <div class="step-num">02</div>
+          <h3 class="step-title">Submit WhatsApp Cart</h3>
+          <p class="step-desc">Review your selected items in the cart and submit your order inquiry directly to our studio team on WhatsApp with project notes.</p>
+        </div>
+        <div class="process-step-card">
+          <div class="step-num">03</div>
+          <h3 class="step-title">Studio Confirmation</h3>
+          <p class="step-desc">Our architects review your requirements, confirm bespoke timber finishes or production lead times, and issue your formal invoice.</p>
+        </div>
+        <div class="process-step-card">
+          <div class="step-num">04</div>
+          <h3 class="step-title">Seamless Delivery</h3>
+          <p class="step-desc">Instant file access dispatched for digital items, white-glove shipping for furniture, or scheduled video consultations.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Catalog Section -->
+    <div id="catalogHeading" style="padding-top: 30px;"></div>
+    <header class="woocommerce-products-header" style="margin-bottom: 25px;">
+      <h2 class="woocommerce-products-header__title page-title">Complete Catalog</h2>
+    </header>
+
+    <!-- Product Search and Toolbar -->
+    <div class="shop-toolbar-wrapper">
+      <div class="shop-search-bar">
+        <svg class="shop-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="shopSearchInput" placeholder="Search products by title, format label, SKU, or description...">
+        <button type="button" class="shop-search-clear" id="shopSearchClear" aria-label="Clear search">&times;</button>
+      </div>
+
+      <!-- Dynamic Category Filter Bar -->
+      <nav class="shop-category-bar" aria-label="Shop categories" id="categoryNav">
+        <button type="button" class="category-pill-btn active" data-category="all">
+          <span class="cat-name">All</span>
+          <span class="cat-badge" id="catCountAll"><?= $totalProducts ?></span>
+        </button>
+        <?php foreach ($categoriesList as $catItem): ?>
+          <button type="button" class="category-pill-btn" data-category="<?= htmlspecialchars($catItem['slug']) ?>" data-name="<?= htmlspecialchars($catItem['name']) ?>" title="<?= htmlspecialchars($catItem['description'] ?? '') ?>">
+            <span class="cat-name"><?= htmlspecialchars($catItem['name']) ?></span>
+            <span class="cat-badge"><?= $catItem['product_count'] ?></span>
+          </button>
+        <?php endforeach; ?>
+      </nav>
+
+      <div class="shop-controls-bar">
+        <div class="shop-filters-left">
+          <select id="availabilityFilter" class="shop-select-filter" aria-label="Filter by availability">
+            <option value="all">All Availability</option>
+            <option value="available">Available Now</option>
+            <option value="made_to_order">Made to Order</option>
+            <option value="coming_soon">Coming Soon</option>
+            <option value="unavailable">Unavailable</option>
+          </select>
+
+          <select id="labelFilter" class="shop-select-filter" aria-label="Filter by format label">
+            <option value="all">All Formats</option>
+            <option value="Digital">Digital</option>
+            <option value="Printed">Printed</option>
+            <option value="Made to order">Made to order</option>
+            <option value="Online course">Online course</option>
+            <option value="Consultation">Consultation</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <p class="woocommerce-result-count" id="resultCount" style="margin: 0;">
+            <?= $totalProducts > 0 ? "Showing 1–{$initialCount} of {$totalProducts} results" : "No products available" ?>
+          </p>
+          <div class="select-wrap">
+            <select name="orderby" class="orderby" id="orderBySelect" aria-label="Shop order">
+              <option value="menu_order" selected="selected">Default sorting</option>
+              <option value="popularity">Sort by popularity</option>
+              <option value="date">Sort by latest</option>
+              <option value="price-asc">Sort by price: low to high</option>
+              <option value="price-desc">Sort by price: high to low</option>
+            </select>
+            <span class="select-arrow" aria-hidden="true">&#9662;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Added to Cart Notice -->
+    <div class="woocommerce-notice" id="cartNotice" role="status" aria-live="polite" style="display: none;" hidden>
+      <div class="notice-content">
+        <span class="notice-icon">&#10003;</span>
+        <span class="notice-message" id="noticeMessage">Product has been added to your cart.</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="cart.php" class="notice-cart-btn" id="noticeCartBtn">View Cart</a>
+        <button type="button" id="noticeCloseBtn" aria-label="Close notification" style="background: transparent; border: none; font-size: 18px; line-height: 1; cursor: pointer; color: #888; padding: 4px 6px;">&times;</button>
+      </div>
+    </div>
+
+    <!-- Products Grid (4 columns) -->
+    <ul class="products columns-4" id="productsGrid">
+      <?php if (!empty($products)): ?>
+        <?php foreach (array_slice($products, 0, 8) as $p): ?>
+          <?php
+            $avail = strtolower($p['availability'] ?? 'available');
+            $availClass = 'avail-' . str_replace('_', '-', $avail);
+            $availText = 'Available';
+            if ($avail === 'made_to_order') $availText = 'Made to Order';
+            elseif ($avail === 'coming_soon') $availText = 'Coming Soon';
+            elseif ($avail === 'unavailable') $availText = 'Unavailable';
+          ?>
+          <li class="product-item" data-id="<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>">
+            <a href="javascript:void(0)" class="product-thumb-link" onclick="window.openProductModal('<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>')">
+              <div class="product-image-box">
+                <img src="<?= htmlspecialchars($p['image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($p['name'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy" width="300" height="300">
+              </div>
+              <span class="product-cat-tag"><?= htmlspecialchars($p['category'] ?? 'Furniture & Objects', ENT_QUOTES, 'UTF-8') ?></span>
+              <h3 class="woocommerce-loop-product__title"><?= htmlspecialchars($p['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+              <?php if (!empty($p['price_on_request'])): ?>
+                <span class="price-on-request">Price on request</span>
+              <?php elseif (!empty($p['sale_price'])): ?>
+                <span class="price">
+                  <del style="opacity: 0.5; margin-right: 5px;"><?= htmlspecialchars($p['formattedPrice'], ENT_QUOTES, 'UTF-8') ?></del>
+                  <ins style="text-decoration: none; font-weight: 700;"><?= htmlspecialchars($p['formattedSalePrice'], ENT_QUOTES, 'UTF-8') ?></ins>
+                </span>
+              <?php else: ?>
+                <span class="price"><?= htmlspecialchars($p['formattedPrice'], ENT_QUOTES, 'UTF-8') ?></span>
+              <?php endif; ?>
+            </a>
+            <?php if ($avail === 'coming_soon'): ?>
+              <button type="button" class="button btn-coming-soon" disabled aria-disabled="true" title="Coming soon — payment not accepted for upcoming items">
+                COMING SOON
+              </button>
+            <?php elseif ($avail === 'unavailable'): ?>
+              <button type="button" class="button btn-unavailable" disabled aria-disabled="true">
+                UNAVAILABLE
+              </button>
+            <?php elseif (!empty($p['price_on_request'])): ?>
+              <button type="button" class="button btn-inquire" onclick="window.inquireProduct('<?= htmlspecialchars($p['id']) ?>')">
+                INQUIRE ON WHATSAPP
+              </button>
+            <?php else: ?>
+              <button type="button" class="button add_to_cart_button" data-id="<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" aria-label="Add &ldquo;<?= htmlspecialchars($p['name'], ENT_QUOTES, 'UTF-8') ?>&rdquo; to your cart">
+                ADD TO CART
+              </button>
+            <?php endif; ?>
+          </li>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <li style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888;">
+          No products currently available in the shop.
+        </li>
+      <?php endif; ?>
+    </ul>
+
+    <!-- Pagination -->
+    <nav class="woocommerce-pagination" aria-label="Product Pagination" id="paginationNav" <?= $totalProducts <= 8 ? 'style="display:none;"' : '' ?>>
+      <ul class="page-numbers" id="paginationList">
+        <li><span class="page-numbers current" aria-current="page">1</span></li>
+        <?php if ($totalProducts > 8): ?>
+          <li><button type="button" class="page-numbers" data-page="2">2</button></li>
+          <li><button type="button" class="page-numbers next" data-page="next" aria-label="Next page">&rarr;</button></li>
+        <?php endif; ?>
+      </ul>
+    </nav>
   </main>
 
-  <footer class="shop-footer">
-    <a class="shop-wordmark" href="index.php">URTH<span>.</span></a>
-    <p>Designed for quiet, considered living.</p>
-    <a href="mailto:info@urthspaces.com">Enquire with our studio</a>
-    <small>URTH. &copy; 2026 ALL RIGHTS RESERVED</small>
+  <!-- ==========================================================================
+       PRODUCT DETAILS QUICK VIEW MODAL
+       ========================================================================== -->
+  <div class="product-modal-backdrop" id="productModalBackdrop" hidden>
+    <div class="product-modal-dialog" id="productModalDialog" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle">
+      <button type="button" class="product-modal-close" id="productModalClose" aria-label="Close product view">&times;</button>
+      
+      <div class="product-modal-left">
+        <img id="modalProductImage" src="img/shop/prod-1.jpg" alt="Product Image">
+      </div>
+
+      <div class="product-modal-right">
+        <div style="margin-bottom: 8px;">
+          <span class="product-modal-cat" id="modalProductCategory">Accessories</span>
+        </div>
+        <h2 class="product-modal-title" id="modalProductTitle">Product Title</h2>
+        <div class="product-modal-price-wrap">
+          <span class="product-modal-price" id="modalProductPrice">£0.00</span>
+          <span class="product-modal-sku" id="modalProductSku">SKU: PR000</span>
+        </div>
+        
+        <div class="modal-avail-warning" id="modalAvailWarning" role="alert"></div>
+
+        <p class="product-modal-desc" id="modalProductDesc">Curated modern architecture and design pieces handcrafted with premium materials.</p>
+        
+        <div class="product-modal-actions" id="modalActionsWrap">
+          <div class="product-modal-qty" id="modalQtyWrap">
+            <button type="button" id="modalQtyMinus" aria-label="Decrease quantity">&minus;</button>
+            <input type="number" id="modalQtyInput" value="1" min="1" max="99" aria-label="Quantity">
+            <button type="button" id="modalQtyPlus" aria-label="Increase quantity">&plus;</button>
+          </div>
+          <button type="button" class="product-modal-add-btn" id="modalAddToCartBtn">ADD TO CART</button>
+        </div>
+
+        <a href="https://wa.me/94768008687" target="_blank" rel="noopener noreferrer" class="product-modal-whatsapp-btn" id="modalWhatsAppBtn">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Inquire via WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       FOOTER (EXACT FOOTER USED IN OTHER PAGES)
+       ========================================================================== -->
+  <footer class="contact-footer" style="position: relative; z-index: 10;">
+    <div class="footer-overlay"></div>
+    <img src="img/shop/footer-bg.jpg" class="footer-bg" alt="Footer Background" />
+    
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-left">
+          <div class="footer-logo">
+            <img src="img/URTH (1).png" alt="Urth Logo" class="footer-brand-image" style="width: auto; height: 32px; margin: 0; padding: 0; object-fit: contain; object-position: left; filter: brightness(0) invert(1);">
+          </div>
+          <div class="footer-desc">
+            <p style="color: rgba(255,255,255,0.7);">The company principle of Architecture-Studio is the collective conception. From the very beginning, the practice has believed in the virtues of exchange, crossing ideas, common effort, shared knowledge and enthusiasm.</p>
+          </div>
+        </div>
+
+        <div class="footer-right">
+          <h6 class="footer-info-title">GET IN TOUCH</h6>
+          <div class="footer-info-content">
+            <p><a href="https://wa.me/94768008687" target="_blank" style="color: white;">+94768008687</a></p>
+            <p><a href="mailto:info@urthspaces.com" style="color: white;">info@urthspaces.com</a></p>
+            <p style="color: rgba(255,255,255,0.7);">No.374, Peradeniya Road, Kandy 20000, Sri Lanka</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-divider"></div>
+
+      <div class="footer-bottom">
+        <div class="footer-copyright">
+          <p style="color: rgba(255,255,255,0.7);">URTH. &copy; 2026 ALL RIGHTS RESERVED &nbsp;&bull;&nbsp; <span style="white-space: nowrap;">MADE BY <a href="https://engagelanka.com" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: none; font-weight: 300;">ENGAGELANKA</a></span></p>
+        </div>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/urth.spaces/" target="_blank" class="footer-social__link" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+          <a href="https://wa.me/94768008687" target="_blank" class="footer-social__link" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+          <a href="https://www.facebook.com/people/Urth/61586496127091/" target="_blank" class="footer-social__link" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+          <a href="https://www.linkedin.com/company/studio-urth/" target="_blank" class="footer-social__link" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        </div>
+      </div>
+    </div>
   </footer>
 
-  <div class="panel-backdrop" hidden></div>
-  <aside class="enquiry-panel" id="enquiry-panel" aria-labelledby="enquiry-title" aria-hidden="true">
-    <div class="panel-heading">
-      <div>
-        <p class="eyebrow">YOUR SELECTION</p>
-        <h2 id="enquiry-title">Enquiry bag <span class="panel-count">0</span></h2>
-      </div>
-      <button class="panel-close" type="button" aria-label="Close enquiry bag">&times;</button>
+  <!-- ==========================================================================
+       CART DRAWER & BACKDROP
+       ========================================================================== -->
+  <div class="cart-backdrop" id="cartBackdrop" hidden></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-labelledby="cartDrawerTitle" aria-hidden="true">
+    <div class="cart-drawer-header">
+      <h2 id="cartDrawerTitle">SHOPPING CART <span class="cart-drawer-count">(0)</span></h2>
+      <button type="button" class="cart-close-btn" id="cartCloseBtn" aria-label="Close cart">&times;</button>
     </div>
-    <p class="panel-note">Ask us about availability, finishes and pricing for your selected pieces.</p>
-    <ul class="bag-items" aria-live="polite"></ul>
-    <p class="bag-empty">Your enquiry bag is empty for now.</p>
-    <a class="send-enquiry" href="https://wa.me/94768008687" target="_blank" rel="noopener noreferrer">Send enquiry on WhatsApp</a>
+    <div class="cart-drawer-body">
+      <ul class="cart-items-list" id="cartItemsList"></ul>
+      <div class="cart-empty-state" id="cartEmptyState">
+        <p>Your shopping cart is currently empty.</p>
+        <a href="#productsGrid" class="cart-browse-btn" id="cartBrowseBtn">Browse Products</a>
+      </div>
+    </div>
+    <div class="cart-drawer-footer" id="cartDrawerFooter" hidden>
+      <div class="cart-subtotal">
+        <span>Subtotal:</span>
+        <span class="subtotal-amount" id="cartSubtotalAmount">£0.00</span>
+      </div>
+      <div class="cart-drawer-actions">
+        <a href="cart.php" class="cart-view-full-btn">
+          View Full Cart
+        </a>
+        <a href="cart.php#checkout" class="cart-checkout-btn">
+          Proceed to Checkout
+        </a>
+        <a href="https://wa.me/94768008687" target="_blank" rel="noopener noreferrer" class="cart-whatsapp-order-btn" id="cartCheckoutBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" style="width: 16px; height: 16px; min-width: 16px; min-height: 16px; max-width: 16px; max-height: 16px; flex-shrink: 0; fill: currentColor;"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Enquire via WhatsApp
+        </a>
+      </div>
+    </div>
   </aside>
 
+  <!-- Pass dynamic products & categories from MySQL to Frontend -->
+  <script>
+    window.INITIAL_PRODUCTS = <?= json_encode($allProductsData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+    window.FEATURED_PRODUCTS = <?= json_encode($featuredProducts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+    window.INITIAL_CATEGORIES = <?= json_encode($categoriesList, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+  </script>
   <script src="mobile-nav.js"></script>
-  <script src="shop.js"></script>
+  <script src="shop.js?v=<?= time() ?>"></script>
 </body>
 </html>
