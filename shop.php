@@ -93,6 +93,7 @@ if ($catResult) {
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="mobile-nav.css">
   <link rel="stylesheet" href="shop.css?v=<?= time() ?>">
+  <link rel="stylesheet" href="shop-info.css">
 </head>
 <body>
 
@@ -441,6 +442,7 @@ if ($catResult) {
         <?php endif; ?>
       </ul>
     </nav>
+    <p class="shop-information-link"><a href="shop-info.php">How to order · Payment and delivery · Returns · Digital licence · Privacy · FAQs &amp; contact</a></p>
   </main>
 
   <!-- ==========================================================================

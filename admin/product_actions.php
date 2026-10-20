@@ -9,6 +9,7 @@ ob_start();
 require_once __DIR__ . '/auth.php';
 require_admin_auth();
 require_once '../config.php';
+require_once __DIR__ . '/../app/Core/private_storage.php';
 
 // Ensure tables exist
 $tableCheck = $conn->query("SHOW TABLES LIKE 'products'");
@@ -26,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST) && isset($_SERVER['CO
 }
 
 $upload_dir = '../img/shop/uploads/';
-$deliverables_dir = '../uploads/deliverables/';
 $allowed_exts = ['svg', 'png', 'jpg', 'jpeg', 'webp', 'avif'];
 $allowed_deliverable_exts = ['zip', 'rar', 'pdf', 'brushset', 'dwg', 'dxf', 'rfa', 'blend', 'epub'];
 
@@ -169,17 +169,14 @@ switch ($action) {
 
         // Digital Deliverable file or protected link
         $digital_access_link = trim($_POST['digital_access_link'] ?? '');
-        $digital_deliverable_file = trim($_POST['digital_deliverable_file'] ?? '');
+        $digital_deliverable_file = '';
 
-        if (isset($_FILES['deliverable_upload']) && $_FILES['deliverable_upload']['error'] === UPLOAD_ERR_OK) {
-            $d_info = pathinfo($_FILES['deliverable_upload']['name']);
-            $d_ext = strtolower($d_info['extension'] ?? '');
-            if (in_array($d_ext, array_merge($allowed_exts, $allowed_deliverable_exts))) {
-                if (!is_dir($deliverables_dir)) @mkdir($deliverables_dir, 0755, true);
-                $d_filename = 'deliv_' . time() . '_' . substr(preg_replace('/[^a-zA-Z0-9_-]/', '_', $d_info['filename']), 0, 30) . '.' . $d_ext;
-                if (move_uploaded_file($_FILES['deliverable_upload']['tmp_name'], $deliverables_dir . $d_filename)) {
-                    $digital_deliverable_file = 'uploads/deliverables/' . $d_filename;
-                }
+        if (isset($_FILES['deliverable_upload']) && $_FILES['deliverable_upload']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadError = null;
+            $digital_deliverable_file = store_private_upload($_FILES['deliverable_upload'], 'products', array_values(array_unique(array_merge($allowed_exts, $allowed_deliverable_exts))), 100 * 1024 * 1024, $uploadError);
+            if ($digital_deliverable_file === null) {
+                header('Location: products.php?msg=' . urlencode($uploadError ?? 'error_upload'));
+                exit;
             }
         }
 
@@ -417,17 +414,14 @@ switch ($action) {
 
         // Deliverables
         $digital_access_link = trim($_POST['digital_access_link'] ?? ($curProduct['digital_access_link'] ?? ''));
-        $digital_deliverable_file = trim($_POST['digital_deliverable_file'] ?? ($curProduct['digital_deliverable_file'] ?? ''));
+        $digital_deliverable_file = $curProduct['digital_deliverable_file'] ?? '';
 
-        if (isset($_FILES['deliverable_upload']) && $_FILES['deliverable_upload']['error'] === UPLOAD_ERR_OK) {
-            $d_info = pathinfo($_FILES['deliverable_upload']['name']);
-            $d_ext = strtolower($d_info['extension'] ?? '');
-            if (in_array($d_ext, array_merge($allowed_exts, $allowed_deliverable_exts))) {
-                if (!is_dir($deliverables_dir)) @mkdir($deliverables_dir, 0755, true);
-                $d_filename = 'deliv_' . time() . '_' . substr(preg_replace('/[^a-zA-Z0-9_-]/', '_', $d_info['filename']), 0, 30) . '.' . $d_ext;
-                if (move_uploaded_file($_FILES['deliverable_upload']['tmp_name'], $deliverables_dir . $d_filename)) {
-                    $digital_deliverable_file = 'uploads/deliverables/' . $d_filename;
-                }
+        if (isset($_FILES['deliverable_upload']) && $_FILES['deliverable_upload']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadError = null;
+            $digital_deliverable_file = store_private_upload($_FILES['deliverable_upload'], 'products', array_values(array_unique(array_merge($allowed_exts, $allowed_deliverable_exts))), 100 * 1024 * 1024, $uploadError);
+            if ($digital_deliverable_file === null) {
+                header('Location: products.php?msg=' . urlencode($uploadError ?? 'error_upload'));
+                exit;
             }
         }
 

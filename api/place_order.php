@@ -19,28 +19,120 @@ if (in_array($origin, $allowed_origins, true)) {
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'httponly' => true,
+        'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'samesite' => 'Lax'
+    ]);
+    session_start();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    header('Allow: POST, OPTIONS');
+    echo json_encode(['status' => 'error', 'message' => 'Use POST to submit an order.']);
     exit;
 }
 
 require_once __DIR__ . '/../config.php';
 
 try {
-    $rawInput = file_get_contents('php://input');
-    $data = json_decode($rawInput, true);
+    $contentType = strtolower(trim(explode(';', $_SERVER['CONTENT_TYPE'] ?? '')[0]));
+    if ($contentType !== 'application/json') {
+        http_response_code(415);
+        echo json_encode(['status' => 'error', 'message' => 'Please submit your order using the checkout form.']);
+        exit;
+    }
 
-    if (!$data && !empty($_POST)) {
-        $data = $_POST;
-        if (isset($data['items']) && is_string($data['items'])) {
-            $data['items'] = json_decode($data['items'], true);
+    if ($origin !== '' && !in_array($origin, $allowed_origins, true)) {
+        $requestScheme = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
+        $requestHost = $_SERVER['HTTP_HOST'] ?? '';
+        if ($requestHost === '' || $origin !== $requestScheme . '://' . $requestHost) {
+            http_response_code(403);
+            echo json_encode(['status' => 'error', 'message' => 'This order request is not allowed.']);
+            exit;
         }
     }
 
-    if (!$data) {
+    $rateLimitTableSql = "CREATE TABLE IF NOT EXISTS shop_order_rate_limits (
+        ip_hash CHAR(64) NOT NULL PRIMARY KEY,
+        window_started INT NOT NULL,
+        request_count INT NOT NULL DEFAULT 0
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+    if (!$conn->query($rateLimitTableSql)) {
+        throw new RuntimeException('Could not initialize checkout rate limit.');
+    }
+    if (random_int(1, 100) === 1) {
+        $conn->query("DELETE FROM shop_order_rate_limits WHERE window_started < UNIX_TIMESTAMP() - 86400");
+    }
+    $ipHash = hash_hmac('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown', $db_pass . $db_name);
+    $rateStmt = $conn->prepare("INSERT INTO shop_order_rate_limits (ip_hash, window_started, request_count)
+        VALUES (?, UNIX_TIMESTAMP(), 1)
+        ON DUPLICATE KEY UPDATE
+            request_count = IF(window_started < UNIX_TIMESTAMP() - 600, 1, request_count + 1),
+            window_started = IF(window_started < UNIX_TIMESTAMP() - 600, UNIX_TIMESTAMP(), window_started)");
+    if (!$rateStmt) {
+        throw new RuntimeException('Could not prepare checkout rate limit.');
+    }
+    $rateStmt->bind_param('s', $ipHash);
+    $rateStmt->execute();
+    $rateStmt->close();
+    $countStmt = $conn->prepare('SELECT request_count FROM shop_order_rate_limits WHERE ip_hash = ?');
+    $countStmt->bind_param('s', $ipHash);
+    $countStmt->execute();
+    $countResult = $countStmt->get_result();
+    $requestCount = $countResult ? (int)$countResult->fetch_assoc()['request_count'] : 0;
+    $countStmt->close();
+    if ($requestCount > 10) {
+        http_response_code(429);
+        echo json_encode(['status' => 'error', 'message' => 'Too many order attempts from this network. Please wait a few minutes and try again.']);
+        exit;
+    }
+
+    $requestTimes = $_SESSION['order_request_times'] ?? [];
+    $requestTimes = array_values(array_filter($requestTimes, static function ($time) {
+        return is_int($time) && $time > time() - 600;
+    }));
+    if (count($requestTimes) >= 5) {
+        http_response_code(429);
+        echo json_encode(['status' => 'error', 'message' => 'Too many order attempts. Please wait a few minutes and try again.']);
+        exit;
+    }
+    $requestTimes[] = time();
+    $_SESSION['order_request_times'] = $requestTimes;
+
+    $rawInput = file_get_contents('php://input');
+    if ($rawInput === false || strlen($rawInput) > 65536) {
+        http_response_code(413);
+        echo json_encode(['status' => 'error', 'message' => 'The order request is too large. Please review your cart and try again.']);
+        exit;
+    }
+    $data = json_decode($rawInput, true);
+
+    if (!is_array($data)) {
         http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => 'Invalid or empty request payload']);
         exit;
+    }
+
+    if (!empty($data['website'])) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'The order could not be submitted. Please try again.']);
+        exit;
+    }
+
+    foreach (['customer_name', 'customer_phone', 'customer_email', 'delivery_address', 'order_notes', 'shipping_method'] as $field) {
+        if (isset($data[$field]) && !is_string($data[$field])) {
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'Some order details are invalid. Please check the form and try again.']);
+            exit;
+        }
     }
 
     $customer_name = trim($data['customer_name'] ?? '');
@@ -49,12 +141,33 @@ try {
     $delivery_address = trim($data['delivery_address'] ?? '');
     $order_notes = trim($data['order_notes'] ?? '');
     $shipping_method = trim($data['shipping_method'] ?? 'Standard Delivery');
-    $shipping_cost = (float)($data['shipping_cost'] ?? 0);
+    $shipping_options = [
+        'Studio Collection' => 0.00,
+        'White Glove Courier' => 15.00
+    ];
+    if (!isset($shipping_options[$shipping_method])) {
+        http_response_code(422);
+        echo json_encode(['status' => 'error', 'message' => 'Please choose a valid delivery option.']);
+        exit;
+    }
+    $shipping_cost = $shipping_options[$shipping_method];
     $items = isset($data['items']) && is_array($data['items']) ? $data['items'] : [];
 
-    if (empty($customer_name) || empty($customer_phone)) {
+    if ($customer_name === '' || $customer_phone === '' || strlen($customer_name) > 255 || strlen($customer_phone) > 50) {
         http_response_code(422);
         echo json_encode(['status' => 'error', 'message' => 'Customer name and phone number are required.']);
+        exit;
+    }
+
+    if ($customer_email !== '' && !filter_var($customer_email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(422);
+        echo json_encode(['status' => 'error', 'message' => 'Please enter a valid email address.']);
+        exit;
+    }
+
+    if (strlen($customer_email) > 255 || strlen($delivery_address) > 10000 || strlen($order_notes) > 10000) {
+        http_response_code(422);
+        echo json_encode(['status' => 'error', 'message' => 'Some order details are too long. Please shorten them and try again.']);
         exit;
     }
 
@@ -64,19 +177,69 @@ try {
         exit;
     }
 
-    // Calculate subtotal
-    $subtotal = 0;
-    foreach ($items as $item) {
-        $price = (float)($item['price'] ?? 0);
-        $qty = max(1, (int)($item['qty'] ?? 1));
-        $subtotal += ($price * $qty);
+    if (count($items) > 30) {
+        http_response_code(422);
+        echo json_encode(['status' => 'error', 'message' => 'Your cart has too many different items. Please review it and try again.']);
+        exit;
     }
 
+    // Rebuild order lines from the current catalogue; never accept prices or descriptions from the browser.
+    $productStmt = $conn->prepare("SELECT id, name, sku, price, sale_price, currency, image, availability, is_active, price_on_request FROM products WHERE id = ? LIMIT 1");
+    if (!$productStmt) {
+        throw new RuntimeException('Could not prepare product lookup.');
+    }
+    $verifiedItems = [];
+    $subtotal = 0;
+    foreach ($items as $item) {
+        if (!is_array($item)) {
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'One or more cart items are invalid. Please refresh your cart and try again.']);
+            exit;
+        }
+        $productId = filter_var($item['id'] ?? null, FILTER_VALIDATE_INT);
+        $qty = filter_var($item['qty'] ?? null, FILTER_VALIDATE_INT);
+        if ($productId === false || $productId === null || $qty === false || $qty === null || $qty < 1 || $qty > 99) {
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'One or more cart items are invalid. Please refresh your cart and try again.']);
+            exit;
+        }
+        $productStmt->bind_param('i', $productId);
+        $productStmt->execute();
+        $productResult = $productStmt->get_result();
+        $product = $productResult ? $productResult->fetch_assoc() : null;
+        if (!$product || !(int)$product['is_active'] || (int)$product['price_on_request']
+            || in_array(strtolower($product['availability'] ?? ''), ['coming_soon', 'unavailable', 'fully_booked'], true)) {
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'A cart item is no longer available. Please refresh your cart.']);
+            exit;
+        }
+        $price = isset($product['sale_price']) && (float)$product['sale_price'] > 0
+            ? (float)$product['sale_price']
+            : (float)$product['price'];
+        if ($price <= 0) {
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'A cart item has an invalid price. Please contact the studio.']);
+            exit;
+        }
+        $subtotal += ($price * $qty);
+        $verifiedItems[] = [
+            'id' => (int)$product['id'],
+            'name' => $product['name'],
+            'sku' => $product['sku'] ?? '',
+            'price' => $price,
+            'qty' => $qty,
+            'image' => $product['image'] ?? '',
+            'currency' => $product['currency'] ?? '£'
+        ];
+    }
+    $productStmt->close();
+    $items = $verifiedItems;
+
     $total = $subtotal + $shipping_cost;
-    $currency = '£';
+    $currency = $items[0]['currency'] ?? '£';
 
     // Generate unique order number
-    $order_number = 'URTH-' . date('ymd') . '-' . strtoupper(substr(md5(uniqid((string)mt_rand(), true)), 0, 4));
+    $order_number = 'URTH-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
 
     // Begin database transaction
     $conn->begin_transaction();
@@ -122,7 +285,8 @@ try {
         'subtotal' => number_format($subtotal, 2),
         'total' => number_format($total, 2),
         'currency' => $currency,
-        'items_count' => count($items)
+        'items_count' => count($items),
+        'items' => $items
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 } catch (Throwable $e) {
@@ -130,8 +294,9 @@ try {
         @$conn->rollback();
     }
     http_response_code(500);
+    error_log('URTH order submission failed: ' . $e->getMessage());
     echo json_encode([
         'status' => 'error',
-        'message' => 'Failed to process order: ' . $e->getMessage()
+        'message' => 'We could not submit your order just now. Please try again or contact the studio.'
     ]);
 }

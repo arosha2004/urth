@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-brand">
             <div class="login-logo">U</div>
             <h1 class="login-title">URTH Admin Panel</h1>
-            <p class="login-subtitle">Sign in to manage studio projects and content</p>
+            <p class="login-subtitle">Authorized staff only. Admin access must be initialized with server-side credentials.</p>
         </div>
 
         <?php if (!empty($error)): ?>

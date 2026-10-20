@@ -10,14 +10,14 @@ ob_start();
 require_once __DIR__ . '/auth.php';
 require_admin_auth();
 require_once '../config.php';
+require_once __DIR__ . '/../app/Core/private_storage.php';
+require_once __DIR__ . '/../app/Core/shop_mail.php';
 
 $staff_username = $_SESSION['admin_username'] ?? 'urthadmin';
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 $order_id = (int)($_POST['order_id'] ?? $_GET['order_id'] ?? 0);
 
-$deliverables_dir = '../uploads/deliverables/';
-$receipts_dir = '../uploads/receipts/';
-$allowed_doc_exts = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'zip', 'rar', 'brushset', 'dwg', 'dxf', 'rfa'];
+$allowed_doc_exts = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'zip', 'rar', 'brushset', 'dwg', 'dxf', 'rfa', 'blend', 'epub'];
 
 // Helper function to log audit trail activity
 function log_order_activity($conn, int $order_id, string $staff, string $action_type, ?string $prev_val, ?string $new_val, ?string $note): void {
@@ -97,16 +97,14 @@ switch ($action) {
 
         // Handle receipt upload if provided
         $receipt_url = $order['receipt_url'];
-        if (isset($_FILES['receipt_file']) && $_FILES['receipt_file']['error'] === UPLOAD_ERR_OK) {
-            $r_info = pathinfo($_FILES['receipt_file']['name']);
-            $r_ext = strtolower($r_info['extension'] ?? '');
-            if (in_array($r_ext, ['pdf', 'png', 'jpg', 'jpeg', 'webp'])) {
-                if (!is_dir($receipts_dir)) @mkdir($receipts_dir, 0755, true);
-                $r_name = 'rec_' . time() . '_' . substr(preg_replace('/[^a-zA-Z0-9_-]/', '_', $r_info['filename']), 0, 25) . '.' . $r_ext;
-                if (move_uploaded_file($_FILES['receipt_file']['tmp_name'], $receipts_dir . $r_name)) {
-                    $receipt_url = 'uploads/receipts/' . $r_name;
-                }
+        if (isset($_FILES['receipt_file']) && $_FILES['receipt_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadError = null;
+            $storedReceipt = store_private_upload($_FILES['receipt_file'], 'receipts', ['pdf', 'png', 'jpg', 'jpeg', 'webp'], 10 * 1024 * 1024, $uploadError);
+            if ($storedReceipt === null) {
+                header('Location: orders.php?msg=' . urlencode($uploadError ?? 'error_upload'));
+                exit;
             }
+            $receipt_url = $storedReceipt;
         }
 
         $now = date('Y-m-d H:i:s');
@@ -514,16 +512,14 @@ switch ($action) {
         $digital_access_link = trim($_POST['digital_access_link'] ?? '');
         $digital_deliverable_file = $order['digital_deliverable_file'];
 
-        if (isset($_FILES['deliverable_file']) && $_FILES['deliverable_file']['error'] === UPLOAD_ERR_OK) {
-            $d_info = pathinfo($_FILES['deliverable_file']['name']);
-            $d_ext = strtolower($d_info['extension'] ?? '');
-            if (in_array($d_ext, $allowed_doc_exts)) {
-                if (!is_dir($deliverables_dir)) @mkdir($deliverables_dir, 0755, true);
-                $d_name = 'order_deliv_' . $order_id . '_' . time() . '_' . substr(preg_replace('/[^a-zA-Z0-9_-]/', '_', $d_info['filename']), 0, 25) . '.' . $d_ext;
-                if (move_uploaded_file($_FILES['deliverable_file']['tmp_name'], $deliverables_dir . $d_name)) {
-                    $digital_deliverable_file = 'uploads/deliverables/' . $d_name;
-                }
+        if (isset($_FILES['deliverable_file']) && $_FILES['deliverable_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadError = null;
+            $storedDeliverable = store_private_upload($_FILES['deliverable_file'], 'deliverables', $allowed_doc_exts, 100 * 1024 * 1024, $uploadError);
+            if ($storedDeliverable === null) {
+                header('Location: orders.php?msg=' . urlencode($uploadError ?? 'error_upload'));
+                exit;
             }
+            $digital_deliverable_file = $storedDeliverable;
         }
 
         $mark_ready = isset($_POST['mark_digital_ready']) ? 1 : 0;
@@ -612,6 +608,10 @@ switch ($action) {
         $title = trim($_POST['update_title'] ?? 'Order Status Update');
         $message = trim($_POST['update_message'] ?? '');
         $channel = trim($_POST['update_channel'] ?? 'Email');
+        if (!in_array($channel, ['Email', 'WhatsApp', 'Phone'], true)) {
+            header('Location: orders.php?msg=error_invalid');
+            exit;
+        }
 
         if (empty($message) || $order_id <= 0) {
             header('Location: orders.php?msg=error_missing');
@@ -622,6 +622,22 @@ switch ($action) {
         if (!$order) {
             header('Location: orders.php?msg=error_invalid');
             exit;
+        }
+
+        $emailSent = true;
+        $emailAttempted = $channel === 'Email';
+        if ($emailAttempted) {
+            if (empty($order['customer_email']) || !filter_var($order['customer_email'], FILTER_VALIDATE_EMAIL)) {
+                header('Location: orders.php?msg=error_email_missing');
+                exit;
+            }
+            try {
+                $emailSent = send_shop_email($conn, $order['customer_email'], $title, $message);
+            } catch (RuntimeException $e) {
+                error_log('URTH customer email could not be recorded: ' . $e->getMessage());
+                header('Location: orders.php?msg=error_email_queue');
+                exit;
+            }
         }
 
         $existingUpdates = [];
@@ -649,7 +665,7 @@ switch ($action) {
 
             log_order_activity($conn, $order_id, $staff_username, 'customer_update', null, null, "Logged customer notification via {$channel}: {$title}");
 
-            header('Location: orders.php?msg=update_logged');
+            header('Location: orders.php?msg=' . ($emailAttempted && !$emailSent ? 'email_failed' : 'update_logged'));
             exit;
         }
 
