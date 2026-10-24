@@ -93,6 +93,7 @@ if ($catResult) {
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="mobile-nav.css">
   <link rel="stylesheet" href="shop.css?v=<?= time() ?>">
+  <link rel="stylesheet" href="shop-info.css">
 </head>
 <body>
 
@@ -147,7 +148,7 @@ if ($catResult) {
        ========================================================================== -->
   <section class="top-banner big fullheight light" id="topBanner">
     <span class="overlay"></span>
-    <img src="img/shop/shop-banner.jpg" alt="URTH Studio Shop" class="s-img-switch banner-bg" />
+    <img src="img/shop/shop-hero-gallery-dark.jpg" alt="URTH Studio Shop" class="s-img-switch banner-bg" />
     <div class="content">
       <h1 class="title">Curated Artifacts, Tools<br>&amp; Design Consultations</h1>
       <p class="description">
@@ -441,6 +442,7 @@ if ($catResult) {
         <?php endif; ?>
       </ul>
     </nav>
+    <p class="shop-information-link"><a href="shop-info.php">How to order · Payment and delivery · Returns · Digital licence · Privacy · FAQs &amp; contact</a></p>
   </main>
 
   <!-- ==========================================================================

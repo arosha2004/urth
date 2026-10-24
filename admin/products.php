@@ -1135,7 +1135,8 @@ switch ($msg) {
                         <div class="form-group">
                             <label class="form-label">Upload Deliverable Asset</label>
                             <input type="file" name="deliverable_upload" class="form-control" accept=".zip,.rar,.pdf,.brushset,.dwg,.dxf,.rfa,.blend">
-                            <input type="text" id="edit_digital_deliverable_file" name="digital_deliverable_file" class="form-control" placeholder="Current file path" style="font-size: 11px; margin-top: 4px;">
+                            <input type="text" id="edit_digital_deliverable_file" class="form-control" placeholder="Current private file key" style="font-size: 11px; margin-top: 4px;" readonly>
+                            <div id="edit_private_product_download" style="font-size: 11px; margin-top: 4px;"></div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Access URL</label>
@@ -1540,6 +1541,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Deliverables
             setVal('#edit_digital_deliverable_file', prod.digital_deliverable_file);
+            const privateProductDownload = document.querySelector('#edit_private_product_download');
+            privateProductDownload.textContent = '';
+            if (prod.digital_deliverable_file) {
+                const productFileLink = document.createElement('a');
+                productFileLink.href = 'private_file.php?key=' + encodeURIComponent(prod.digital_deliverable_file);
+                productFileLink.textContent = 'Download private product file';
+                privateProductDownload.appendChild(productFileLink);
+            }
             setVal('#edit_digital_access_link', prod.digital_access_link);
 
             // Checkboxes & Selects

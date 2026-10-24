@@ -29,6 +29,12 @@ try {
         password TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS admin_login_attempts (
+        attempt_key TEXT PRIMARY KEY,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        window_started INTEGER NOT NULL,
+        locked_until INTEGER NOT NULL DEFAULT 0
+    )");
 
     // Create Projects table
     $pdo->exec("CREATE TABLE IF NOT EXISTS projects (
@@ -40,17 +46,27 @@ try {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )");
 
-    // Ensure default admin user exists.
-    // IMPORTANT: Change this password immediately after first login via the DB or an admin reset tool.
-    // The hash below is bcrypt for the placeholder "change-me-on-first-login!" — do NOT use it in production.
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin_users WHERE username = :username");
-    $stmt->execute(['username' => 'urthadmin']);
-    if ($stmt->fetchColumn() == 0) {
+    // Remove only the legacy, publicly documented placeholder account.
+    $legacyAdmin = $pdo->prepare("SELECT id, password FROM admin_users WHERE username = :username");
+    $legacyAdmin->execute(['username' => 'urthadmin']);
+    $legacyUser = $legacyAdmin->fetch();
+    if ($legacyUser && password_verify('change-me-on-first-login!', $legacyUser['password'])) {
+        $deleteLegacy = $pdo->prepare("DELETE FROM admin_users WHERE id = :id");
+        $deleteLegacy->execute(['id' => $legacyUser['id']]);
+    }
+
+    $adminUsername = trim((string)getenv('URTH_ADMIN_USERNAME'));
+    $adminPassword = (string)getenv('URTH_ADMIN_PASSWORD');
+    if ($adminUsername !== '' && strlen($adminPassword) >= 16) {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin_users WHERE username = :username");
+        $stmt->execute(['username' => $adminUsername]);
+        if ((int)$stmt->fetchColumn() === 0) {
         $insertAdmin = $pdo->prepare("INSERT INTO admin_users (username, password) VALUES (:username, :password)");
         $insertAdmin->execute([
-            'username' => 'urthadmin',
-            'password' => password_hash('change-me-on-first-login!', PASSWORD_BCRYPT, ['cost' => 12])
+                'username' => $adminUsername,
+                'password' => password_hash($adminPassword, PASSWORD_BCRYPT, ['cost' => 12])
         ]);
+        }
     }
 
     // Seed initial sample projects if empty

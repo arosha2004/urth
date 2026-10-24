@@ -4,6 +4,11 @@
  */
 
 if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'httponly' => true,
+        'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'samesite' => 'Lax'
+    ]);
     session_start();
 }
 
@@ -34,19 +39,44 @@ function authenticate_admin(string $username, string $password): bool {
     global $pdo;
 
     $username = trim($username);
+    $attemptKey = hash('sha256', strtolower($username) . '|' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    $now = time();
+    $attemptStmt = $pdo->prepare("SELECT attempts, window_started, locked_until FROM admin_login_attempts WHERE attempt_key = :attempt_key");
+    $attemptStmt->execute(['attempt_key' => $attemptKey]);
+    $attempt = $attemptStmt->fetch();
+    if ($attempt && (int)$attempt['locked_until'] > $now) {
+        return false;
+    }
 
     $stmt = $pdo->prepare("SELECT * FROM admin_users WHERE username = :username LIMIT 1");
     $stmt->execute(['username' => $username]);
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
-        // FIX #12: Regenerate session ID after login to prevent session fixation
         session_regenerate_id(true);
         $_SESSION['admin_logged_in'] = true;
         $_SESSION['admin_username'] = $user['username'];
+        $clearAttempts = $pdo->prepare("DELETE FROM admin_login_attempts WHERE attempt_key = :attempt_key");
+        $clearAttempts->execute(['attempt_key' => $attemptKey]);
         return true;
     }
 
+    $windowStarted = $attempt && $now - (int)$attempt['window_started'] < 900
+        ? (int)$attempt['window_started']
+        : $now;
+    $attempts = $windowStarted === ($attempt ? (int)$attempt['window_started'] : 0)
+        ? (int)$attempt['attempts'] + 1
+        : 1;
+    $lockedUntil = $attempts >= 5 ? $now + 900 : 0;
+    $saveAttempt = $pdo->prepare("INSERT INTO admin_login_attempts (attempt_key, attempts, window_started, locked_until)
+        VALUES (:attempt_key, :attempts, :window_started, :locked_until)
+        ON CONFLICT(attempt_key) DO UPDATE SET attempts = excluded.attempts, window_started = excluded.window_started, locked_until = excluded.locked_until");
+    $saveAttempt->execute([
+        'attempt_key' => $attemptKey,
+        'attempts' => $attempts,
+        'window_started' => $windowStarted,
+        'locked_until' => $lockedUntil
+    ]);
     return false;
 }
 

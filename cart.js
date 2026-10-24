@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearCartBtn = document.querySelector('#clearCartBtn');
   const checkoutForm = document.querySelector('#checkoutForm');
   const submitOrderBtn = document.querySelector('#submitOrderBtn');
+  const checkoutError = document.querySelector('#checkoutError');
   const cartWhatsAppOrderBtn = document.querySelector('#cartWhatsAppOrderBtn');
   const shippingRadios = document.querySelectorAll('input[name="shipping_option"]');
 
@@ -180,7 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
 
       if (cart.length === 0) {
-        alert('Your cart is empty. Please add items from our collection before placing an order.');
+        if (checkoutError) {
+          checkoutError.textContent = 'Your cart is empty. Please add items before placing an order.';
+          checkoutError.hidden = false;
+        }
         return;
       }
 
@@ -197,8 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const shippingCost = getShippingCost();
       const shippingMethod = getShippingMethodName();
-      const subtotal = cart.reduce((sum, item) => sum + ((parseFloat(item.price) || 0) * item.qty), 0);
-      const grandTotal = subtotal + shippingCost;
+      let subtotal = cart.reduce((sum, item) => sum + ((parseFloat(item.price) || 0) * item.qty), 0);
+      let grandTotal = subtotal + shippingCost;
 
       if (submitOrderBtn) {
         submitOrderBtn.disabled = true;
@@ -211,7 +215,11 @@ document.addEventListener('DOMContentLoaded', () => {
       let orderRef = 'URTH-' + new Date().toISOString().slice(2, 10).replace(/-/g, '') + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
       let totalFormatted = grandTotal.toFixed(2);
 
-      // Record in MySQL backend
+      if (checkoutError) {
+        checkoutError.hidden = true;
+        checkoutError.textContent = '';
+      }
+
       try {
         const payload = {
           customer_name: custName,
@@ -221,6 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
           order_notes: custNotes,
           shipping_method: shippingMethod,
           shipping_cost: shippingCost,
+          website: document.querySelector('#checkoutWebsite')?.value || '',
           items: cart
         };
 
@@ -230,13 +239,35 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify(payload)
         });
 
-        const result = await response.json();
-        if (result.status === 'success' && result.order_number) {
-          orderRef = result.order_number;
-          if (result.total) totalFormatted = result.total;
+        const result = await response.json().catch(() => null);
+        if (!result) {
+          throw new Error('The shop is temporarily unavailable. Please try again shortly or contact the studio.');
+        }
+        if (!response.ok || result.status !== 'success' || !result.order_number) {
+          throw new Error(result.message || 'Order could not be submitted.');
+        }
+        orderRef = result.order_number;
+        if (result.subtotal) subtotal = Number(result.subtotal);
+        if (result.total) {
+          totalFormatted = result.total;
+          grandTotal = Number(result.total);
+        }
+        if (result.items) {
+          cart = result.items;
         }
       } catch (err) {
-        console.warn('Could not record order in database, continuing with WhatsApp dispatch:', err);
+        console.error('Order submission failed:', err);
+        if (checkoutError) {
+          checkoutError.textContent = err instanceof TypeError
+            ? 'We could not reach the shop server. Check your connection and try again.'
+            : (err.message || 'We could not submit your order. Please try again or contact the studio.');
+          checkoutError.hidden = false;
+        }
+        if (submitOrderBtn) {
+          submitOrderBtn.disabled = false;
+          submitOrderBtn.textContent = 'Try Again';
+        }
+        return;
       }
 
       // Build structured WhatsApp message with all customer and order details

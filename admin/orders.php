@@ -121,8 +121,32 @@ switch ($msg) {
         $alertMessage = 'Invalid payment or refund amount specified.';
         $alertType = 'danger';
         break;
+    case 'error_filetype':
+        $alertMessage = 'This file type is not allowed.';
+        $alertType = 'danger';
+        break;
+    case 'error_size':
+        $alertMessage = 'The file is too large or the upload exceeded the server limit.';
+        $alertType = 'danger';
+        break;
+    case 'error_upload':
+        $alertMessage = 'The file could not be stored securely. Please try again.';
+        $alertType = 'danger';
+        break;
     case 'error_csrf':
         $alertMessage = 'Security token invalid or expired. Please try again.';
+        $alertType = 'danger';
+        break;
+    case 'email_failed':
+        $alertMessage = 'Email delivery failed. The message is saved in the failed-email queue for retry.';
+        $alertType = 'danger';
+        break;
+    case 'error_email_missing':
+        $alertMessage = 'This customer has no valid email address on file. Add or correct the address before sending an email.';
+        $alertType = 'danger';
+        break;
+    case 'error_email_queue':
+        $alertMessage = 'The email could not be recorded for delivery. No message was sent; please try again.';
         $alertType = 'danger';
         break;
     case 'error_db':
@@ -171,6 +195,7 @@ switch ($msg) {
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
                 Partners
             </a>
+            <a href="emails.php" class="admin-nav-link">Failed Emails</a>
         </nav>
 
         <div class="header-actions">
@@ -709,6 +734,7 @@ switch ($msg) {
                         <div class="form-group">
                             <label class="form-label" style="font-size: 11px;">Upload Receipt</label>
                             <input type="file" name="receipt_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp">
+                            <div id="m_current_receipt_file" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"></div>
                         </div>
                     </div>
 
@@ -1373,7 +1399,26 @@ Please email remittance confirmation or attach receipt in customer portal.`;
 
             // TAB 5: Deliverables
             document.querySelector('#m_digital_access_link').value = ord.digital_access_link || '';
-            document.querySelector('#m_current_file_path').textContent = ord.digital_deliverable_file ? 'Assigned file: ' + ord.digital_deliverable_file : 'No deliverable archive attached yet';
+            const deliverableFileBox = document.querySelector('#m_current_file_path');
+            deliverableFileBox.textContent = '';
+            if (ord.digital_deliverable_file) {
+                const deliverableLink = document.createElement('a');
+                deliverableLink.href = 'private_file.php?key=' + encodeURIComponent(ord.digital_deliverable_file);
+                deliverableLink.textContent = 'Download private deliverable';
+                deliverableFileBox.appendChild(deliverableLink);
+            } else {
+                deliverableFileBox.textContent = 'No deliverable archive attached yet';
+            }
+            const receiptFileBox = document.querySelector('#m_current_receipt_file');
+            receiptFileBox.textContent = '';
+            if (ord.receipt_url) {
+                const receiptLink = document.createElement('a');
+                receiptLink.href = 'private_file.php?key=' + encodeURIComponent(ord.receipt_url);
+                receiptLink.textContent = 'View private payment receipt';
+                receiptFileBox.appendChild(receiptLink);
+            } else {
+                receiptFileBox.textContent = 'No receipt attached';
+            }
             document.querySelector('#generateTokenLinkBtn').onclick = () => {
                 const token = 'sec_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
                 document.querySelector('#m_digital_access_link').value = 'https://urthspaces.com/download.php?token=' + token;
