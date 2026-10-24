@@ -192,7 +192,7 @@ $gallery_result = $gal_stmt->get_result();
         <?php endif; ?>
         <form action="" method="POST" enctype="multipart/form-data">
             <div class="form-group">
-                <label>Project Title</label>
+                <label>Title</label>
                 <input type="text" name="title" value="<?= htmlspecialchars($project['title']) ?>" required>
             </div>
             <div class="form-group">
@@ -218,12 +218,12 @@ $gallery_result = $gal_stmt->get_result();
             <hr style="margin: 20px 0;">
 
             <div class="form-group">
-                <label>Add New Gallery Images (Multiple)</label>
+                <label>Gallery Images</label>
                 <input type="file" name="gallery_images[]" accept="image/*" multiple>
             </div>
 
             <div class="form-group">
-                <label>Current Gallery Images</label>
+                <label>Gallery</label>
                 <div class="gallery-preview">
                     <?php while ($gimg = $gallery_result->fetch_assoc()): ?>
                         <div class="gallery-item">
@@ -235,7 +235,7 @@ $gallery_result = $gal_stmt->get_result();
                 </div>
             </div>
 
-            <button type="submit" class="btn">Update Project</button>
+            <button type="submit" class="btn">Save Changes</button>
             <a href="index.php" style="margin-left: 10px;">Cancel</a>
         </form>
     </div>
