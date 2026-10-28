@@ -486,7 +486,7 @@ body {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  background: #25d366;
+  background: #111111;
   color: #ffffff;
   border: none;
   padding: 15px 22px;
@@ -502,13 +502,13 @@ body {
   transition: all 0.25s ease;
   box-sizing: border-box;
   line-height: 1.2;
-  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.28);
+  box-shadow: 0 4px 14px rgba(17, 17, 17, 0.2);
 }
 
 .cart-whatsapp-order-btn:hover {
-  background: #20ba59;
+  background: #1f1f1f;
   color: #ffffff;
-  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+  box-shadow: 0 6px 20px rgba(17, 17, 17, 0.32);
   transform: translateY(-1px);
 }
 
