@@ -258,6 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
           price: parseFloat(currentProduct.price) || 0,
           currency: currentProduct.currency || '£',
           image: currentProduct.image,
+          product_type: currentProduct.product_type || 'furniture_object',
+          book_format: currentProduct.book_format || '',
           option: opt,
           qty: qty
         });
@@ -295,14 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const inquireWhatsAppBtn = document.querySelector('#inquireWhatsAppBtn');
   if (inquireWhatsAppBtn) {
     inquireWhatsAppBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.open(buildWhatsAppUrl(), '_blank');
-    });
-  }
-
-  const inquireWhatsAppPrimary = document.querySelector('#inquireWhatsAppPrimary');
-  if (inquireWhatsAppPrimary) {
-    inquireWhatsAppPrimary.addEventListener('click', (e) => {
       e.preventDefault();
       window.open(buildWhatsAppUrl(), '_blank');
     });

@@ -41,10 +41,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../app/Core/private_storage.php';
+require_once __DIR__ . '/../app/Core/shop_mail.php';
+
+$storedCustomerUploads = [];
 
 try {
     $contentType = strtolower(trim(explode(';', $_SERVER['CONTENT_TYPE'] ?? '')[0]));
-    if ($contentType !== 'application/json') {
+    if ($contentType === 'application/json') {
+        $rawInput = file_get_contents('php://input');
+        if ($rawInput === false || strlen($rawInput) > 65536) {
+            http_response_code(413);
+            echo json_encode(['status' => 'error', 'message' => 'The order request is too large. Please review your cart and try again.']);
+            exit;
+        }
+        $data = json_decode($rawInput, true);
+    } elseif ($contentType === 'multipart/form-data') {
+        $data = $_POST;
+        $data['items'] = json_decode((string)($_POST['items'] ?? ''), true);
+    } else {
         http_response_code(415);
         echo json_encode(['status' => 'error', 'message' => 'Please submit your order using the checkout form.']);
         exit;
@@ -107,14 +122,6 @@ try {
     $requestTimes[] = time();
     $_SESSION['order_request_times'] = $requestTimes;
 
-    $rawInput = file_get_contents('php://input');
-    if ($rawInput === false || strlen($rawInput) > 65536) {
-        http_response_code(413);
-        echo json_encode(['status' => 'error', 'message' => 'The order request is too large. Please review your cart and try again.']);
-        exit;
-    }
-    $data = json_decode($rawInput, true);
-
     if (!is_array($data)) {
         http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => 'Invalid or empty request payload']);
@@ -127,7 +134,7 @@ try {
         exit;
     }
 
-    foreach (['customer_name', 'customer_phone', 'customer_email', 'delivery_address', 'order_notes', 'shipping_method'] as $field) {
+    foreach (['customer_name', 'customer_phone', 'customer_email', 'delivery_address', 'order_notes', 'shipping_method', 'payment_method', 'terms_accepted'] as $field) {
         if (isset($data[$field]) && !is_string($data[$field])) {
             http_response_code(422);
             echo json_encode(['status' => 'error', 'message' => 'Some order details are invalid. Please check the form and try again.']);
@@ -141,16 +148,18 @@ try {
     $delivery_address = trim($data['delivery_address'] ?? '');
     $order_notes = trim($data['order_notes'] ?? '');
     $shipping_method = trim($data['shipping_method'] ?? 'Standard Delivery');
-    $shipping_options = [
-        'Studio Collection' => 0.00,
-        'White Glove Courier' => 15.00
-    ];
-    if (!isset($shipping_options[$shipping_method])) {
+    if ($shipping_method !== 'Confirm after order review') {
         http_response_code(422);
         echo json_encode(['status' => 'error', 'message' => 'Please choose a valid delivery option.']);
         exit;
     }
-    $shipping_cost = $shipping_options[$shipping_method];
+    $shipping_cost = 0.00;
+    $payment_method = trim($data['payment_method'] ?? '');
+    if ($payment_method !== 'Bank transfer' || ($data['terms_accepted'] ?? '') !== '1') {
+        http_response_code(422);
+        echo json_encode(['status' => 'error', 'message' => 'Choose an available payment method and accept the shop terms and privacy notice.']);
+        exit;
+    }
     $items = isset($data['items']) && is_array($data['items']) ? $data['items'] : [];
 
     if ($customer_name === '' || $customer_phone === '' || strlen($customer_name) > 255 || strlen($customer_phone) > 50) {
@@ -159,7 +168,7 @@ try {
         exit;
     }
 
-    if ($customer_email !== '' && !filter_var($customer_email, FILTER_VALIDATE_EMAIL)) {
+    if (!filter_var($customer_email, FILTER_VALIDATE_EMAIL)) {
         http_response_code(422);
         echo json_encode(['status' => 'error', 'message' => 'Please enter a valid email address.']);
         exit;
@@ -184,12 +193,18 @@ try {
     }
 
     // Rebuild order lines from the current catalogue; never accept prices or descriptions from the browser.
-    $productStmt = $conn->prepare("SELECT id, name, sku, price, sale_price, currency, image, availability, is_active, price_on_request FROM products WHERE id = ? LIMIT 1");
+    $conn->begin_transaction();
+    $productStmt = $conn->prepare("SELECT id, name, sku, price, sale_price, currency, image, availability, is_active, price_on_request, product_type, options_list, book_format, stock_quantity, booking_capacity, booked_count, allow_backorder FROM products WHERE id = ? LIMIT 1 FOR UPDATE");
     if (!$productStmt) {
         throw new RuntimeException('Could not prepare product lookup.');
     }
     $verifiedItems = [];
     $subtotal = 0;
+    $currency = null;
+    $requiresDeliveryAddress = false;
+    $acceptsCustomerUploads = false;
+    $lockedProducts = [];
+    $requestedQuantities = [];
     foreach ($items as $item) {
         if (!is_array($item)) {
             http_response_code(422);
@@ -213,6 +228,30 @@ try {
             echo json_encode(['status' => 'error', 'message' => 'A cart item is no longer available. Please refresh your cart.']);
             exit;
         }
+        $productType = $product['product_type'] ?? 'furniture_object';
+        $productCurrency = $product['currency'] ?? '£';
+        $lockedProducts[(int)$product['id']] = $product;
+        $requestedQuantities[(int)$product['id']] = ($requestedQuantities[(int)$product['id']] ?? 0) + $qty;
+        if ($currency !== null && $currency !== $productCurrency) {
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'Products with different currencies must be ordered separately.']);
+            exit;
+        }
+        $currency = $productCurrency;
+        $productOption = trim((string)($item['option'] ?? ''));
+        $availableOptions = array_filter(array_map('trim', explode(',', (string)($product['options_list'] ?? ''))));
+        if ($productOption !== '' && !in_array($productOption, $availableOptions, true)) {
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'A selected product option is no longer available. Please refresh the product page.']);
+            exit;
+        }
+        if ($productType === 'furniture_object'
+            || ($productType === 'book_planner' && preg_match('/print|physical/i', (string)($product['book_format'] ?? '')))) {
+            $requiresDeliveryAddress = true;
+        }
+        if (in_array($productType, ['furniture_object', 'design_session'], true)) {
+            $acceptsCustomerUploads = true;
+        }
         $price = isset($product['sale_price']) && (float)$product['sale_price'] > 0
             ? (float)$product['sale_price']
             : (float)$product['price'];
@@ -229,33 +268,110 @@ try {
             'price' => $price,
             'qty' => $qty,
             'image' => $product['image'] ?? '',
-            'currency' => $product['currency'] ?? '£'
+            'currency' => $productCurrency,
+            'option' => $productOption,
+            'product_type' => $productType
         ];
     }
     $productStmt->close();
     $items = $verifiedItems;
 
+    foreach ($requestedQuantities as $reservedProductId => $requestedQuantity) {
+        $reservedProduct = $lockedProducts[$reservedProductId];
+        $reservedType = $reservedProduct['product_type'] ?? 'furniture_object';
+        $reservedAvailability = strtolower($reservedProduct['availability'] ?? 'available');
+        $isPhysical = $reservedType === 'furniture_object'
+            || ($reservedType === 'book_planner' && preg_match('/print|physical/i', (string)($reservedProduct['book_format'] ?? '')));
+        $isBookable = in_array($reservedType, ['course_workshop', 'design_session'], true);
+
+        if ($isPhysical && $reservedAvailability !== 'made_to_order' && !(int)$reservedProduct['allow_backorder']
+            && (int)$reservedProduct['stock_quantity'] < $requestedQuantity) {
+            $conn->rollback();
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'There is not enough stock to accept this order request. Please contact URTH to confirm availability.']);
+            exit;
+        }
+        if ($isBookable && (int)$reservedProduct['booking_capacity'] > 0
+            && (int)$reservedProduct['booked_count'] + $requestedQuantity > (int)$reservedProduct['booking_capacity']) {
+            $conn->rollback();
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'There are not enough available places or consultation slots for this request. Please contact URTH.']);
+            exit;
+        }
+    }
+
+    if ($requiresDeliveryAddress && $delivery_address === '') {
+        http_response_code(422);
+        echo json_encode(['status' => 'error', 'message' => 'A delivery address is required for physical products.']);
+        exit;
+    }
+    if (!$requiresDeliveryAddress) {
+        $delivery_address = '';
+    }
+
+    $customerUploads = $_FILES['customer_files'] ?? null;
+    if ($customerUploads !== null && !empty($customerUploads['name'][0])) {
+        if (!$acceptsCustomerUploads) {
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'Reference files are only accepted for custom furniture and design-session requests.']);
+            exit;
+        }
+        if (count($customerUploads['name']) > 5) {
+            http_response_code(422);
+            echo json_encode(['status' => 'error', 'message' => 'Upload no more than five reference files.']);
+            exit;
+        }
+        $allowedUploadExtensions = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+        for ($fileIndex = 0; $fileIndex < count($customerUploads['name']); $fileIndex++) {
+            if (($customerUploads['error'][$fileIndex] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            $upload = [
+                'name' => $customerUploads['name'][$fileIndex] ?? '',
+                'tmp_name' => $customerUploads['tmp_name'][$fileIndex] ?? '',
+                'error' => $customerUploads['error'][$fileIndex] ?? UPLOAD_ERR_NO_FILE,
+                'size' => $customerUploads['size'][$fileIndex] ?? 0
+            ];
+            $uploadError = null;
+            $storedUpload = store_private_upload($upload, 'customer-uploads', $allowedUploadExtensions, 10 * 1024 * 1024, $uploadError);
+            if ($storedUpload === null) {
+                foreach ($storedCustomerUploads as $previousUpload) {
+                    $previousPath = private_storage_path($previousUpload);
+                    if ($previousPath !== null && is_file($previousPath)) {
+                        unlink($previousPath);
+                    }
+                }
+                $storedCustomerUploads = [];
+                http_response_code(422);
+                echo json_encode(['status' => 'error', 'message' => 'A reference file could not be uploaded. Check file types and the 10 MB per-file limit.']);
+                exit;
+            }
+            $storedCustomerUploads[] = $storedUpload;
+        }
+    }
+
     $total = $subtotal + $shipping_cost;
-    $currency = $items[0]['currency'] ?? '£';
+    $currency = $currency ?? '£';
+    $statusToken = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+    $statusTokenHash = hash('sha256', $statusToken);
+    $statusTokenExpiresAt = date('Y-m-d H:i:s', time() + (30 * 86400));
+    $customerUploadsJson = json_encode($storedCustomerUploads, JSON_UNESCAPED_SLASHES);
 
     // Generate unique order number
     $order_number = 'URTH-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
 
-    // Begin database transaction
-    $conn->begin_transaction();
-
-    $orderStmt = $conn->prepare("INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, delivery_address, order_notes, shipping_method, subtotal, shipping_cost, total, currency, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')");
+    $orderStmt = $conn->prepare("INSERT INTO orders (order_number, customer_name, customer_email, customer_phone, delivery_address, order_notes, shipping_method, subtotal, shipping_cost, total, currency, status, payment_method, terms_accepted_at, customer_uploads, customer_status_token_hash, customer_status_token_expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', ?, NOW(), ?, ?, ?)");
     if (!$orderStmt) {
         throw new Exception("Prepare failed: " . $conn->error);
     }
 
-    $orderStmt->bind_param("sssssssddds", $order_number, $customer_name, $customer_email, $customer_phone, $delivery_address, $order_notes, $shipping_method, $subtotal, $shipping_cost, $total, $currency);
+    $orderStmt->bind_param("sssssssdddsssss", $order_number, $customer_name, $customer_email, $customer_phone, $delivery_address, $order_notes, $shipping_method, $subtotal, $shipping_cost, $total, $currency, $payment_method, $customerUploadsJson, $statusTokenHash, $statusTokenExpiresAt);
     $orderStmt->execute();
     $order_id = $conn->insert_id;
     $orderStmt->close();
 
     // Insert order items
-    $itemStmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, product_name, product_sku, price, quantity, total, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $itemStmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, product_name, product_sku, selected_option, price, quantity, total, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     if (!$itemStmt) {
         throw new Exception("Prepare items failed: " . $conn->error);
     }
@@ -264,27 +380,55 @@ try {
         $prod_id = isset($it['id']) && is_numeric($it['id']) ? (int)$it['id'] : null;
         $prod_name = trim($it['name'] ?? 'Product');
         $prod_sku = trim($it['sku'] ?? '');
+        $selected_option = trim($it['option'] ?? '');
         $it_price = (float)($it['price'] ?? 0);
         $it_qty = max(1, (int)($it['qty'] ?? 1));
         $it_total = $it_price * $it_qty;
         $it_image = trim($it['image'] ?? '');
 
-        $itemStmt->bind_param("iissdids", $order_id, $prod_id, $prod_name, $prod_sku, $it_price, $it_qty, $it_total, $it_image);
+        $itemStmt->bind_param("iisssdids", $order_id, $prod_id, $prod_name, $prod_sku, $selected_option, $it_price, $it_qty, $it_total, $it_image);
         $itemStmt->execute();
     }
     $itemStmt->close();
 
     $conn->commit();
 
+    $baseUrl = rtrim((string)(getenv('URTH_PUBLIC_BASE_URL') ?: 'https://urthspaces.com'), '/');
+    $statusUrl = $baseUrl . '/order-status.php?token=' . rawurlencode($statusToken);
+    $itemSummary = implode("\n", array_map(static function ($item) {
+        $option = $item['option'] !== '' ? ' (' . $item['option'] . ')' : '';
+        return $item['qty'] . ' x ' . $item['name'] . $option . ' — ' . $item['currency'] . number_format($item['price'] * $item['qty'], 2);
+    }, $items));
+    $customerEmailSent = false;
+    $studioEmailSent = false;
+    $emailBody = "Hello {$customer_name},\n\nWe received your URTH order request {$order_number}. Payment is pending while URTH reviews availability, delivery arrangements and the final total.\n\nItems:\n{$itemSummary}\n\nProvisional item subtotal: {$currency}" . number_format($subtotal, 2) . "\nPreferred payment method: {$payment_method}\n\nTrack your order securely for 30 days: {$statusUrl}\n\nPlease wait for URTH to confirm the final total and payment instructions before paying.\n\nURTH Architecture Studio";
+    try {
+        $customerEmailSent = send_shop_email($conn, $customer_email, "URTH order request received — {$order_number}", $emailBody);
+    } catch (Throwable $emailError) {
+        error_log('URTH customer order acknowledgement could not be queued: ' . $emailError->getMessage());
+    }
+    try {
+        $studioRecipient = trim((string)(getenv('URTH_ORDER_EMAIL') ?: 'info@urthspaces.com'));
+        $studioEmailSent = send_shop_email(
+            $conn,
+            $studioRecipient,
+            "New URTH order request — {$order_number}",
+            "A new order request is awaiting review.\n\nOrder: {$order_number}\nCustomer: {$customer_name}\nEmail: {$customer_email}\nPhone: {$customer_phone}\nProvisional subtotal: {$currency}" . number_format($subtotal, 2) . "\nPayment pending.\n\nItems:\n{$itemSummary}\n\nManage orders: {$baseUrl}/admin/orders.php"
+        );
+    } catch (Throwable $emailError) {
+        error_log('URTH studio order notification could not be queued: ' . $emailError->getMessage());
+    }
+
     echo json_encode([
         'status' => 'success',
-        'message' => 'Order placed successfully.',
+        'message' => 'Order request saved. Payment is pending while URTH reviews the order.',
         'order_number' => $order_number,
         'order_id' => $order_id,
         'customer_name' => $customer_name,
         'subtotal' => number_format($subtotal, 2),
         'total' => number_format($total, 2),
         'currency' => $currency,
+        'email_status' => ($customerEmailSent && $studioEmailSent) ? 'sent' : 'pending',
         'items_count' => count($items),
         'items' => $items
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -292,6 +436,12 @@ try {
 } catch (Throwable $e) {
     if (isset($conn) && $conn instanceof mysqli) {
         @$conn->rollback();
+    }
+    foreach ($storedCustomerUploads as $storedUpload) {
+        $storedPath = private_storage_path($storedUpload);
+        if ($storedPath !== null && is_file($storedPath)) {
+            unlink($storedPath);
+        }
     }
     http_response_code(500);
     error_log('URTH order submission failed: ' . $e->getMessage());

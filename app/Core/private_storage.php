@@ -40,7 +40,7 @@ function private_storage_root(): string
 
 function private_storage_key_is_valid(string $key): bool
 {
-    return preg_match('~^(receipts|deliverables|products)/[A-Za-z0-9][A-Za-z0-9._-]{0,119}$~D', $key) === 1;
+    return preg_match('~^(receipts|deliverables|products|customer-uploads)/[A-Za-z0-9][A-Za-z0-9._-]{0,119}$~D', $key) === 1;
 }
 
 function private_storage_path(string $key): ?string
@@ -55,7 +55,7 @@ function private_storage_path(string $key): ?string
 function store_private_upload(array $upload, string $category, array $allowedExtensions, int $maxBytes, ?string &$error = null): ?string
 {
     $error = null;
-    if (!in_array($category, ['receipts', 'deliverables', 'products'], true)) {
+    if (!in_array($category, ['receipts', 'deliverables', 'products', 'customer-uploads'], true)) {
         throw new InvalidArgumentException('Unsupported private upload category.');
     }
 

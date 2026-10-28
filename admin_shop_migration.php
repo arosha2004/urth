@@ -48,6 +48,24 @@ foreach ($productColsToAdd as $col => $def) {
     }
 }
 
+// 2b. Preserve the customer's selected product option in each order line.
+$existingItemCols = [];
+$res = $conn->query("SHOW COLUMNS FROM order_items");
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        $existingItemCols[] = $row['Field'];
+    }
+    if (!in_array('selected_option', $existingItemCols, true)) {
+        if ($conn->query("ALTER TABLE order_items ADD COLUMN selected_option VARCHAR(255) DEFAULT NULL")) {
+            echo "Added column order_items.selected_option\n";
+        } else {
+            echo "Error adding order_items.selected_option: " . $conn->error . "\n";
+        }
+    }
+} else {
+    echo "Could not inspect order_items; run setup.php before this migration: " . $conn->error . "\n";
+}
+
 // 3. Expand orders table columns
 $orderColsToAdd = [
     'order_type' => "VARCHAR(30) DEFAULT 'order'",
@@ -88,7 +106,11 @@ $orderColsToAdd = [
     'refund_processed_by' => "VARCHAR(100) DEFAULT NULL",
     'refund_processed_at' => "DATETIME DEFAULT NULL",
     'internal_notes' => "LONGTEXT DEFAULT NULL",
-    'customer_updates' => "LONGTEXT DEFAULT NULL"
+    'customer_updates' => "LONGTEXT DEFAULT NULL",
+    'terms_accepted_at' => "DATETIME DEFAULT NULL",
+    'customer_uploads' => "LONGTEXT DEFAULT NULL",
+    'customer_status_token_hash' => "CHAR(64) DEFAULT NULL",
+    'customer_status_token_expires_at' => "DATETIME DEFAULT NULL"
 ];
 
 $existingOrderCols = [];
@@ -107,6 +129,15 @@ foreach ($orderColsToAdd as $col => $def) {
         } else {
             echo "Error adding orders.{$col}: " . $conn->error . "\n";
         }
+    }
+}
+
+$tokenIndex = $conn->query("SHOW INDEX FROM orders WHERE Key_name = 'idx_order_status_token'");
+if ($tokenIndex && $tokenIndex->num_rows === 0) {
+    if ($conn->query("ALTER TABLE orders ADD INDEX idx_order_status_token (customer_status_token_hash)")) {
+        echo "Added index orders.idx_order_status_token\n";
+    } else {
+        echo "Error adding orders.idx_order_status_token: " . $conn->error . "\n";
     }
 }
 

@@ -50,7 +50,7 @@ unset($ord);
 
 // Statistics & Metrics
 $totalOrders = count($orders);
-$totalEnquiries = count(array_filter($orders, function($o) { return ($o['order_type'] ?? 'order') === 'custom_enquiry'; }));
+$totalEnquiries = count(array_filter($orders, function($o) { return in_array(($o['order_type'] ?? 'order'), ['custom_enquiry', 'quote_request'], true); }));
 $pendingPayments = count(array_filter($orders, function($o) { return in_array($o['payment_status'] ?? '', ['pending_payment', 'balance_pending']); }));
 $inProductionCount = count(array_filter($orders, function($o) { return ($o['fulfilment_status'] ?? '') === 'in_production'; }));
 $pendingRefundsCount = count(array_filter($orders, function($o) { return ($o['refund_status'] ?? '') === 'pending_action' || ($o['payment_status'] ?? '') === 'refund_pending'; }));
@@ -634,6 +634,10 @@ switch ($msg) {
                     <strong style="color: #92400e; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Notes:</strong>
                     <div id="m_cust_notes" style="color: #78350f; font-size: 13px; margin-top: 2px;"></div>
                 </div>
+                <div id="m_customer_uploads_box" style="display: none; background: #eff6ff; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid #bfdbfe; margin-bottom: 16px;">
+                    <strong style="color: #1e3a8a; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Private customer reference files:</strong>
+                    <div id="m_customer_uploads" style="font-size: 13px; margin-top: 4px;"></div>
+                </div>
 
                 <!-- Financial Breakdown Cards -->
                 <div class="financial-grid" style="margin-bottom: 16px;">
@@ -717,11 +721,7 @@ switch ($msg) {
                         <div class="form-group">
                             <label class="form-label" style="font-size: 11px;">Method *</label>
                             <select name="payment_method" class="form-control" required>
-                                <option value="Bank Transfer (BACS)">Bank Transfer (BACS)</option>
-                                <option value="Direct Wire / Swift">Wire Transfer</option>
-                                <option value="Stripe / Card Link">Card Payment</option>
-                                <option value="Cash / Studio Pickup">Cash</option>
-                                <option value="PayPal">PayPal</option>
+                                <option value="Bank transfer">Bank transfer</option>
                             </select>
                         </div>
                     </div>
@@ -952,10 +952,10 @@ switch ($msg) {
                             <div id="m_current_file_path" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"></div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Access Link</label>
-                            <input type="url" name="digital_access_link" id="m_digital_access_link" class="form-control" placeholder="https://...">
+                            <label class="form-label" style="font-size: 11px;">Expiring private download link</label>
+                            <input type="url" name="digital_access_link" id="m_digital_access_link" class="form-control" readonly placeholder="Created after delivery is ready and payment is confirmed">
+                            <small>Private download links expire after 30 days. Save again to revoke and resend access.</small>
                             <div style="display: flex; gap: 6px; margin-top: 4px;">
-                                <button type="button" class="btn btn-outline btn-sm" id="generateTokenLinkBtn" style="font-size: 10px; padding: 2px 8px;">Generate Link</button>
                                 <button type="button" class="btn btn-outline btn-sm" id="copyDeliverableLinkBtn" style="font-size: 10px; padding: 2px 8px;">Copy</button>
                             </div>
                         </div>
@@ -1207,6 +1207,13 @@ switch ($msg) {
 </div>
 
 <script>
+window.URTH_BANK_DETAILS = <?= json_encode([
+    'bank_name' => getenv('URTH_BANK_NAME') ?: '',
+    'account_name' => getenv('URTH_BANK_ACCOUNT_NAME') ?: '',
+    'sort_code' => getenv('URTH_BANK_SORT_CODE') ?: '',
+    'account_number' => getenv('URTH_BANK_ACCOUNT_NUMBER') ?: '',
+    'iban' => getenv('URTH_BANK_IBAN') ?: ''
+], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 document.addEventListener('DOMContentLoaded', () => {
     // Modal Helpers
     const openModal = (m) => { if (m) { m.classList.add('active'); document.body.style.overflow = 'hidden'; } };
@@ -1291,6 +1298,30 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 notesBox.style.display = 'none';
             }
+            const customerUploadsBox = document.querySelector('#m_customer_uploads_box');
+            const customerUploadsList = document.querySelector('#m_customer_uploads');
+            customerUploadsList.replaceChildren();
+            let customerUploads = [];
+            try {
+                customerUploads = Array.isArray(ord.customer_uploads)
+                    ? ord.customer_uploads
+                    : JSON.parse(ord.customer_uploads || '[]');
+            } catch (error) {
+                console.error('Could not read customer reference files:', error);
+            }
+            if (Array.isArray(customerUploads) && customerUploads.length) {
+                customerUploads.forEach((key, index) => {
+                    const link = document.createElement('a');
+                    link.href = 'private_file.php?key=' + encodeURIComponent(key);
+                    link.textContent = `Reference file ${index + 1}`;
+                    link.style.display = 'block';
+                    link.rel = 'noopener';
+                    customerUploadsList.appendChild(link);
+                });
+                customerUploadsBox.style.display = 'block';
+            } else {
+                customerUploadsBox.style.display = 'none';
+            }
 
             // Financial boxes
             document.querySelector('#m_fin_total').textContent = curr + tot.toFixed(2);
@@ -1310,7 +1341,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <img src="${img}" style="width: 40px; height: 40px; object-fit: contain; background: #fff; border-radius: 4px; border: 1px solid var(--border-color);" alt="${it.product_name}">
                             <div>
                                 <strong style="font-size: 13px; color: var(--text-primary); display: block;">${it.product_name}</strong>
-                                <span style="font-size: 11px; color: var(--text-muted);">${it.product_sku || ''}</span>
+                                <span style="font-size: 11px; color: var(--text-muted);">${it.product_sku || ''}${it.selected_option ? ' · ' + it.selected_option : ''}</span>
                             </div>
                         </div>
                         <div style="text-align: right; font-size: 13px;">
@@ -1337,23 +1368,36 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // Bank instructions generator
-            const bankInstructions = `STUDIO PAYMENT INSTRUCTIONS — URTH ARCHITECTURE STUDIO
+            const bankDetails = [
+                ['Bank', window.URTH_BANK_DETAILS?.bank_name],
+                ['Account Name', window.URTH_BANK_DETAILS?.account_name],
+                ['Sort Code', window.URTH_BANK_DETAILS?.sort_code],
+                ['Account Number', window.URTH_BANK_DETAILS?.account_number],
+                ['IBAN', window.URTH_BANK_DETAILS?.iban]
+            ];
+            const completeBankDetails = bankDetails.every(([, value]) => typeof value === 'string' && value.trim() !== '');
+            const bankInstructions = completeBankDetails
+                ? `STUDIO PAYMENT INSTRUCTIONS — URTH ARCHITECTURE STUDIO
 Order Ref: ${ord.order_number}
 Customer: ${ord.customer_name}
-Total: ${curr}${tot.toFixed(2)} | Balance Due: ${curr}${due.toFixed(2)}
+Confirmed total: ${curr}${tot.toFixed(2)} | Balance due: ${curr}${due.toFixed(2)}
 
-Bank: Barclays Bank UK
-Account Name: URTH Architecture Studio Ltd
-Sort Code: 20-00-00
-Account No: 12345678
-IBAN: GB29BARC20000012345678
-Payment Reference: ${ord.order_number}
+${bankDetails.map(([label, value]) => `${label}: ${value}`).join('\n')}
+Payment reference: ${ord.order_number}
 
-Please email remittance confirmation or attach receipt in customer portal.`;
+Please submit payment evidence using the secure order-status link.`
+                : `Payment instructions are not configured. Contact URTH to confirm the final total and approved payment details. Do not send payment until URTH confirms the instructions.
+Order Ref: ${ord.order_number}
+Customer: ${ord.customer_name}
+Provisional total: ${curr}${tot.toFixed(2)} | Balance due: ${curr}${due.toFixed(2)}`;
             document.querySelector('#m_bank_instructions_text').value = bankInstructions;
             document.querySelector('#copyBankInstructionsBtn').onclick = () => {
+                if (!completeBankDetails) {
+                    alert('Approved bank details are not configured. Do not send payment yet.');
+                    return;
+                }
                 navigator.clipboard.writeText(bankInstructions);
-                alert('Payment instructions copied to clipboard!');
+                alert('Configured bank instructions copied.');
             };
             const waBankMsg = encodeURIComponent(bankInstructions);
             document.querySelector('#sendWhatsAppBankBtn').href = `https://wa.me/${cleanPhone}?text=${waBankMsg}`;
@@ -1419,17 +1463,13 @@ Please email remittance confirmation or attach receipt in customer portal.`;
             } else {
                 receiptFileBox.textContent = 'No receipt attached';
             }
-            document.querySelector('#generateTokenLinkBtn').onclick = () => {
-                const token = 'sec_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                document.querySelector('#m_digital_access_link').value = 'https://urthspaces.com/download.php?token=' + token;
-            };
             document.querySelector('#copyDeliverableLinkBtn').onclick = () => {
                 const linkVal = document.querySelector('#m_digital_access_link').value;
                 if (linkVal) {
                     navigator.clipboard.writeText(linkVal);
                     alert('Protected download link copied!');
                 } else {
-                    alert('No access link specified.');
+                    alert('A private link is created and emailed after the deliverable is ready and payment is confirmed.');
                 }
             };
 

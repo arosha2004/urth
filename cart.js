@@ -11,8 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const submitOrderBtn = document.querySelector('#submitOrderBtn');
   const checkoutError = document.querySelector('#checkoutError');
   const cartWhatsAppOrderBtn = document.querySelector('#cartWhatsAppOrderBtn');
-  const shippingRadios = document.querySelectorAll('input[name="shipping_option"]');
-
   // Success Modal
   const orderSuccessModal = document.querySelector('#orderSuccessModal');
   const modalOrderNumber = document.querySelector('#modalOrderNumber');
@@ -44,13 +42,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getShippingCost() {
-    const selected = document.querySelector('input[name="shipping_option"]:checked');
-    return selected ? parseFloat(selected.value) || 0 : 0;
+    return 0;
   }
 
   function getShippingMethodName() {
-    const selected = document.querySelector('input[name="shipping_option"]:checked');
-    return selected ? selected.getAttribute('data-name') || 'Standard' : 'Standard';
+    return 'Confirm after order review';
+  }
+
+  function getCurrencyCode(currency) {
+    const codes = { '£': 'GBP', GBP: 'GBP', '$': 'USD', USD: 'USD', '€': 'EUR', EUR: 'EUR', LKR: 'LKR' };
+    return codes[currency] || String(currency || 'GBP').toUpperCase();
+  }
+
+  function formatMoney(amount, currency) {
+    const symbols = { GBP: '£', USD: '$', EUR: '€', LKR: 'LKR' };
+    const code = getCurrencyCode(currency);
+    return `${symbols[code] || currency || '£'}${Number(amount).toFixed(2)} ${code}`;
+  }
+
+  function requiresDeliveryAddress() {
+    return cart.some(item => {
+      if (['digital_asset', 'course_workshop', 'design_session'].includes(item.product_type)) return false;
+      if (item.product_type === 'book_planner') return /print|physical/i.test(item.book_format || '');
+      return true;
+    });
+  }
+
+  function updateCheckoutRequirements() {
+    const addressField = document.querySelector('#custAddress');
+    const addressLabel = document.querySelector('label[for="custAddress"]');
+    if (addressField && addressLabel) {
+      const required = requiresDeliveryAddress();
+      addressField.required = required;
+      addressLabel.textContent = required ? 'Delivery Address *' : 'Delivery Address (not needed for digital products or services)';
+    }
+
+    const filesInput = document.querySelector('#customerFiles');
+    const filesField = filesInput ? filesInput.closest('.checkout-field') : null;
+    if (filesField) {
+      filesField.hidden = !cart.some(item => ['furniture_object', 'design_session'].includes(item.product_type));
+    }
   }
 
   function renderCart() {
@@ -92,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="cart-prod-sku">SKU: ${item.sku || 'PR' + item.id}</span>
             </td>
             <td>
-              <span class="cart-prod-price">£${price.toFixed(2)}</span>
+              <span class="cart-prod-price">${formatMoney(price, item.currency)}</span>
             </td>
             <td>
               <div class="cart-qty-stepper">
@@ -102,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
             </td>
             <td style="text-align: right;">
-              <span class="cart-prod-subtotal">£${lineTotal.toFixed(2)}</span>
+              <span class="cart-prod-subtotal">${formatMoney(lineTotal, item.currency)}</span>
             </td>
           </tr>
         `;
@@ -131,8 +162,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const shipping = getShippingCost();
     const grandTotal = subtotal + shipping;
 
-    if (cartSubtotalVal) cartSubtotalVal.textContent = `£${subtotal.toFixed(2)}`;
-    if (cartGrandTotalVal) cartGrandTotalVal.textContent = `£${grandTotal.toFixed(2)}`;
+    const currencies = Array.from(new Set(cart.map(item => getCurrencyCode(item.currency))));
+    const currency = currencies.length === 1 ? currencies[0] : 'Multiple currencies';
+    if (cartSubtotalVal) cartSubtotalVal.textContent = currency === 'Multiple currencies' ? currency : formatMoney(subtotal, currency);
+    if (cartGrandTotalVal) cartGrandTotalVal.textContent = currency === 'Multiple currencies'
+      ? currency
+      : `${formatMoney(grandTotal, currency)} (provisional)`;
+    if (submitOrderBtn) {
+      submitOrderBtn.disabled = currencies.length > 1;
+      submitOrderBtn.title = currencies.length > 1 ? 'Place separate orders for products with different currencies.' : '';
+    }
+    updateCheckoutRequirements();
   }
 
   function updateQty(productId, delta) {
@@ -170,11 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Shipping selection change
-  shippingRadios.forEach(radio => {
-    radio.addEventListener('change', renderCart);
-  });
-
   // Direct WhatsApp Checkout Order Placement
   if (checkoutForm) {
     checkoutForm.addEventListener('submit', async (e) => {
@@ -187,17 +222,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return;
       }
+      if (!checkoutForm.reportValidity()) return;
+
+      const currencies = Array.from(new Set(cart.map(item => getCurrencyCode(item.currency))));
+      if (currencies.length !== 1) {
+        if (checkoutError) {
+          checkoutError.textContent = 'Products in different currencies must be ordered separately.';
+          checkoutError.hidden = false;
+        }
+        return;
+      }
 
       const custName = document.querySelector('#custName').value.trim();
       const custPhone = document.querySelector('#custPhone').value.trim();
       const custEmail = document.querySelector('#custEmail').value.trim();
       const custAddress = document.querySelector('#custAddress').value.trim();
       const custNotes = document.querySelector('#custNotes').value.trim();
-
-      if (!custName || !custPhone) {
-        alert('Please fill in your Full Name and Phone Number.');
-        return;
-      }
 
       const shippingCost = getShippingCost();
       const shippingMethod = getShippingMethodName();
@@ -208,12 +248,14 @@ document.addEventListener('DOMContentLoaded', () => {
         submitOrderBtn.disabled = true;
         submitOrderBtn.innerHTML = `
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="animation: spin 1s linear infinite; margin-right: 8px;"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
-          Preparing WhatsApp Order...
+          Submitting Order Request...
         `;
       }
 
-      let orderRef = 'URTH-' + new Date().toISOString().slice(2, 10).replace(/-/g, '') + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+      let orderRef = '';
       let totalFormatted = grandTotal.toFixed(2);
+      let orderCurrency = cart[0].currency || '£';
+      let emailStatus = 'pending';
 
       if (checkoutError) {
         checkoutError.hidden = true;
@@ -221,22 +263,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        const payload = {
-          customer_name: custName,
-          customer_phone: custPhone,
-          customer_email: custEmail,
-          delivery_address: custAddress,
-          order_notes: custNotes,
-          shipping_method: shippingMethod,
-          shipping_cost: shippingCost,
-          website: document.querySelector('#checkoutWebsite')?.value || '',
-          items: cart
-        };
+        const payload = new FormData();
+        payload.append('customer_name', custName);
+        payload.append('customer_phone', custPhone);
+        payload.append('customer_email', custEmail);
+        payload.append('delivery_address', custAddress);
+        payload.append('order_notes', custNotes);
+        payload.append('shipping_method', shippingMethod);
+        payload.append('payment_method', document.querySelector('#custPaymentMethod').value);
+        payload.append('terms_accepted', document.querySelector('#orderTermsConsent').checked ? '1' : '0');
+        payload.append('website', document.querySelector('#checkoutWebsite').value);
+        payload.append('items', JSON.stringify(cart));
+        const customerFiles = document.querySelector('#customerFiles');
+        if (customerFiles) {
+          Array.from(customerFiles.files).forEach(file => payload.append('customer_files[]', file));
+        }
 
         const response = await fetch('api/place_order.php', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: payload
         });
 
         const result = await response.json().catch(() => null);
@@ -247,6 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
           throw new Error(result.message || 'Order could not be submitted.');
         }
         orderRef = result.order_number;
+        orderCurrency = result.currency || orderCurrency;
+        emailStatus = result.email_status || emailStatus;
         if (result.subtotal) subtotal = Number(result.subtotal);
         if (result.total) {
           totalFormatted = result.total;
@@ -270,50 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Build structured WhatsApp message with all customer and order details
-      const itemsListText = cart.map((i, index) => {
-        const p = parseFloat(i.price) || 0;
-        const lineTotal = (p * i.qty).toFixed(2);
-        return `${index + 1}. *${i.name}*\n   Qty: ${i.qty} | Price: £${p.toFixed(2)} | Subtotal: £${lineTotal}`;
-      }).join('\n\n');
-
-      const waMsgLines = [
-        `*NEW ORDER - URTH ARCHITECTURE STUDIO*`,
-        `*Order Reference:* ${orderRef}`,
-        ``,
-        `━━━━━━━━━━━━━━━━━━━━`,
-        `*CUSTOMER DETAILS*`,
-        `━━━━━━━━━━━━━━━━━━━━`,
-        `• *Full Name:* ${custName}`,
-        `• *Phone / WhatsApp:* ${custPhone}`,
-        custEmail ? `• *Email:* ${custEmail}` : null,
-        custAddress ? `• *Delivery Address:* ${custAddress}` : null,
-        custNotes ? `• *Order Notes / Customizations:* ${custNotes}` : null,
-        ``,
-        `━━━━━━━━━━━━━━━━━━━━`,
-        `*ORDERED ITEMS*`,
-        `━━━━━━━━━━━━━━━━━━━━`,
-        itemsListText,
-        ``,
-        `━━━━━━━━━━━━━━━━━━━━`,
-        `*PAYMENT & DELIVERY SUMMARY*`,
-        `━━━━━━━━━━━━━━━━━━━━`,
-        `• *Subtotal:* £${subtotal.toFixed(2)}`,
-        `• *Delivery:* ${shippingMethod} (£${shippingCost.toFixed(2)})`,
-        `• *Grand Total:* *£${totalFormatted}*`,
-        ``,
-        `Please confirm availability, dispatch details, and order acceptance. Thank you!`
-      ].filter(line => line !== null);
-
-      const waMessage = waMsgLines.join('\n');
-      const waUrl = `https://wa.me/94768008687?text=${encodeURIComponent(waMessage)}`;
-
-      // Open WhatsApp chat directly
-      const waTab = window.open(waUrl, '_blank');
-      if (!waTab) {
-        window.location.href = waUrl;
-      }
-
       // Clear cart
       cart = [];
       saveCart();
@@ -322,11 +325,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // Show confirmation modal
       if (modalOrderNumber) modalOrderNumber.textContent = orderRef;
       if (modalOrderSummaryText) {
-        modalOrderSummaryText.innerHTML = `Order Reference: <strong>${orderRef}</strong> &bull; Total: <strong>£${totalFormatted}</strong><br><span style="color:#25d366; font-size:12px; margin-top:6px; display:inline-block; font-weight:600;">✓ Form details and order summary prepared in WhatsApp</span>`;
+        modalOrderSummaryText.textContent = `Order Reference: ${orderRef} • Provisional item total: ${formatMoney(grandTotal, orderCurrency)} • Payment pending. ${emailStatus === 'sent' ? 'A confirmation email has been sent.' : 'The confirmation email could not be sent yet; URTH will follow up.'}`;
       }
       const modalWhatsAppChatBtn = document.querySelector('#modalWhatsAppChatBtn');
       if (modalWhatsAppChatBtn) {
-        modalWhatsAppChatBtn.href = waUrl;
+        modalWhatsAppChatBtn.href = `mailto:info@urthspaces.com?subject=${encodeURIComponent('Order ' + orderRef)}`;
+        modalWhatsAppChatBtn.textContent = 'Contact URTH';
       }
       if (orderSuccessModal) {
         orderSuccessModal.classList.add('is-visible');
@@ -337,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitOrderBtn.disabled = false;
         submitOrderBtn.innerHTML = `
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Send Order via WhatsApp
+          Submit Order Request
         `;
       }
     });

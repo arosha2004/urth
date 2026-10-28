@@ -43,6 +43,8 @@ if ($result) {
             'availability' => $availability,
             'product_label' => $row['product_label'] ?? '',
             'price_on_request' => $priceOnRequest ? 1 : 0,
+            'product_type' => $row['product_type'] ?? 'furniture_object',
+            'book_format' => $row['book_format'] ?? '',
             'date' => substr($row['created_at'] ?? date('Y-m-d'), 0, 10),
         ];
         $products[] = $p;

@@ -12,6 +12,7 @@ require_admin_auth();
 require_once '../config.php';
 require_once __DIR__ . '/../app/Core/private_storage.php';
 require_once __DIR__ . '/../app/Core/shop_mail.php';
+require_once __DIR__ . '/../app/Core/shop_delivery.php';
 
 $staff_username = $_SESSION['admin_username'] ?? 'urthadmin';
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
@@ -38,6 +39,21 @@ function get_order_by_id($conn, int $id): ?array {
     $order = $res ? $res->fetch_assoc() : null;
     $stmt->close();
     return $order;
+}
+
+function deliver_paid_digital_order(mysqli $conn, array $order): void {
+    if (($order['payment_status'] ?? '') !== 'fully_paid'
+        || ($order['fulfilment_status'] ?? '') !== 'digital_ready'
+        || empty($order['digital_deliverable_file'])) {
+        return;
+    }
+
+    try {
+        $downloadLink = create_shop_download_link($conn, (int)$order['id'], $order['digital_deliverable_file']);
+        send_shop_digital_delivery($conn, $order, $downloadLink);
+    } catch (Throwable $e) {
+        error_log('URTH digital delivery could not be completed for order ' . ($order['order_number'] ?? '') . ': ' . $e->getMessage());
+    }
 }
 
 switch ($action) {
@@ -129,6 +145,10 @@ switch ($action) {
             if (!empty($note)) $logNote .= " — Note: " . $note;
 
             log_order_activity($conn, $order_id, $staff_username, 'payment_confirmed', $prevPaymentStatus, $newPaymentStatus, $logNote);
+            $order['payment_status'] = $newPaymentStatus;
+            $order['fulfilment_status'] = $order['fulfilment_status'] ?? '';
+            $order['digital_deliverable_file'] = $order['digital_deliverable_file'] ?? '';
+            deliver_paid_digital_order($conn, $order);
 
             header('Location: orders.php?msg=payment_recorded');
             exit;
@@ -179,6 +199,8 @@ switch ($action) {
             $stmt->close();
 
             log_order_activity($conn, $order_id, $staff_username, 'payment_status_changed', $prev, $new_payment_status, "Staff changed payment status to {$new_payment_status}. " . $note);
+            $order['payment_status'] = $new_payment_status;
+            deliver_paid_digital_order($conn, $order);
 
             header('Location: orders.php?msg=payment_status_updated');
             exit;
@@ -537,6 +559,9 @@ switch ($action) {
 
             $logNote = "Digital deliverable updated. Access Link: {$digital_access_link}. Deliverable file: {$digital_deliverable_file}.";
             log_order_activity($conn, $order_id, $staff_username, 'deliverable_assigned', $order['fulfilment_status'], $newFulfilment, $logNote);
+            $order['fulfilment_status'] = $newFulfilment;
+            $order['digital_deliverable_file'] = $digital_deliverable_file;
+            deliver_paid_digital_order($conn, $order);
 
             header('Location: orders.php?msg=deliverable_updated');
             exit;
