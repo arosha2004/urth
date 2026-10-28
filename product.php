@@ -50,12 +50,25 @@ if (!$product) {
 // Price calculations
 $priceFloat = (float)$product['price'];
 $curr = !empty($product['currency']) ? $product['currency'] : '£';
+$currencyDetails = [
+    '£' => ['symbol' => '£', 'code' => 'GBP'],
+    'GBP' => ['symbol' => '£', 'code' => 'GBP'],
+    '$' => ['symbol' => '$', 'code' => 'USD'],
+    'USD' => ['symbol' => '$', 'code' => 'USD'],
+    '€' => ['symbol' => '€', 'code' => 'EUR'],
+    'EUR' => ['symbol' => '€', 'code' => 'EUR'],
+    'LKR' => ['symbol' => 'LKR', 'code' => 'LKR'],
+];
+$currency = $currencyDetails[strtoupper(trim($curr))] ?? $currencyDetails[$curr] ?? [
+    'symbol' => $curr,
+    'code' => strtoupper($curr),
+];
 $salePriceFloat = $product['sale_price'] !== null ? (float)$product['sale_price'] : null;
 $priceOnRequest = (int)($product['price_on_request'] ?? 0) === 1 || ($priceFloat <= 0 && $product['price_on_request'] !== null);
 $availability = !empty($product['availability']) ? strtolower($product['availability']) : 'available';
 
-$formattedPrice = $priceOnRequest ? 'Price on request' : ($curr . number_format($priceFloat, 2));
-$formattedSalePrice = ($priceOnRequest || $salePriceFloat === null) ? null : ($curr . number_format($salePriceFloat, 2));
+$formattedPrice = $priceOnRequest ? 'Price on request' : ($currency['symbol'] . number_format($priceFloat, 2) . ' ' . $currency['code']);
+$formattedSalePrice = ($priceOnRequest || $salePriceFloat === null) ? null : ($currency['symbol'] . number_format($salePriceFloat, 2) . ' ' . $currency['code']);
 
 // Calculate discount percentage
 $discountPct = 0;
@@ -105,12 +118,36 @@ if (!empty($product['what_included'])) {
 }
 
 // Delivery & preparation time
-$deliveryTime = !empty($product['delivery_time']) ? $product['delivery_time'] : 'Dispatched within 3–5 business days';
-$deliveryInfo = !empty($product['delivery_info']) ? $product['delivery_info'] : 'White-glove UK courier delivery included. Packaged in reinforced, recyclable wooden crate with corner dampening foam. Worldwide freight delivery arranged with trackable sea or air dispatch.';
-$cancellationRefund = !empty($product['cancellation_refund']) ? $product['cancellation_refund'] : 'Free cancellation within 24 hours of placing order. 14-day hassle-free return policy for standard models in original packaging.';
+$deliveryTime = !empty($product['delivery_time']) ? $product['delivery_time'] : '';
+$deliveryInfo = !empty($product['delivery_info']) ? $product['delivery_info'] : '';
+$cancellationRefund = !empty($product['cancellation_refund']) ? $product['cancellation_refund'] : '';
 
 // Product Type
 $pType = !empty($product['product_type']) ? $product['product_type'] : 'furniture_object';
+$formatProductField = static function ($value) {
+    return trim((string)$value) !== ''
+        ? nl2br(htmlspecialchars((string)$value))
+        : '<span class="product-detail-pending">To be confirmed by URTH before ordering.</span>';
+};
+$previewEntries = !empty($product['preview_images'])
+    ? preg_split('/\r\n|\r|\n/', trim($product['preview_images']))
+    : [];
+$previewEntries = array_values(array_filter(array_map('trim', $previewEntries)));
+$previewImages = [];
+$previewNotes = [];
+foreach ($previewEntries as $previewEntry) {
+    $scheme = strtolower((string)parse_url($previewEntry, PHP_URL_SCHEME));
+    $isWebUrl = filter_var($previewEntry, FILTER_VALIDATE_URL)
+        && in_array($scheme, ['http', 'https'], true);
+    $isLocalImage = strpos($previewEntry, '//') !== 0
+        && strpos($previewEntry, ':') === false
+        && preg_match('/^(?:\/|(?:img|uploads)\/).+\.(?:avif|gif|jpe?g|png|webp)(?:\?.*)?$/i', $previewEntry);
+    if ($isWebUrl || $isLocalImage) {
+        $previewImages[] = $previewEntry;
+    } else {
+        $previewNotes[] = $previewEntry;
+    }
+}
 
 // Related Products (same category or top active)
 $relatedStmt = $conn->prepare("SELECT * FROM products WHERE is_active = 1 AND id != ? AND (category = ? OR 1=1) ORDER BY (category = ?) DESC, popularity DESC, display_order ASC LIMIT 4");
@@ -157,7 +194,7 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
   <?php endif; ?>
   <?php if (!$priceOnRequest): ?>
     <meta property="product:price:amount" content="<?= number_format($salePriceFloat ?: $priceFloat, 2, '.', '') ?>">
-    <meta property="product:price:currency" content="<?= $curr === '£' ? 'GBP' : ($curr === '$' ? 'USD' : 'EUR') ?>">
+    <meta property="product:price:currency" content="<?= htmlspecialchars($currency['code']) ?>">
   <?php endif; ?>
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="<?= htmlspecialchars($product['name']) ?> — URTH">
@@ -294,10 +331,16 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
               <?php endif; ?>
             </div>
 
-            <img id="mainProductImg"
-                 src="<?= htmlspecialchars($gallery[0] ?? $product['image']) ?>"
-                 alt="<?= htmlspecialchars($product['name']) ?>"
-                 loading="eager">
+            <?php if (!empty($gallery)): ?>
+              <img id="mainProductImg"
+                   src="<?= htmlspecialchars($gallery[0]) ?>"
+                   alt="<?= htmlspecialchars($product['name']) ?>"
+                   loading="eager">
+            <?php else: ?>
+              <div class="product-image-pending" role="img" aria-label="Product image to be added">
+                Product image to be added
+              </div>
+            <?php endif; ?>
           </div>
 
           <!-- Thumbnail Navigation Strip -->
@@ -330,17 +373,17 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
               <span class="product-price-on-request">Price on Request</span>
             <?php elseif ($salePriceFloat): ?>
               <div class="product-current-price">
-                <span class="currency-symbol"><?= htmlspecialchars($curr) ?></span><?= number_format($salePriceFloat, 2) ?>
-                <span class="currency-iso"><?= $curr === '£' ? 'GBP' : ($curr === '$' ? 'USD' : 'EUR') ?></span>
+                <span class="currency-symbol"><?= htmlspecialchars($currency['symbol']) ?></span><?= number_format($salePriceFloat, 2) ?>
+                <span class="currency-iso"><?= htmlspecialchars($currency['code']) ?></span>
               </div>
-              <span class="product-del-price"><?= htmlspecialchars($curr . number_format($priceFloat, 2)) ?></span>
+              <span class="product-del-price"><?= htmlspecialchars($currency['symbol'] . number_format($priceFloat, 2) . ' ' . $currency['code']) ?></span>
               <?php if ($discountPct > 0): ?>
                 <span class="product-discount-pill">Save <?= $discountPct ?>%</span>
               <?php endif; ?>
             <?php else: ?>
               <div class="product-current-price">
-                <span class="currency-symbol"><?= htmlspecialchars($curr) ?></span><?= number_format($priceFloat, 2) ?>
-                <span class="currency-iso"><?= $curr === '£' ? 'GBP' : ($curr === '$' ? 'USD' : 'EUR') ?></span>
+                <span class="currency-symbol"><?= htmlspecialchars($currency['symbol']) ?></span><?= number_format($priceFloat, 2) ?>
+                <span class="currency-iso"><?= htmlspecialchars($currency['code']) ?></span>
               </div>
             <?php endif; ?>
           </div>
@@ -352,16 +395,19 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
             <div class="leadtime-text">
-              <strong>Expected Delivery / Lead Time:</strong> <?= htmlspecialchars($deliveryTime) ?>
+              <strong>Expected Delivery / Preparation Time:</strong>
+              <?= $deliveryTime !== '' ? htmlspecialchars($deliveryTime) : '<span class="product-detail-pending">To be confirmed by URTH before ordering. See <a href="shop-info.php#payment-delivery">shop delivery information</a>.</span>' ?>
             </div>
           </div>
 
           <!-- Description Summary -->
-          <?php if (!empty($product['description'])): ?>
-            <div class="product-desc-lead">
+          <div class="product-desc-lead">
+            <?php if (!empty($product['description'])): ?>
               <?= nl2br(htmlspecialchars($product['description'])) ?>
-            </div>
-          <?php endif; ?>
+            <?php else: ?>
+              <span class="product-detail-pending">Product description to be confirmed by URTH.</span>
+            <?php endif; ?>
+          </div>
 
           <!-- Available Options (Size, Finish, Format, Licence, etc.) -->
           <?php if (!empty($optionsList)): ?>
@@ -380,6 +426,10 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
                 <?php endforeach; ?>
               </div>
             </div>
+          <?php else: ?>
+            <p class="product-options-pending">
+              No selectable options are listed. Contact URTH to confirm available sizes, finishes, formats or licence options before ordering.
+            </p>
           <?php endif; ?>
 
           <!-- Action Buttons Form -->
@@ -468,11 +518,9 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
           <button type="button" class="product-tab-btn active" data-tab="tab-specs" role="tab" aria-selected="true">
             Product Specifications
           </button>
-          <?php if (!empty($includedItems)): ?>
-            <button type="button" class="product-tab-btn" data-tab="tab-included" role="tab" aria-selected="false">
-              What Is Included (<?= count($includedItems) ?>)
-            </button>
-          <?php endif; ?>
+          <button type="button" class="product-tab-btn" data-tab="tab-included" role="tab" aria-selected="false">
+            What Is Included<?= !empty($includedItems) ? ' (' . count($includedItems) . ')' : '' ?>
+          </button>
           <button type="button" class="product-tab-btn" data-tab="tab-delivery" role="tab" aria-selected="false">
             Delivery &amp; Preparation
           </button>
@@ -487,174 +535,129 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
             
             <?php if ($pType === 'digital_asset'): ?>
               <!-- Digital Asset details -->
-              <?php if (!empty($product['file_formats'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">File Formats</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['file_formats']) ?></div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">File Formats</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['file_formats'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Software Compatibility</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['software_compatibility'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Permitted Use &amp; Licence</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['permitted_use'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card" style="grid-column: 1 / -1;">
+                <span class="spec-attr-label">Preview Images &amp; Demos</span>
+                <?php if (!empty($previewImages)): ?>
+                  <div class="product-preview-gallery">
+                    <?php foreach ($previewImages as $previewImage): ?>
+                      <a href="<?= htmlspecialchars($previewImage) ?>" target="_blank" rel="noopener noreferrer">
+                        <img src="<?= htmlspecialchars($previewImage) ?>" alt="<?= htmlspecialchars($product['name']) ?> preview" loading="lazy">
+                      </a>
+                    <?php endforeach; ?>
+                  </div>
+                <?php endif; ?>
+                <?php if (!empty($previewNotes)): ?>
+                  <div class="spec-attr-value"><?= nl2br(htmlspecialchars(implode("\n", $previewNotes))) ?></div>
+                <?php elseif (empty($previewImages)): ?>
+                  <div class="spec-attr-value"><?= $formatProductField('') ?></div>
+                <?php endif; ?>
+              </div>
+              <div class="spec-attribute-card" style="grid-column: 1 / -1;">
+                <span class="spec-attr-label">Digital Delivery / Access Method</span>
+                <div class="spec-attr-value">
+                  <?= $formatProductField($deliveryInfo !== '' ? $deliveryInfo : 'Confirm with URTH whether this item is manually delivered or provided through secure access, and when it will be available.') ?>
                 </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['software_compatibility'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Software Compatibility</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['software_compatibility']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['permitted_use'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Permitted Use &amp; License</span>
-                  <div class="spec-attr-value"><?= nl2br(htmlspecialchars($product['permitted_use'])) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['preview_images'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Preview Assets &amp; Demos</span>
-                  <div class="spec-attr-value"><?= nl2br(htmlspecialchars($product['preview_images'])) ?></div>
-                </div>
-              <?php endif; ?>
+              </div>
 
             <?php elseif ($pType === 'book_planner'): ?>
               <!-- Book or Planner details -->
-              <?php if (!empty($product['book_format'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Digital / Printed Format</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['book_format']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['book_dimensions'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Dimensions &amp; Physical Scope</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['book_dimensions']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['sample_pages'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Sample Pages &amp; Previews</span>
-                  <div class="spec-attr-value"><?= nl2br(htmlspecialchars($product['sample_pages'])) ?></div>
-                </div>
-              <?php endif; ?>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Digital / Printed Format</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['book_format'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Dimensions</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['book_dimensions'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Sample Pages</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['sample_pages'] ?? '') ?></div>
+              </div>
 
             <?php elseif ($pType === 'course_workshop'): ?>
               <!-- Course or Workshop details -->
-              <?php if (!empty($product['course_topics'])): ?>
-                <div class="spec-attribute-card" style="grid-column: 1 / -1;">
-                  <span class="spec-attr-label">Curriculum Topics Covered</span>
-                  <div class="spec-attr-value"><?= nl2br(htmlspecialchars($product['course_topics'])) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['course_format'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Format</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['course_format']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['course_duration'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Duration</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['course_duration']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['access_period'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Access Period</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['access_period']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['live_dates'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Dates &amp; Time Zone for Live Events</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['live_dates']) ?></div>
-                </div>
-              <?php endif; ?>
+              <div class="spec-attribute-card" style="grid-column: 1 / -1;">
+                <span class="spec-attr-label">Topics</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['course_topics'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Format</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['course_format'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Duration</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['course_duration'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Access Period</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['access_period'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Dates &amp; Time Zone for Live Events</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['live_dates'] ?? '') ?></div>
+              </div>
 
             <?php elseif ($pType === 'design_session'): ?>
               <!-- Design Session details -->
-              <?php if (!empty($product['session_scope'])): ?>
-                <div class="spec-attribute-card" style="grid-column: 1 / -1;">
-                  <span class="spec-attr-label">Consultation Scope</span>
-                  <div class="spec-attr-value"><?= nl2br(htmlspecialchars($product['session_scope'])) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['session_duration'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Session Duration</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['session_duration']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['customer_info_needed'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Required Customer Information</span>
-                  <div class="spec-attr-value"><?= nl2br(htmlspecialchars($product['customer_info_needed'])) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['deliverables'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Final Deliverables</span>
-                  <div class="spec-attr-value"><?= nl2br(htmlspecialchars($product['deliverables'])) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['included_revisions'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Included Revisions</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['included_revisions']) ?></div>
-                </div>
-              <?php endif; ?>
+              <div class="spec-attribute-card" style="grid-column: 1 / -1;">
+                <span class="spec-attr-label">Scope</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['session_scope'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Duration</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['session_duration'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Required Customer Information</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['customer_info_needed'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Deliverables</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['deliverables'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Included Revisions</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['included_revisions'] ?? '') ?></div>
+              </div>
 
             <?php else: ?>
               <!-- Furniture or Object details (default) -->
-              <?php if (!empty($product['dimensions'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Dimensions</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['dimensions']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['materials'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Materials</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['materials']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['finishes'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Finishes</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['finishes']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['customisation'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Customisation</span>
-                  <div class="spec-attr-value"><?= nl2br(htmlspecialchars($product['customisation'])) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['production_time'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Production Time</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['production_time']) ?></div>
-                </div>
-              <?php endif; ?>
-
-              <?php if (!empty($product['delivery_area'])): ?>
-                <div class="spec-attribute-card">
-                  <span class="spec-attr-label">Delivery Area</span>
-                  <div class="spec-attr-value"><?= htmlspecialchars($product['delivery_area']) ?></div>
-                </div>
-              <?php endif; ?>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Dimensions</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['dimensions'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Materials</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['materials'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Finishes</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['finishes'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Customisation</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['customisation'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Production Time</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['production_time'] ?? '') ?></div>
+              </div>
+              <div class="spec-attribute-card">
+                <span class="spec-attr-label">Delivery Area</span>
+                <div class="spec-attr-value"><?= $formatProductField($product['delivery_area'] ?? '') ?></div>
+              </div>
 
             <?php endif; ?>
 
@@ -672,8 +675,8 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
         </div>
 
         <!-- Tab 2: What Is Included -->
-        <?php if (!empty($includedItems)): ?>
-          <div class="product-tab-panel" id="tab-included" role="tabpanel">
+        <div class="product-tab-panel" id="tab-included" role="tabpanel">
+          <?php if (!empty($includedItems)): ?>
             <ul class="included-items-list">
               <?php foreach ($includedItems as $itemText): ?>
                 <li class="included-item-row">
@@ -682,8 +685,10 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
                 </li>
               <?php endforeach; ?>
             </ul>
-          </div>
-        <?php endif; ?>
+          <?php else: ?>
+            <p class="product-detail-pending">Included items have not been confirmed. Contact URTH before ordering.</p>
+          <?php endif; ?>
+        </div>
 
         <!-- Tab 3: Delivery & Preparation -->
         <div class="product-tab-panel" id="tab-delivery" role="tabpanel">
@@ -692,7 +697,9 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
               Expected Fulfillment &amp; Preparation
             </h5>
-            <p class="policy-card-desc"><?= nl2br(htmlspecialchars($deliveryTime)) ?></p>
+            <p class="policy-card-desc">
+              <?= $deliveryTime !== '' ? nl2br(htmlspecialchars($deliveryTime)) : '<span class="product-detail-pending">Expected delivery or preparation time has not been confirmed. Review the <a href="shop-info.php#payment-delivery">shop delivery information</a> and contact URTH before ordering.</span>' ?>
+            </p>
           </div>
 
           <div class="policy-card">
@@ -700,7 +707,9 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
               Shipping, Packaging &amp; Freight Methods
             </h5>
-            <p class="policy-card-desc"><?= nl2br(htmlspecialchars($deliveryInfo)) ?></p>
+            <p class="policy-card-desc">
+              <?= $deliveryInfo !== '' ? nl2br(htmlspecialchars($deliveryInfo)) : '<span class="product-detail-pending">Delivery method, charges and area have not been confirmed. Review the <a href="shop-info.php#payment-delivery">shop delivery information</a> and contact URTH before ordering.</span>' ?>
+            </p>
           </div>
         </div>
 
@@ -711,7 +720,9 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
               Cancellation, Return &amp; Refund Terms
             </h5>
-            <p class="policy-card-desc"><?= nl2br(htmlspecialchars($cancellationRefund)) ?></p>
+            <p class="policy-card-desc">
+              <?= $cancellationRefund !== '' ? nl2br(htmlspecialchars($cancellationRefund)) : '<span class="product-detail-pending">Product-specific cancellation and refund terms have not been confirmed. Review the <a href="shop-info.php#returns-refunds">shop returns and refunds information</a> and contact URTH before ordering.</span>' ?>
+            </p>
           </div>
         </div>
 

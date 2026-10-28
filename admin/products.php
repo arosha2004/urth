@@ -841,7 +841,7 @@ switch ($msg) {
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Preview Images &amp; Demos</label>
-                                <input type="text" name="preview_images" class="form-control" placeholder="e.g. 12 high-resolution render samples included in download">
+                                <textarea name="preview_images" class="form-control" rows="3" placeholder="One image URL or preview note per line"></textarea>
                             </div>
                         </div>
                     </div>
@@ -1227,7 +1227,7 @@ switch ($msg) {
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Preview Images &amp; Demos</label>
-                                <input type="text" id="edit_preview_images" name="preview_images" class="form-control">
+                                <textarea id="edit_preview_images" name="preview_images" class="form-control" rows="3" placeholder="One image URL or preview note per line"></textarea>
                             </div>
                         </div>
                     </div>
