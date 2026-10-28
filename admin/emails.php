@@ -64,13 +64,26 @@ $csrfToken = generate_csrf_token();
 <body>
 <div class="admin-layout">
     <header class="admin-header">
-        <a href="orders.php" class="header-brand"><span class="brand-text"><span class="brand-name">URTH</span><span class="brand-sub">Admin Console</span></span></a>
-        <nav class="admin-nav-tabs"><a href="orders.php" class="admin-nav-link">Orders</a><a href="emails.php" class="admin-nav-link active">Failed Emails</a></nav>
-        <div class="header-actions"><a class="btn btn-outline btn-sm" href="logout.php">Sign Out</a></div>
+        <a href="index.php" class="header-brand">
+            <img src="../urth_clone/images/6a1c3ef3f96cad36ed74d8cd_favicon.jpg" alt="URTH Logo" style="width: 38px; height: 38px; border-radius: var(--radius-sm); object-fit: cover;">
+            <div class="brand-text">
+                <span class="brand-name">URTH</span>
+                <span class="brand-sub">Admin</span>
+            </div>
+        </a>
+        <nav class="admin-nav-tabs">
+            <a href="index.php" class="admin-nav-link">Projects</a>
+            <a href="products.php" class="admin-nav-link">Products</a>
+            <a href="orders.php" class="admin-nav-link">Orders</a>
+            <a href="partners.php" class="admin-nav-link">Partners</a>
+            <a href="emails.php" class="admin-nav-link active">Failed Emails</a>
+        </nav>
+        <div class="header-actions">
+            <a href="logout.php" class="btn btn-danger btn-sm" title="Log out">Logout</a>
+        </div>
     </header>
     <main class="email-log-wrap">
-        <h1>Failed customer emails</h1>
-        <p>Messages that the server mail transport did not accept remain here for staff retry. Configure <code>URTH_MAIL_FROM</code> and the server's mail transport before retrying.</p>
+        <h1>Failed Emails</h1>
         <?php if ($message !== ''): ?>
             <div class="alert alert-<?= htmlspecialchars($messageType, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></div>
         <?php endif; ?>

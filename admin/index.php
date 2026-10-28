@@ -75,7 +75,7 @@ switch ($msg) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Projects — URTH Admin Panel</title>
+    <title>Projects — URTH Admin</title>
     <link rel="stylesheet" href="assets/css/admin.css?v=<?= time() ?>">
 </head>
 <body>
@@ -88,7 +88,7 @@ switch ($msg) {
             <img src="../urth_clone/images/6a1c3ef3f96cad36ed74d8cd_favicon.jpg" alt="URTH Logo" style="width: 38px; height: 38px; border-radius: var(--radius-sm); object-fit: cover;">
             <div class="brand-text">
                 <span class="brand-name">URTH</span>
-                <span class="brand-sub">Admin Console</span>
+                <span class="brand-sub">Admin</span>
             </div>
         </a>
 
@@ -100,7 +100,7 @@ switch ($msg) {
             </a>
             <a href="products.php" class="admin-nav-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                Shop Products
+                Products
             </a>
             <a href="orders.php" class="admin-nav-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -108,7 +108,7 @@ switch ($msg) {
             </a>
             <a href="partners.php" class="admin-nav-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
-                Partner Logos
+                Partners
             </a>
         </nav>
 
@@ -118,12 +118,12 @@ switch ($msg) {
                 <span><?= htmlspecialchars($_SESSION['admin_username'] ?? 'Admin') ?></span>
             </div>
 
-            <a href="../index.php" class="btn btn-outline btn-sm" title="Return to public portfolio website">
+            <a href="../index.php" class="btn btn-outline btn-sm" title="Preview website">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                Back to Main Site
+                View Site
             </a>
 
-            <a href="logout.php" class="btn btn-danger btn-sm" title="Log out of admin session">
+            <a href="logout.php" class="btn btn-danger btn-sm" title="Log out">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
             </a>
@@ -144,13 +144,12 @@ switch ($msg) {
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-title-wrap">
-                <h1>Manage Projects</h1>
-                <p>Add, edit, or remove architecture & design showcase projects</p>
+                <h1>Projects</h1>
             </div>
 
             <button type="button" id="openAddModal" class="btn btn-gold">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add New Project
+                + Add Project
             </button>
         </div>
 
@@ -168,7 +167,7 @@ switch ($msg) {
 
             <div class="stat-card">
                 <div class="stat-info">
-                    <div class="stat-label">Project Categories</div>
+                    <div class="stat-label">Categories</div>
                     <div class="stat-value"><?= $totalCategories ?></div>
                 </div>
                 <div class="stat-icon">
@@ -178,7 +177,7 @@ switch ($msg) {
 
             <div class="stat-card">
                 <div class="stat-info">
-                    <div class="stat-label">System Status</div>
+                    <div class="stat-label">Status</div>
                     <div class="stat-value" style="font-size: 18px; color: var(--success); display: flex; align-items: center; gap: 8px;">
                         <span style="width: 10px; height: 10px; border-radius: 50%; background: var(--success); display: inline-block;"></span> Active
                     </div>
@@ -194,7 +193,7 @@ switch ($msg) {
             <div class="search-filter-group">
                 <div class="search-box">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" id="tableSearch" class="form-control" placeholder="Search by title, category or ID...">
+                    <input type="text" id="tableSearch" class="form-control" placeholder="Search projects...">
                 </div>
 
                 <div style="min-width: 180px;">
@@ -230,8 +229,8 @@ switch ($msg) {
                                 <td colspan="6">
                                     <div class="empty-state">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
-                                        <h3>No projects found</h3>
-                                        <p>Click "Add New Project" to create your first portfolio entry.</p>
+                                        <h3>No Projects Found</h3>
+                                        <p>Click "+ Add Project" to create one.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -253,7 +252,7 @@ switch ($msg) {
                                     
                                     <td>
                                         <span class="category-pill <?= $catSlug ?>">
-                                            <?= htmlspecialchars($project['category']) ?>
+                                             <?= htmlspecialchars($project['category']) ?>
                                         </span>
                                     </td>
                                     
@@ -318,7 +317,7 @@ switch ($msg) {
 
     <!-- Footer -->
     <footer class="admin-footer">
-        &copy; <?= date('Y') ?> URTH Architecture Studio — Admin Management Panel
+        &copy; <?= date('Y') ?> URTH Admin
     </footer>
 
 </div>
@@ -327,18 +326,18 @@ switch ($msg) {
 <div id="addProjectModal" class="modal-overlay">
     <div class="modal-dialog">
         <div class="modal-header">
-            <h3 class="modal-title">Add New Project</h3>
+            <h3 class="modal-title">Add Project</h3>
             <button type="button" class="modal-close" data-modal-close>&times;</button>
         </div>
         <form action="project_add.php" method="POST" enctype="multipart/form-data">
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="add_title" class="form-label">Project Title</label>
+                    <label for="add_title" class="form-label">Title *</label>
                     <input type="text" id="add_title" name="title" class="form-control" placeholder="e.g. Ideas Hub Showcase" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="add_category" class="form-label">Category</label>
+                    <label for="add_category" class="form-label">Category *</label>
                     <select id="add_category" name="category" class="form-control" required>
                         <option value="Ideas Hub">Ideas Hub</option>
                         <option value="Spatial Redesign">Spatial Redesign</option>
@@ -349,7 +348,6 @@ switch ($msg) {
                     </select>
                 </div>
 
-                
                 <div class="form-group">
                     <label for="add_location" class="form-label">Location</label>
                     <input type="text" id="add_location" name="location" class="form-control" placeholder="e.g. Sri Lanka">
@@ -357,11 +355,11 @@ switch ($msg) {
 
                 <div class="form-group">
                     <label for="add_description" class="form-label">Description</label>
-                    <textarea id="add_description" name="description" class="form-control" rows="4" placeholder="Enter project description..."></textarea>
+                    <textarea id="add_description" name="description" class="form-control" rows="4" placeholder="Enter description..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="add_image_file" class="form-label">Hero Image / Thumbnail</label>
+                    <label for="add_image_file" class="form-label">Hero Image *</label>
                     <input type="file" id="add_image_file" name="image1" class="form-control" accept="image/*" required>
                     <div class="img-preview-box" id="add_hero_preview_container" style="display: none; margin-top: 10px;">
                         <img id="add_hero_preview" src="" alt="Hero Preview" style="max-width: 100%; max-height: 200px; border-radius: 4px; object-fit: cover;">
@@ -369,7 +367,7 @@ switch ($msg) {
                 </div>
 
                 <div class="form-group" id="gallery_section">
-                    <label class="form-label">Gallery Images (Optional - Max 12)</label>
+                    <label class="form-label">Gallery Images</label>
                     <div id="gallery_inputs_wrapper">
                         <div class="gallery-input-row" style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
                             <div style="flex-grow: 1;">
@@ -381,12 +379,12 @@ switch ($msg) {
                             <button type="button" class="btn btn-danger btn-sm remove-gallery-row" style="padding: 0 10px; height: 42px; display: none;" title="Remove">&times;</button>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-outline btn-sm" id="add_gallery_btn" style="margin-top: 5px;">+ Add Another Image</button>
+                    <button type="button" class="btn btn-outline btn-sm" id="add_gallery_btn" style="margin-top: 5px;">+ Add Image</button>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
-                <button type="submit" class="btn btn-gold">Create Project</button>
+                <button type="submit" class="btn btn-gold">Add Project</button>
             </div>
         </form>
     </div>
@@ -403,12 +401,12 @@ switch ($msg) {
             <input type="hidden" id="edit_id" name="id">
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="edit_title" class="form-label">Project Title</label>
+                    <label for="edit_title" class="form-label">Title *</label>
                     <input type="text" id="edit_title" name="title" class="form-control" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="edit_category" class="form-label">Category</label>
+                    <label for="edit_category" class="form-label">Category *</label>
                     <select id="edit_category" name="category" class="form-control" required>
                         <option value="Ideas Hub">Ideas Hub</option>
                         <option value="Spatial Redesign">Spatial Redesign</option>
@@ -419,7 +417,6 @@ switch ($msg) {
                     </select>
                 </div>
 
-                
                 <div class="form-group">
                     <label for="edit_location" class="form-label">Location</label>
                     <input type="text" id="edit_location" name="location" class="form-control" placeholder="e.g. Sri Lanka">
@@ -439,7 +436,7 @@ switch ($msg) {
                 </div>
 
                 <div class="form-group" id="edit_gallery_section">
-                    <label class="form-label">Gallery Images (Optional - Max 12)</label>
+                    <label class="form-label">Gallery Images</label>
                     <input type="hidden" name="deleted_gallery_images" id="deleted_gallery_images" value="">
                     <div id="edit_gallery_inputs_wrapper">
                         <!-- Existing gallery images will be injected here via JS -->
@@ -453,7 +450,7 @@ switch ($msg) {
                             <button type="button" class="btn btn-danger btn-sm remove-gallery-row" style="padding: 0 10px; height: 42px; display: none;" title="Remove">&times;</button>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-outline btn-sm" id="edit_add_gallery_btn" style="margin-top: 5px;">+ Add Another Image</button>
+                    <button type="button" class="btn btn-outline btn-sm" id="edit_add_gallery_btn" style="margin-top: 5px;">+ Add Image</button>
                 </div>
             </div>
             <div class="modal-footer">
@@ -468,7 +465,7 @@ switch ($msg) {
 <div id="deleteProjectModal" class="modal-overlay">
     <div class="modal-dialog" style="max-width: 440px;">
         <div class="modal-header">
-            <h3 class="modal-title">Confirm Deletion</h3>
+            <h3 class="modal-title">Delete Project</h3>
             <button type="button" class="modal-close" data-modal-close>&times;</button>
         </div>
         <form action="project_delete.php" method="POST">
@@ -477,14 +474,16 @@ switch ($msg) {
                 <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--danger-bg); color: var(--danger); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                 </div>
-                <h4 style="font-size: 16px; margin-bottom: 8px;">Are you sure?</h4>
-                <p style="color: var(--text-secondary); font-size: 13px;">
-                    Do you really want to delete "<strong id="delete_project_name" style="color: var(--text-primary);"></strong>"? This action cannot be undone.
+                <p style="color: var(--text-secondary); font-size: 14px;">
+                    Are you sure you want to delete "<strong id="delete_project_name" style="color: var(--text-primary);"></strong>"?
+                </p>
+                <p style="color: var(--danger); font-size: 12px; margin-top: 8px;">
+                    This cannot be undone.
                 </p>
             </div>
             <div class="modal-footer" style="justify-content: center;">
                 <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
-                <button type="submit" class="btn btn-danger">Delete Project</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
             </div>
         </form>
     </div>

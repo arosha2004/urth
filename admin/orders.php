@@ -160,7 +160,7 @@ switch ($msg) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Orders &amp; Custom Enquiries — URTH Admin Panel</title>
+    <title>Orders — URTH Admin</title>
     <link rel="stylesheet" href="assets/css/admin.css?v=<?= time() ?>">
 </head>
 <body>
@@ -173,7 +173,7 @@ switch ($msg) {
             <img src="../urth_clone/images/6a1c3ef3f96cad36ed74d8cd_favicon.jpg" alt="URTH Logo" style="width: 38px; height: 38px; border-radius: var(--radius-sm); object-fit: cover;">
             <div class="brand-text">
                 <span class="brand-name">URTH</span>
-                <span class="brand-sub">Admin Console</span>
+                <span class="brand-sub">Admin</span>
             </div>
         </a>
 
@@ -185,15 +185,15 @@ switch ($msg) {
             </a>
             <a href="products.php" class="admin-nav-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                Shop Products
+                Products
             </a>
             <a href="orders.php" class="admin-nav-link active">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                Orders &amp; Enquiries <?php if ($pendingRefundsCount > 0): ?><span style="background: var(--danger); color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: 4px;" title="<?= $pendingRefundsCount ?> refund actions pending"><?= $pendingRefundsCount ?></span><?php endif; ?>
+                Orders <?php if ($pendingRefundsCount > 0): ?><span style="background: var(--danger); color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: 4px;" title="<?= $pendingRefundsCount ?> refund actions pending"><?= $pendingRefundsCount ?></span><?php endif; ?>
             </a>
             <a href="partners.php" class="admin-nav-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
-                Partner Logos
+                Partners
             </a>
             <a href="emails.php" class="admin-nav-link">Failed Emails</a>
         </nav>
@@ -204,9 +204,9 @@ switch ($msg) {
                 <span><?= htmlspecialchars($_SESSION['admin_username'] ?? 'Admin') ?></span>
             </div>
 
-            <a href="../cart.php" target="_blank" class="btn btn-outline btn-sm" title="Preview public checkout">
+            <a href="../cart.php" target="_blank" class="btn btn-outline btn-sm" title="Preview checkout">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                View Cart Page
+                View Cart
             </a>
 
             <a href="logout.php" class="btn btn-danger btn-sm" title="Log out">
@@ -233,29 +233,28 @@ switch ($msg) {
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="display: inline-flex; width: 28px; height: 28px; border-radius: 50%; background: #ef4444; color: #fff; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;">!</span>
                     <div>
-                        <strong style="color: #b91c1c; font-size: 13px;">Attention Required: <?= $pendingRefundsCount ?> Pending Refund Action<?= $pendingRefundsCount > 1 ? 's' : '' ?></strong>
-                        <div style="font-size: 12px; color: #7f1d1d;">Customer cancellations requiring refund verification in payment gateway. Filter by "Refund Action Pending" below to process.</div>
+                        <strong style="color: #b91c1c; font-size: 13px;"><?= $pendingRefundsCount ?> Pending Refund<?= $pendingRefundsCount > 1 ? 's' : '' ?></strong>
+                        <div style="font-size: 12px; color: #7f1d1d;">Cancellations requiring refund verification.</div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-danger btn-sm" onclick="filterByPendingRefund()">View Refund Queue</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="filterByPendingRefund()">View Refunds</button>
             </div>
         <?php endif; ?>
 
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-title-wrap">
-                <h1>Customer Orders &amp; Custom Enquiries</h1>
-                <p>Manage shop checkout orders, bespoke quotes, payments &amp; deposits, fulfilment, dispatch tracking, bookings, and refunds</p>
+                <h1>Orders</h1>
             </div>
 
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <a href="export_orders.php" id="exportOrdersBtn" class="btn btn-outline" title="Export orders to CSV spreadsheet">
+                <a href="export_orders.php" id="exportOrdersBtn" class="btn btn-outline" title="Export CSV">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Export Order List (CSV)
+                    Export CSV
                 </a>
                 <button type="button" id="openManualOrderBtn" class="btn btn-gold">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    + New Order / Enquiry
+                    + New Order
                 </button>
             </div>
         </div>
@@ -264,8 +263,8 @@ switch ($msg) {
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-info">
-                    <div class="stat-label">Total Orders &amp; Enquiries</div>
-                    <div class="stat-value"><?= $totalOrders ?> <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">(<?= $totalEnquiries ?> bespoke)</span></div>
+                    <div class="stat-label">Total Orders</div>
+                    <div class="stat-value"><?= $totalOrders ?></div>
                 </div>
                 <div class="stat-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -274,7 +273,7 @@ switch ($msg) {
 
             <div class="stat-card">
                 <div class="stat-info">
-                    <div class="stat-label">In Production / Crafting</div>
+                    <div class="stat-label">In Production</div>
                     <div class="stat-value" style="color: var(--gold-primary);"><?= $inProductionCount ?></div>
                 </div>
                 <div class="stat-icon">
@@ -284,8 +283,8 @@ switch ($msg) {
 
             <div class="stat-card">
                 <div class="stat-info">
-                    <div class="stat-label">Payments to Collect</div>
-                    <div class="stat-value" style="color: #f59e0b;">£<?= number_format($totalOutstanding, 2) ?> <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">(<?= $pendingPayments ?> orders)</span></div>
+                    <div class="stat-label">Outstanding</div>
+                    <div class="stat-value" style="color: #f59e0b;">£<?= number_format($totalOutstanding, 2) ?> <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">(<?= $pendingPayments ?>)</span></div>
                 </div>
                 <div class="stat-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -294,7 +293,7 @@ switch ($msg) {
 
             <div class="stat-card">
                 <div class="stat-info">
-                    <div class="stat-label">Total Revenue Collected</div>
+                    <div class="stat-label">Total Revenue</div>
                     <div class="stat-value" style="color: var(--success);">£<?= number_format($totalRevenue, 2) ?></div>
                 </div>
                 <div class="stat-icon">
@@ -308,26 +307,26 @@ switch ($msg) {
             <div class="search-filter-group" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; flex: 1;">
                 <div class="search-box" style="flex: 1; min-width: 240px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" id="orderSearchInput" class="form-control" placeholder="Search by order #, customer, email, phone, tracking code...">
+                    <input type="text" id="orderSearchInput" class="form-control" placeholder="Search orders...">
                 </div>
 
                 <div style="min-width: 140px;">
                     <select id="typeFilter" class="form-control" style="cursor: pointer;">
                         <option value="">All Types</option>
-                        <option value="order">Shop Cart Orders</option>
-                        <option value="custom_enquiry">Custom Enquiries</option>
-                        <option value="quote_request">Quote Requests</option>
+                        <option value="order">Orders</option>
+                        <option value="custom_enquiry">Enquiries</option>
+                        <option value="quote_request">Quotes</option>
                     </select>
                 </div>
 
                 <div style="min-width: 160px;">
                     <select id="paymentFilter" class="form-control" style="cursor: pointer;">
-                        <option value="">All Payment Statuses</option>
+                        <option value="">All Payments</option>
                         <option value="pending_payment">Pending Payment</option>
                         <option value="deposit_paid">Deposit Paid</option>
                         <option value="balance_pending">Balance Pending</option>
                         <option value="fully_paid">Fully Paid</option>
-                        <option value="refund_pending">Refund Action Pending</option>
+                        <option value="refund_pending">Refund Pending</option>
                         <option value="partially_refunded">Partially Refunded</option>
                         <option value="refunded">Refunded</option>
                         <option value="cancelled">Cancelled</option>
@@ -336,24 +335,24 @@ switch ($msg) {
 
                 <div style="min-width: 170px;">
                     <select id="fulfilmentFilter" class="form-control" style="cursor: pointer;">
-                        <option value="">All Fulfilment Statuses</option>
+                        <option value="">All Fulfilment</option>
                         <option value="enquiry">New Enquiry</option>
                         <option value="quote_prepared">Quote Prepared</option>
-                        <option value="quote_sent">Quote Sent to Client</option>
-                        <option value="quote_accepted">Client Accepted Quote</option>
-                        <option value="in_queue">In Queue / Confirmed</option>
-                        <option value="in_production">In Production / Crafting</option>
+                        <option value="quote_sent">Quote Sent</option>
+                        <option value="quote_accepted">Quote Accepted</option>
+                        <option value="in_queue">Confirmed</option>
+                        <option value="in_production">In Production</option>
                         <option value="booking_scheduled">Booking Scheduled</option>
-                        <option value="digital_ready">Digital Deliverables Ready</option>
-                        <option value="dispatched">Dispatched / In Transit</option>
-                        <option value="completed">Delivered / Fulfilled</option>
+                        <option value="digital_ready">Digital Ready</option>
+                        <option value="dispatched">Dispatched</option>
+                        <option value="completed">Delivered</option>
                         <option value="cancelled">Cancelled</option>
                     </select>
                 </div>
             </div>
 
             <div style="font-size: 13px; color: var(--text-secondary); white-space: nowrap;">
-                Showing <strong id="orderCount" style="color: var(--text-primary);"><?= $totalOrders ?></strong> records
+                <strong id="orderCount" style="color: var(--text-primary);"><?= $totalOrders ?></strong> orders
             </div>
         </div>
 
@@ -363,13 +362,13 @@ switch ($msg) {
                 <table class="custom-table" id="ordersTable">
                     <thead>
                         <tr>
-                            <th style="width: 140px;">Order / Enquiry #</th>
+                            <th style="width: 140px;">Order #</th>
                             <th style="width: 120px;">Date</th>
-                            <th>Customer &amp; Contact</th>
-                            <th>Items &amp; Scope</th>
-                            <th style="width: 150px;">Financials</th>
-                            <th style="width: 130px;">Payment Status</th>
-                            <th style="width: 150px;">Fulfilment Status</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th style="width: 150px;">Total</th>
+                            <th style="width: 130px;">Payment</th>
+                            <th style="width: 150px;">Fulfilment</th>
                             <th style="width: 90px;">Staff</th>
                             <th style="width: 130px; text-align: right;">Actions</th>
                         </tr>
@@ -380,8 +379,8 @@ switch ($msg) {
                                 <td colspan="9">
                                     <div class="empty-state">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                        <h3>No Orders or Enquiries Found</h3>
-                                        <p>Click "+ New Order / Enquiry" or receive client checkouts from the shop page.</p>
+                                        <h3>No Orders Found</h3>
+                                        <p>Click "+ New Order" to create one.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -556,7 +555,7 @@ switch ($msg) {
 
     <!-- Footer -->
     <footer class="admin-footer">
-        &copy; <?= date('Y') ?> URTH Architecture Studio — Admin Management Panel
+        &copy; <?= date('Y') ?> URTH Admin
     </footer>
 
 </div>
@@ -584,31 +583,31 @@ switch ($msg) {
             <div class="modal-nav-tabs">
                 <button type="button" class="modal-tab-btn active" data-tab="tab_overview">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    Overview &amp; Items
+                    Overview
                 </button>
                 <button type="button" class="modal-tab-btn" data-tab="tab_payments">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
-                    Payments &amp; Balances
+                    Payments
                 </button>
                 <button type="button" class="modal-tab-btn" data-tab="tab_quote">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                    Quote &amp; Acceptance
+                    Quote
                 </button>
                 <button type="button" class="modal-tab-btn" data-tab="tab_logistics">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                    Dispatch &amp; Booking
+                    Dispatch
                 </button>
                 <button type="button" class="modal-tab-btn" data-tab="tab_deliverables">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Digital Vault
+                    Deliverables
                 </button>
                 <button type="button" class="modal-tab-btn" data-tab="tab_cancellation">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                    Cancellation &amp; Refund
+                    Refunds
                 </button>
                 <button type="button" class="modal-tab-btn" data-tab="tab_timeline">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
-                    Audit Timeline &amp; Notes
+                    Timeline &amp; Notes
                 </button>
             </div>
 
@@ -617,7 +616,7 @@ switch ($msg) {
                 <!-- Customer Details Grid -->
                 <div style="background: var(--bg-canvas); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
                     <div>
-                        <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 2px;">Customer Contact</span>
+                        <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 2px;">Customer</span>
                         <strong id="m_cust_name" style="font-size: 15px; color: var(--text-primary); display: block;"></strong>
                         <div style="margin-top: 4px;">
                             <a href="#" target="_blank" id="m_cust_phone_link" style="color: #25d366; text-decoration: none; font-weight: 600; font-size: 13px;"></a>
@@ -625,40 +624,40 @@ switch ($msg) {
                         <div id="m_cust_email" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;"></div>
                     </div>
                     <div>
-                        <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 2px;">Delivery / Studio Address</span>
+                        <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 2px;">Address</span>
                         <div id="m_cust_address" style="font-size: 13px; color: var(--text-secondary); line-height: 1.4;"></div>
                         <div id="m_cust_shipping_method" style="font-size: 11px; color: var(--gold-primary); font-weight: 600; margin-top: 4px;"></div>
                     </div>
                 </div>
 
                 <div id="m_notes_box" style="display: none; background: #fffbeb; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid #fde68a; margin-bottom: 16px;">
-                    <strong style="color: #92400e; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Client Specific Request / Notes:</strong>
+                    <strong style="color: #92400e; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Notes:</strong>
                     <div id="m_cust_notes" style="color: #78350f; font-size: 13px; margin-top: 2px;"></div>
                 </div>
 
                 <!-- Financial Breakdown Cards -->
                 <div class="financial-grid" style="margin-bottom: 16px;">
                     <div class="financial-box">
-                        <div class="financial-box-label">Grand Total</div>
+                        <div class="financial-box-label">Total</div>
                         <div class="financial-box-value highlight-gold" id="m_fin_total">£0.00</div>
                     </div>
                     <div class="financial-box">
-                        <div class="financial-box-label">Deposit Req.</div>
+                        <div class="financial-box-label">Deposit</div>
                         <div class="financial-box-value" id="m_fin_dep_req">£0.00</div>
                     </div>
                     <div class="financial-box">
-                        <div class="financial-box-label">Amount Paid</div>
+                        <div class="financial-box-label">Paid</div>
                         <div class="financial-box-value highlight-green" id="m_fin_paid">£0.00</div>
                     </div>
                     <div class="financial-box">
-                        <div class="financial-box-label">Outstanding Balance</div>
+                        <div class="financial-box-label">Balance</div>
                         <div class="financial-box-value" id="m_fin_balance">£0.00</div>
                     </div>
                 </div>
 
                 <!-- Items Container -->
                 <div>
-                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; color: var(--text-primary);">Order Line Items</h4>
+                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; color: var(--text-primary);">Items</h4>
                     <div id="m_items_list" style="display: flex; flex-direction: column; gap: 8px;"></div>
                 </div>
             </div>
@@ -668,7 +667,7 @@ switch ($msg) {
                 <div style="background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Current Payment Status:</span>
+                            <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Status:</span>
                             <div id="m_current_pay_badge" style="margin-top: 4px;"></div>
                             <div id="m_pay_audit_info" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"></div>
                         </div>
@@ -684,12 +683,12 @@ switch ($msg) {
                                 <option value="deposit_paid">Deposit Paid</option>
                                 <option value="balance_pending">Balance Pending</option>
                                 <option value="fully_paid">Fully Paid</option>
-                                <option value="refund_pending">Refund Action Pending</option>
+                                <option value="refund_pending">Refund Pending</option>
                                 <option value="partially_refunded">Partially Refunded</option>
                                 <option value="refunded">Refunded</option>
-                                <option value="cancelled">Cancelled / Void</option>
+                                <option value="cancelled">Cancelled</option>
                             </select>
-                            <button type="submit" class="btn btn-outline btn-sm">Update Status</button>
+                            <button type="submit" class="btn btn-outline btn-sm">Update</button>
                         </form>
                     </div>
                 </div>
@@ -700,58 +699,58 @@ switch ($msg) {
                     <input type="hidden" name="order_id" class="m_sync_order_id">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
-                    <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #059669; font-weight: 700; margin-bottom: 12px;">+ Record Payment Received</h4>
+                    <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #059669; font-weight: 700; margin-bottom: 12px;">Record Payment</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Payment Classification *</label>
+                            <label class="form-label" style="font-size: 11px;">Payment Type *</label>
                             <select name="payment_type" id="m_pay_type_select" class="form-control" required>
-                                <option value="deposit">Deposit Payment (50% or custom)</option>
-                                <option value="balance">Outstanding Balance Payment</option>
-                                <option value="full">Full Payment Settlement</option>
-                                <option value="custom">Custom Interim Installment</option>
+                                <option value="deposit">Deposit</option>
+                                <option value="balance">Balance Payment</option>
+                                <option value="full">Full Settlement</option>
+                                <option value="custom">Installment</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Amount Received (£) *</label>
+                            <label class="form-label" style="font-size: 11px;">Amount (£) *</label>
                             <input type="number" step="0.01" min="0.01" name="payment_amount" id="m_pay_amount_input" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Payment Method *</label>
+                            <label class="form-label" style="font-size: 11px;">Method *</label>
                             <select name="payment_method" class="form-control" required>
                                 <option value="Bank Transfer (BACS)">Bank Transfer (BACS)</option>
-                                <option value="Direct Wire / Swift">Direct Wire / Swift Transfer</option>
-                                <option value="Stripe / Card Link">Stripe / Card Payment</option>
-                                <option value="Cash / Studio Pickup">Cash / Studio Payment</option>
-                                <option value="PayPal">PayPal Invoice</option>
+                                <option value="Direct Wire / Swift">Wire Transfer</option>
+                                <option value="Stripe / Card Link">Card Payment</option>
+                                <option value="Cash / Studio Pickup">Cash</option>
+                                <option value="PayPal">PayPal</option>
                             </select>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Transaction Ref # / Receipt Code</label>
-                            <input type="text" name="transaction_reference" class="form-control" placeholder="e.g. BACS-984120 or Stripe ch_3Nx...">
+                            <label class="form-label" style="font-size: 11px;">Transaction Ref</label>
+                            <input type="text" name="transaction_reference" class="form-control" placeholder="e.g. BACS-984120">
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Upload Receipt / Bank Remittance (PDF, JPG, PNG)</label>
+                            <label class="form-label" style="font-size: 11px;">Upload Receipt</label>
                             <input type="file" name="receipt_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp">
                             <div id="m_current_receipt_file" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"></div>
                         </div>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
-                        <div style="font-size: 11px; color: var(--text-muted);">Recorded under staff username: <strong><?= htmlspecialchars($_SESSION['admin_username'] ?? 'Admin') ?></strong></div>
-                        <button type="submit" class="btn btn-gold btn-sm">Confirm &amp; Record Payment</button>
+                        <div style="font-size: 11px; color: var(--text-muted);">Staff: <strong><?= htmlspecialchars($_SESSION['admin_username'] ?? 'Admin') ?></strong></div>
+                        <button type="submit" class="btn btn-gold btn-sm">Save Payment</button>
                     </div>
                 </form>
 
                 <!-- Payment Instructions Generator -->
                 <div style="background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-primary); margin: 0;">Payment Instructions for Customer</h4>
+                        <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-primary); margin: 0;">Payment Instructions</h4>
                         <div style="display: flex; gap: 6px;">
-                            <button type="button" class="btn btn-outline btn-sm" id="copyBankInstructionsBtn" style="font-size: 11px;">Copy Instructions</button>
-                            <a href="#" target="_blank" id="sendWhatsAppBankBtn" class="btn btn-outline btn-sm" style="font-size: 11px; color: #25d366;">Send via WhatsApp</a>
+                            <button type="button" class="btn btn-outline btn-sm" id="copyBankInstructionsBtn" style="font-size: 11px;">Copy</button>
+                            <a href="#" target="_blank" id="sendWhatsAppBankBtn" class="btn btn-outline btn-sm" style="font-size: 11px; color: #25d366;">WhatsApp</a>
                         </div>
                     </div>
                     <textarea id="m_bank_instructions_text" class="form-control" rows="4" readonly style="font-family: monospace; font-size: 11px; background: #fff;"></textarea>
@@ -766,47 +765,47 @@ switch ($msg) {
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gold-primary); font-weight: 700; margin: 0;">Prepare / Revise Studio Quote</h4>
+                        <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gold-primary); font-weight: 700; margin: 0;">Prepare Quote</h4>
                         <span id="m_quote_status_tag" style="font-size: 11px; color: var(--text-muted);"></span>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Scope / Item Description *</label>
-                            <input type="text" name="quote_item_title" id="m_quote_title" class="form-control" placeholder="e.g. Custom Oak Dining Table (2400 x 1000mm) with brushed brass accents" required>
+                            <label class="form-label" style="font-size: 11px;">Description *</label>
+                            <input type="text" name="quote_item_title" id="m_quote_title" class="form-control" placeholder="e.g. Custom Oak Dining Table (2400 x 1000mm)" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Quoted Price (£) *</label>
+                            <label class="form-label" style="font-size: 11px;">Price (£) *</label>
                             <input type="number" step="0.01" min="0" name="quote_item_rate" id="m_quote_rate" class="form-control" placeholder="2400.00" required>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Packaging &amp; White-Glove Shipping (£)</label>
+                            <label class="form-label" style="font-size: 11px;">Shipping (£)</label>
                             <input type="number" step="0.01" min="0" name="quote_shipping_cost" id="m_quote_shipping" class="form-control" value="0.00">
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Deposit Required (%)</label>
+                            <label class="form-label" style="font-size: 11px;">Deposit (%)</label>
                             <input type="number" name="quote_deposit_percentage" id="m_quote_deposit_pct" class="form-control" value="50" min="10" max="100">
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Quote Validity (Days)</label>
+                            <label class="form-label" style="font-size: 11px;">Validity (Days)</label>
                             <input type="number" name="quote_validity_days" id="m_quote_validity_days" class="form-control" value="30">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" style="font-size: 11px;">Terms &amp; Craft Conditions</label>
-                        <textarea name="quote_terms" id="m_quote_terms" class="form-control" rows="2" placeholder="e.g. 50% commitment deposit required before timber selection. Estimated production lead time 4 weeks."></textarea>
+                        <label class="form-label" style="font-size: 11px;">Terms &amp; Conditions</label>
+                        <textarea name="quote_terms" id="m_quote_terms" class="form-control" rows="2" placeholder="Lead times, deposit requirements, or delivery notes..."></textarea>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer;">
                             <input type="checkbox" name="mark_quote_sent" value="1" style="accent-color: var(--gold-primary);">
-                            Mark Quote as Dispatched to Client
+                            Mark Quote as Sent
                         </label>
-                        <button type="submit" class="btn btn-gold btn-sm">Save &amp; Generate Quote</button>
+                        <button type="submit" class="btn btn-gold btn-sm">Save Quote</button>
                     </div>
                 </form>
 
@@ -816,22 +815,22 @@ switch ($msg) {
                     <input type="hidden" name="order_id" class="m_sync_order_id">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
-                    <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #059669; margin-bottom: 8px;">Record Customer Acceptance</h4>
+                    <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #059669; margin-bottom: 8px;">Customer Acceptance</h4>
                     <div style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 10px; align-items: flex-end;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Acceptance Channel</label>
+                            <label class="form-label" style="font-size: 11px;">Channel</label>
                             <select name="acceptance_channel" class="form-control">
-                                <option value="Email">Signed PDF via Email</option>
-                                <option value="WhatsApp">WhatsApp Confirmation</option>
-                                <option value="Phone Call">Phone Verbal Agreement</option>
-                                <option value="In-Studio">In-Studio Agreement</option>
+                                <option value="Email">Email</option>
+                                <option value="WhatsApp">WhatsApp</option>
+                                <option value="Phone Call">Phone</option>
+                                <option value="In-Studio">In-Studio</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Client Notes / Confirmation Code</label>
-                            <input type="text" name="acceptance_notes" class="form-control" placeholder="e.g. Client confirmed timber sample #3 and approved delivery window">
+                            <label class="form-label" style="font-size: 11px;">Notes</label>
+                            <input type="text" name="acceptance_notes" class="form-control" placeholder="Confirmation reference or client notes">
                         </div>
-                        <button type="submit" class="btn btn-gold btn-sm" style="height: 38px;">Record Acceptance</button>
+                        <button type="submit" class="btn btn-gold btn-sm" style="height: 38px;">Save</button>
                     </div>
                 </form>
             </div>
@@ -841,7 +840,7 @@ switch ($msg) {
                 <!-- Fulfilment Progress Milestone Bar -->
                 <div class="stepper-wrap" style="margin-bottom: 16px;">
                     <div class="stepper-header">
-                        <span>Fulfilment Milestone: <strong id="m_fulfilment_label" style="color: var(--gold-primary);"></strong></span>
+                        <span>Milestone: <strong id="m_fulfilment_label" style="color: var(--gold-primary);"></strong></span>
                         <span id="m_fulfilment_pct">0%</span>
                     </div>
                     <div class="stepper-bar-bg">
@@ -859,16 +858,16 @@ switch ($msg) {
                             <option value="quote_prepared">Quote Prepared</option>
                             <option value="quote_sent">Quote Sent</option>
                             <option value="quote_accepted">Quote Accepted</option>
-                            <option value="in_queue">In Queue / Confirmed (25%)</option>
-                            <option value="in_production">In Production / Crafting (50%)</option>
+                            <option value="in_queue">Confirmed (25%)</option>
+                            <option value="in_production">In Production (50%)</option>
                             <option value="booking_scheduled">Booking Scheduled (60%)</option>
                             <option value="digital_ready">Deliverables Ready (100%)</option>
-                            <option value="dispatched">Dispatched / In Transit (85%)</option>
-                            <option value="completed">Delivered / Fulfilled (100%)</option>
+                            <option value="dispatched">Dispatched (85%)</option>
+                            <option value="completed">Delivered (100%)</option>
                             <option value="cancelled">Cancelled</option>
                         </select>
                         <input type="number" name="fulfilment_progress" id="m_input_progress" class="form-control" min="0" max="100" style="width: 80px;" placeholder="%">
-                        <button type="submit" class="btn btn-outline btn-sm">Save Milestone</button>
+                        <button type="submit" class="btn btn-outline btn-sm">Save</button>
                     </form>
                 </div>
 
@@ -878,22 +877,22 @@ switch ($msg) {
                     <input type="hidden" name="order_id" class="m_sync_order_id">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
-                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--gold-primary); margin-bottom: 10px;">Dispatch, Courier &amp; Live Tracking</h4>
+                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--gold-primary); margin-bottom: 10px;">Dispatch &amp; Tracking</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Courier / Logistics Partner</label>
-                            <input type="text" name="courier_name" id="m_courier_name" class="form-control" placeholder="e.g. DHL Express, DPD, White-Glove Logistics">
+                            <label class="form-label" style="font-size: 11px;">Courier</label>
+                            <input type="text" name="courier_name" id="m_courier_name" class="form-control" placeholder="e.g. DHL, DPD">
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Tracking / Consignment Code</label>
+                            <label class="form-label" style="font-size: 11px;">Tracking Number</label>
                             <input type="text" name="tracking_number" id="m_tracking_number" class="form-control" placeholder="e.g. DHL-99214-GB">
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-top: 10px;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Direct Tracking URL</label>
-                            <input type="url" name="tracking_url" id="m_tracking_url" class="form-control" placeholder="https://track.dhl.com/en?tracking-id=...">
+                            <label class="form-label" style="font-size: 11px;">Tracking URL</label>
+                            <input type="url" name="tracking_url" id="m_tracking_url" class="form-control" placeholder="https://...">
                         </div>
                         <div class="form-group">
                             <label class="form-label" style="font-size: 11px;">Estimated Delivery</label>
@@ -904,9 +903,9 @@ switch ($msg) {
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer;">
                             <input type="checkbox" name="mark_dispatched" value="1" style="accent-color: var(--gold-primary);">
-                            Update Fulfilment Status to Dispatched (85%)
+                            Mark as Dispatched
                         </label>
-                        <button type="submit" class="btn btn-gold btn-sm">Save Logistics Details</button>
+                        <button type="submit" class="btn btn-gold btn-sm">Save Dispatch</button>
                     </div>
                 </form>
 
@@ -916,24 +915,24 @@ switch ($msg) {
                     <input type="hidden" name="order_id" class="m_sync_order_id">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
-                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #0284c7; margin-bottom: 10px;">Booking Dates &amp; Consultation Link</h4>
+                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #0284c7; margin-bottom: 10px;">Booking &amp; Consultation</h4>
                     <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Session Date &amp; Time</label>
+                            <label class="form-label" style="font-size: 11px;">Date &amp; Time</label>
                             <input type="datetime-local" name="booking_date" id="m_booking_date" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Meeting Room Link / Studio Location</label>
-                            <input type="text" name="booking_meeting_link" id="m_booking_link" class="form-control" placeholder="https://meet.google.com/xxx-xxxx-xxx or Studio Address">
+                            <label class="form-label" style="font-size: 11px;">Meeting Link / Location</label>
+                            <input type="text" name="booking_meeting_link" id="m_booking_link" class="form-control" placeholder="https://meet.google.com/... or Studio Address">
                         </div>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer;">
                             <input type="checkbox" name="mark_scheduled" value="1" style="accent-color: #0284c7;">
-                            Set Fulfilment Status to Booking Scheduled (60%)
+                            Mark as Scheduled
                         </label>
-                        <button type="submit" class="btn btn-gold btn-sm">Update Booking</button>
+                        <button type="submit" class="btn btn-gold btn-sm">Save Booking</button>
                     </div>
                 </form>
             </div>
@@ -945,19 +944,19 @@ switch ($msg) {
                     <input type="hidden" name="order_id" class="m_sync_order_id">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
-                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #4f46e5; margin-bottom: 10px;">Upload Deliverables or Assign Protected Links</h4>
+                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #4f46e5; margin-bottom: 10px;">Deliverables &amp; Links</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Upload Deliverable Archive (.ZIP, .PDF, .RFA)</label>
+                            <label class="form-label" style="font-size: 11px;">Upload Deliverable</label>
                             <input type="file" name="deliverable_file" class="form-control" accept=".zip,.rar,.pdf,.brushset,.dwg,.dxf,.rfa,.blend">
                             <div id="m_current_file_path" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"></div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Protected Access Link / Secret Token URL</label>
-                            <input type="url" name="digital_access_link" id="m_digital_access_link" class="form-control" placeholder="https://urthspaces.com/download.php?token=sec_xxx">
+                            <label class="form-label" style="font-size: 11px;">Access Link</label>
+                            <input type="url" name="digital_access_link" id="m_digital_access_link" class="form-control" placeholder="https://...">
                             <div style="display: flex; gap: 6px; margin-top: 4px;">
-                                <button type="button" class="btn btn-outline btn-sm" id="generateTokenLinkBtn" style="font-size: 10px; padding: 2px 8px;">Auto-Generate Token</button>
-                                <button type="button" class="btn btn-outline btn-sm" id="copyDeliverableLinkBtn" style="font-size: 10px; padding: 2px 8px;">Copy Link</button>
+                                <button type="button" class="btn btn-outline btn-sm" id="generateTokenLinkBtn" style="font-size: 10px; padding: 2px 8px;">Generate Link</button>
+                                <button type="button" class="btn btn-outline btn-sm" id="copyDeliverableLinkBtn" style="font-size: 10px; padding: 2px 8px;">Copy</button>
                             </div>
                         </div>
                     </div>
@@ -965,9 +964,9 @@ switch ($msg) {
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer;">
                             <input type="checkbox" name="mark_digital_ready" value="1" style="accent-color: #4f46e5;">
-                            Mark as Digital Deliverable Ready (100% Fulfilled)
+                            Mark as Ready
                         </label>
-                        <button type="submit" class="btn btn-gold btn-sm">Save Deliverable</button>
+                        <button type="submit" class="btn btn-gold btn-sm">Save</button>
                     </div>
                 </form>
             </div>
@@ -980,16 +979,16 @@ switch ($msg) {
                     <input type="hidden" name="order_id" class="m_sync_order_id">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
-                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #dc2626; margin-bottom: 10px;">Record Cancellation</h4>
+                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #dc2626; margin-bottom: 10px;">Cancellation</h4>
                     <div class="form-group">
-                        <label class="form-label" style="font-size: 11px;">Cancellation Reason *</label>
-                        <textarea name="cancellation_reason" id="m_cancel_reason" class="form-control" rows="2" placeholder="e.g. Customer change of mind, bespoke timber unavailable, project cancelled..." required></textarea>
+                        <label class="form-label" style="font-size: 11px;">Reason *</label>
+                        <textarea name="cancellation_reason" id="m_cancel_reason" class="form-control" rows="2" placeholder="Reason for cancellation..." required></textarea>
                     </div>
 
                     <div style="margin-top: 10px; padding: 10px; background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #b91c1c; cursor: pointer;">
                             <input type="checkbox" name="request_refund" id="m_request_refund_chk" value="1" style="accent-color: #dc2626;">
-                            Mark as "Pending Refund Action" in Studio Queue
+                            Mark as Pending Refund
                         </label>
                         <div id="m_refund_fields_wrap" style="display: none; margin-top: 10px;">
                             <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
@@ -998,15 +997,15 @@ switch ($msg) {
                                     <input type="number" step="0.01" min="0" name="refund_amount" id="m_refund_amount_req" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" style="font-size: 11px;">Refund Instructions for Finance</label>
-                                    <input type="text" name="refund_reason" class="form-control" placeholder="e.g. Full refund via Stripe dashboard">
+                                    <label class="form-label" style="font-size: 11px;">Refund Instructions</label>
+                                    <input type="text" name="refund_reason" class="form-control" placeholder="Instructions for finance">
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div style="text-align: right; margin-top: 12px;">
-                        <button type="submit" class="btn btn-danger btn-sm">Confirm Cancellation</button>
+                        <button type="submit" class="btn btn-danger btn-sm">Cancel Order</button>
                     </div>
                 </form>
 
@@ -1016,32 +1015,32 @@ switch ($msg) {
                     <input type="hidden" name="order_id" class="m_sync_order_id">
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
-                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #7c3aed; margin-bottom: 10px;">Confirm &amp; Record Processed Refund</h4>
+                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #7c3aed; margin-bottom: 10px;">Record Processed Refund</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
                         <div class="form-group">
                             <label class="form-label" style="font-size: 11px;">Refund Amount (£) *</label>
                             <input type="number" step="0.01" min="0.01" name="processed_refund_amount" id="m_refund_processed_amount" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Refund Method</label>
+                            <label class="form-label" style="font-size: 11px;">Method</label>
                             <select name="refund_method" class="form-control">
                                 <option value="Original Payment Method">Original Payment Method</option>
                                 <option value="Bank Transfer (BACS)">Bank Transfer (BACS)</option>
-                                <option value="Stripe Portal">Stripe Payment Gateway</option>
-                                <option value="Studio Credit">Studio Credit Voucher</option>
+                                <option value="Stripe Portal">Stripe</option>
+                                <option value="Studio Credit">Studio Credit</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Refund Transaction Reference</label>
-                            <input type="text" name="refund_reference" class="form-control" placeholder="e.g. re_3Nx992 or BACS-REF-RFD">
+                            <label class="form-label" style="font-size: 11px;">Transaction Reference</label>
+                            <input type="text" name="refund_reference" class="form-control" placeholder="e.g. re_3Nx992">
                         </div>
                     </div>
                     <div class="form-group" style="margin-top: 10px;">
-                        <label class="form-label" style="font-size: 11px;">Refund Notes</label>
+                        <label class="form-label" style="font-size: 11px;">Notes</label>
                         <input type="text" name="refund_notes" class="form-control" placeholder="Staff reconciliation notes...">
                     </div>
                     <div style="text-align: right; margin-top: 12px;">
-                        <button type="submit" class="btn btn-gold btn-sm">Record Refund as Executed</button>
+                        <button type="submit" class="btn btn-gold btn-sm">Save Refund</button>
                     </div>
                 </form>
             </div>
@@ -1051,14 +1050,14 @@ switch ($msg) {
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <!-- Internal Staff Notes -->
                     <div>
-                        <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-primary); margin-bottom: 8px;">Internal Studio Team Notes</h4>
+                        <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-primary); margin-bottom: 8px;">Team Notes</h4>
                         <form action="order_actions.php" method="POST" style="margin-bottom: 12px;">
                             <input type="hidden" name="action" value="add_internal_note">
                             <input type="hidden" name="order_id" class="m_sync_order_id">
                             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
                             <div style="display: flex; gap: 8px;">
-                                <input type="text" name="internal_note_text" class="form-control" placeholder="Add private note for workshop or finance..." required>
+                                <input type="text" name="internal_note_text" class="form-control" placeholder="Add note..." required>
                                 <button type="submit" class="btn btn-gold btn-sm">Add</button>
                             </div>
                         </form>
@@ -1067,14 +1066,14 @@ switch ($msg) {
 
                     <!-- Customer Communications -->
                     <div>
-                        <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-primary); margin-bottom: 8px;">Customer Updates Log</h4>
+                        <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-primary); margin-bottom: 8px;">Customer Updates</h4>
                         <form action="order_actions.php" method="POST" style="margin-bottom: 12px;">
                             <input type="hidden" name="action" value="send_customer_update">
                             <input type="hidden" name="order_id" class="m_sync_order_id">
                             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
 
                             <div style="display: flex; gap: 8px; margin-bottom: 6px;">
-                                <input type="text" name="update_title" class="form-control" placeholder="Update Title" style="font-size: 12px;" required>
+                                <input type="text" name="update_title" class="form-control" placeholder="Title" style="font-size: 12px;" required>
                                 <select name="update_channel" class="form-control" style="width: 110px; font-size: 12px;">
                                     <option value="Email">Email</option>
                                     <option value="WhatsApp">WhatsApp</option>
@@ -1082,7 +1081,7 @@ switch ($msg) {
                                 </select>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <input type="text" name="update_message" class="form-control" placeholder="Message content dispatched..." style="font-size: 12px;" required>
+                                <input type="text" name="update_message" class="form-control" placeholder="Message..." style="font-size: 12px;" required>
                                 <button type="submit" class="btn btn-gold btn-sm">Log</button>
                             </div>
                         </form>
@@ -1092,7 +1091,7 @@ switch ($msg) {
 
                 <!-- Staff Attribution Audit Trail -->
                 <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 14px;">
-                    <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--gold-primary); margin-bottom: 12px;">Staff Attribution Audit Log</h4>
+                    <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--gold-primary); margin-bottom: 12px;">Audit Log</h4>
                     <div id="m_audit_timeline" class="audit-timeline"></div>
                 </div>
             </div>
@@ -1112,7 +1111,7 @@ switch ($msg) {
 <div id="manualOrderModal" class="modal-overlay">
     <div class="modal-dialog" style="max-width: 650px;">
         <div class="modal-header">
-            <h3 class="modal-title">+ Add Manual Order or Custom Enquiry</h3>
+            <h3 class="modal-title">New Order</h3>
             <button type="button" class="modal-close" data-modal-close>&times;</button>
         </div>
         <form action="order_actions.php" method="POST">
@@ -1121,11 +1120,11 @@ switch ($msg) {
 
             <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
                 <div class="form-group">
-                    <label class="form-label">Record Type *</label>
+                    <label class="form-label">Type *</label>
                     <select name="order_type" class="form-control" required>
-                        <option value="order">Standard Shop Order (Customer phone/email sale)</option>
-                        <option value="custom_enquiry">Bespoke Custom Furniture / Interior Enquiry</option>
-                        <option value="quote_request">Architecture / Design Session Quote Request</option>
+                        <option value="order">Standard Order</option>
+                        <option value="custom_enquiry">Custom Enquiry</option>
+                        <option value="quote_request">Quote Request</option>
                     </select>
                 </div>
 
@@ -1135,28 +1134,28 @@ switch ($msg) {
                         <input type="text" name="customer_name" class="form-control" placeholder="e.g. Julian Sterling" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Customer Phone *</label>
+                        <label class="form-label">Phone *</label>
                         <input type="text" name="customer_phone" class="form-control" placeholder="e.g. +44 7911 123456" required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Customer Email</label>
+                    <label class="form-label">Email</label>
                     <input type="email" name="customer_email" class="form-control" placeholder="e.g. client@studio.com">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Delivery Address / Project Location</label>
-                    <textarea name="delivery_address" class="form-control" rows="2" placeholder="Full address or project site..."></textarea>
+                    <label class="form-label">Address</label>
+                    <textarea name="delivery_address" class="form-control" rows="2" placeholder="Delivery address or site location..."></textarea>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px;">
                     <div class="form-group">
-                        <label class="form-label">Item / Scope Title *</label>
+                        <label class="form-label">Item Name *</label>
                         <input type="text" name="item_name" class="form-control" placeholder="e.g. Custom Dining Table" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Unit Price (£) *</label>
+                        <label class="form-label">Price (£) *</label>
                         <input type="number" step="0.01" min="0" name="item_price" class="form-control" placeholder="2400.00" required>
                     </div>
                     <div class="form-group">
@@ -1166,14 +1165,14 @@ switch ($msg) {
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Initial Project Notes / Requirements</label>
-                    <textarea name="order_notes" class="form-control" rows="2" placeholder="Specifications, timber requirements, target dates..."></textarea>
+                    <label class="form-label">Notes</label>
+                    <textarea name="order_notes" class="form-control" rows="2" placeholder="Requirements, specifications, or deadlines..."></textarea>
                 </div>
             </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
-                <button type="submit" class="btn btn-gold">Create Record</button>
+                <button type="submit" class="btn btn-gold">Create Order</button>
             </div>
         </form>
     </div>
@@ -1183,7 +1182,7 @@ switch ($msg) {
 <div id="deleteOrderModal" class="modal-overlay">
     <div class="modal-dialog" style="max-width: 440px;">
         <div class="modal-header">
-            <h3 class="modal-title">Delete Order Record</h3>
+            <h3 class="modal-title">Delete Order</h3>
             <button type="button" class="modal-close" data-modal-close>&times;</button>
         </div>
         <form action="order_actions.php" method="POST">
@@ -1193,15 +1192,15 @@ switch ($msg) {
             
             <div class="modal-body">
                 <p style="color: var(--text-secondary); line-height: 1.6;">
-                    Are you sure you want to remove order <strong id="delete_order_num" style="color: var(--text-primary);"></strong>?
+                    Are you sure you want to delete order <strong id="delete_order_num" style="color: var(--text-primary);"></strong>?
                 </p>
                 <p style="color: var(--danger); font-size: 12px; margin-top: 8px;">
-                    This will delete the customer order, line items, and audit logs permanently.
+                    This cannot be undone.
                 </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
-                <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
             </div>
         </form>
     </div>

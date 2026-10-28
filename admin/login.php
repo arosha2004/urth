@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login — URTH Architecture Studio</title>
+    <title>Login — URTH Admin</title>
     <link rel="stylesheet" href="assets/css/admin.css">
 </head>
 <body class="login-body">
@@ -46,8 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-card">
         <div class="login-brand">
             <div class="login-logo">U</div>
-            <h1 class="login-title">URTH Admin Panel</h1>
-            <p class="login-subtitle">Authorized staff only. Admin access must be initialized with server-side credentials.</p>
+            <h1 class="login-title">URTH Admin</h1>
         </div>
 
         <?php if (!empty($error)): ?>
@@ -69,13 +68,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token()) ?>">
             <div class="form-group">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" id="username" name="username" class="form-control" placeholder="Enter username (e.g. urthadmin)" required autofocus value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
+                <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
             </div>
 
             <div class="form-group">
                 <label for="password" class="form-label">Password</label>
                 <div class="password-wrapper">
-                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
                     <button type="button" id="togglePassword" class="toggle-password" title="Toggle password visibility">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
@@ -84,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <button type="submit" class="btn btn-gold" style="width: 100%; margin-top: 1rem; padding: 12px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                Sign In to Dashboard
+                Sign In
             </button>
         </form>
 
