@@ -92,19 +92,21 @@ if ($catResult) {
 <body>
 
   <!-- ==========================================================================
-       HERO TOP NAV (EXACT NAVBAR USED IN OTHER PAGES)
+       HERO TOP NAV (EXACT NAVBAR MATCHING ALL URTH PAGES)
        ========================================================================== -->
   <div class="hero-top-nav">
     <div class="logo">
       <a href="index.php" style="text-decoration: none;">
-        <img src="img/URTH (1).png" alt="URTH home" class="navbar-brand-image">
+        <img src="img/URTH (1).png" alt="Urth Logo" class="navbar-brand-image" style="height: 22px; margin: 0; padding: 0; object-fit: contain; vertical-align: middle; transform: translateY(-2px);">
       </a>
     </div>
 
     <nav class="center-nav">
-      <a href="about.html">Studio</a>
-      <a href="projects.php">Projects</a>
-      <a href="shop.php" class="active">Shop</a>
+      <a href="index.php">HOME</a>
+      <a href="about.html">ABOUT</a>
+      <a href="projects.php">PROJECTS</a>
+      <a href="contact.html">CONTACT</a>
+      <a href="shop.php" class="active">SHOP</a>
     </nav>
 
     <div class="right-nav">
@@ -114,7 +116,6 @@ if ($catResult) {
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <path d="M16 10a4 4 0 0 1-8 0"></path>
         </svg>
-        <span class="bag-label">Bag</span>
         <span class="cart-badge" id="cartBadge">0</span>
       </button>
 
@@ -128,9 +129,11 @@ if ($catResult) {
 
   <div class="mobile-nav-overlay">
     <nav class="mobile-nav-links">
-      <a href="about.html">Studio</a>
-      <a href="projects.php">Projects</a>
-      <a href="shop.php" class="active">Shop</a>
+      <a href="index.php">HOME</a>
+      <a href="about.html">ABOUT</a>
+      <a href="projects.php">PROJECTS</a>
+      <a href="contact.html">CONTACT</a>
+      <a href="shop.php" class="active">SHOP</a>
     </nav>
   </div>
 
