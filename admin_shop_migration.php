@@ -1,7 +1,5 @@
 <?php
-/**
- * URTH Shop & Orders Advanced Database Migration
- */
+
 require_once __DIR__ . '/config.php';
 
 echo "Migrating URTH database schema for advanced shop & order management...\n";
