@@ -13,7 +13,7 @@ $projects = [];
 if ($result) {
     while($row = $result->fetch_assoc()) {
         // Map MySQL schema to what the Admin UI expects
-        $row['image_url'] = $row['image1'] ?? '';
+        $row['image_url'] = resolve_project_image($row['image1'] ?? '', $row['title'] ?? '');
         $projects[] = $row;
     }
 }

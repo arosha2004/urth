@@ -908,8 +908,8 @@ if($projects_query) {
 <?php foreach($projects as $project): ?>
               <div role="listitem" class="project-item w-dyn-item">
                 <a href="<?= htmlspecialchars($project['link_url']) ?>" class="project-image" style="display: block;">
-                  <div class="category-tag"><?= htmlspecialchars($project['category']) ?></div><img src="<?= htmlspecialchars($project['image1']) ?>"
-                    loading="lazy" alt="<?= htmlspecialchars($project['title']) ?>" class="parallax-image">
+                  <div class="category-tag"><?= htmlspecialchars($project['category']) ?></div><img src="<?= htmlspecialchars(resolve_project_image($project['image1'] ?? '', $project['title'] ?? '')) ?>"
+                    loading="lazy" alt="<?= htmlspecialchars($project['title']) ?>" class="parallax-image" onerror="this.onerror=null;this.src='img/projects_hero.jpg';">
                 </a>
                 <div fade-in-up-2="" class="projct-info">
                   <div class="vertical-headline">

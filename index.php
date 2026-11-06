@@ -70,11 +70,12 @@ if($projects_query) {
                 // The original code had the second item (index 1) as active
                 $activeClass = ($index === 1) ? ' active' : '';
                 $link = !empty($project['link_url']) ? htmlspecialchars($project['link_url']) : '#';
+                $img_src = resolve_project_image($project['image1'] ?? '', $project['title'] ?? '');
                 
                 echo '<article class="carousel-slide' . $activeClass . '" data-index="' . $index . '">';
                 echo '  <div class="slide-img-wrap">';
                 echo '    <a href="' . $link . '">';
-                echo '      <img src="' . htmlspecialchars($project['image1']) . '" alt="' . htmlspecialchars($project['title']) . '" class="slide-img" draggable="false" />';
+                echo '      <img src="' . htmlspecialchars($img_src) . '" alt="' . htmlspecialchars($project['title']) . '" class="slide-img" draggable="false" onerror="this.onerror=null;this.src=\'img/projects_hero.jpg\';" />';
                 echo '    </a>';
                 echo '  </div>';
                 echo '  <div class="slide-label">';

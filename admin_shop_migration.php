@@ -203,3 +203,4 @@ if ($resOrders) {
 }
 
 echo "Migration completed successfully!\n";
+

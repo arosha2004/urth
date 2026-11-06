@@ -211,7 +211,7 @@ $gallery_result = $gal_stmt->get_result();
                 <label>Hero Image</label>
                 <input type="file" name="image1" accept="image/*">
                 <?php if ($project['image1']): ?>
-                    <img src="../<?= htmlspecialchars($project['image1']) ?>" class="current-img">
+                    <img src="../<?= htmlspecialchars(resolve_project_image($project['image1'] ?? '', $project['title'] ?? '')) ?>" class="current-img" onerror="this.onerror=null;this.src='../img/projects_hero.jpg';">
                 <?php endif; ?>
             </div>
 

@@ -252,7 +252,7 @@ window.__WF_REVIEW_BRIDGE = {
     });
   </script>
   <div class="hero-bg">
-    <img src="<?= htmlspecialchars($project['image1']) ?>" alt="Hero background" />
+    <img src="<?= htmlspecialchars(resolve_project_image($project['image1'] ?? '', $project['title'] ?? '')) ?>" alt="Hero background" onerror="this.onerror=null;this.src='img/projects_hero.jpg';" />
   </div>
   <div class="hero-top-nav">
     <div class="logo">
@@ -433,7 +433,7 @@ window.__WF_REVIEW_BRIDGE = {
   <div class="gallery-container">
     <?php while($gimg = $gallery_result->fetch_assoc()): ?>
     <div class="gallery-item">
-      <img src="<?= htmlspecialchars($gimg['image_path']) ?>" alt="<?= htmlspecialchars($project['title']) ?>">
+      <img src="<?= htmlspecialchars(resolve_project_image($gimg['image_path'] ?? '')) ?>" alt="<?= htmlspecialchars($project['title']) ?>" onerror="this.onerror=null;this.src='img/urthprojs/1.jpg';">
       <div class="gallery-overlay"><h4 class="gallery-caption"><?= htmlspecialchars($project['title']) ?></h4></div>
     </div>
     <?php endwhile; ?>
