@@ -714,12 +714,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Button feedback
     if (btnElement) {
-      const originalText = btnElement.textContent;
-      btnElement.textContent = 'ADDED ✓';
+      const isIconButton = btnElement.classList.contains('product-add');
+
+      // Clear any existing reset timer if user clicks repeatedly
+      if (btnElement._resetTimer) {
+        clearTimeout(btnElement._resetTimer);
+      } else {
+        btnElement._originalContent = isIconButton ? '+' : btnElement.textContent.trim();
+      }
+
+      // Re-trigger animation cleanly even on fast repeated clicks
+      btnElement.classList.remove('is-added');
+      void btnElement.offsetWidth; // Force DOM reflow to restart CSS animation
       btnElement.classList.add('is-added');
-      setTimeout(() => {
-        btnElement.textContent = originalText;
+
+      if (isIconButton) {
+        btnElement.innerHTML = '<svg class="add-check-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        btnElement.setAttribute('aria-label', 'Added to bag');
+      } else {
+        btnElement.textContent = 'ADDED ✓';
+      }
+
+      btnElement._resetTimer = setTimeout(() => {
         btnElement.classList.remove('is-added');
+        if (isIconButton) {
+          btnElement.textContent = '+';
+          btnElement.setAttribute('aria-label', `Add “${prod.name}” to your bag`);
+        } else {
+          btnElement.textContent = btnElement._originalContent || 'ADD TO CART';
+        }
+        btnElement._resetTimer = null;
+        btnElement._originalContent = null;
       }, 1500);
     }
 

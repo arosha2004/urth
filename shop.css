@@ -626,8 +626,8 @@ button, select {
 }
 
 .button.add_to_cart_button.is-added {
-  background-color: #27ae60;
-  border-color: #27ae60;
+  background-color: var(--shop-ink, #111111);
+  border-color: var(--shop-ink, #111111);
   color: #ffffff;
 }
 
@@ -1494,6 +1494,12 @@ button, select {
 .product-modal-add-btn:hover {
   background-color: #ffffff;
   color: #111111;
+}
+
+.product-modal-add-btn.is-added {
+  background-color: var(--shop-ink, #111111);
+  border-color: var(--shop-ink, #111111);
+  color: #ffffff;
 }
 
 .product-modal-whatsapp-btn {
@@ -2721,11 +2727,58 @@ body {
   letter-spacing: 0;
   line-height: 1;
   cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .product-item .product-add:hover {
   color: #fff;
   background: var(--shop-ink);
+  transform: scale(1.08);
+}
+
+.product-item .product-add:active {
+  transform: scale(0.92);
+}
+
+.product-item .product-add.is-added {
+  color: #fff;
+  background: var(--shop-ink);
+  animation: productAddSuccess 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.product-item .product-add.is-added:hover {
+  color: #fff;
+  background: var(--shop-ink);
+}
+
+.product-item .product-add .add-check-icon {
+  display: block;
+  width: 15px;
+  height: 15px;
+  stroke: #ffffff;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkmarkStroke 0.3s ease forwards 0.05s;
+}
+
+@keyframes productAddSuccess {
+  0% {
+    transform: scale(0.85);
+  }
+  50% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes checkmarkStroke {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 .product-item .product-add:disabled {
@@ -3108,6 +3161,12 @@ body {
     right: 6px;
     width: 28px;
     height: 28px;
+    font-size: 16px;
+  }
+
+  .product-item .product-add .add-check-icon {
+    width: 13px;
+    height: 13px;
   }
 
   .product-quick-view {
