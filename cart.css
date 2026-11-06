@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
 
 :root {
   --urth-black: #111111;
@@ -9,7 +9,7 @@
   --urth-text-muted: rgba(17, 17, 17, 0.65);
   --urth-white: #ffffff;
   --font-body: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-heading: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 *, *::before, *::after {
@@ -439,6 +439,7 @@ body {
 }
 
 .checkout-field input,
+.checkout-field select,
 .checkout-field textarea {
   width: 100%;
   padding: 10px 12px;
@@ -451,9 +452,26 @@ body {
   transition: border-color 0.2s;
 }
 
+.checkout-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
 .checkout-field input:focus,
+.checkout-field select:focus,
 .checkout-field textarea:focus {
   border-color: var(--urth-black);
+}
+
+.checkout-field small,
+.cart-shipping-options,
+.cart-totals-row,
+.cart-breadcrumb,
+.cart-container,
+.cart-empty-box p,
+body {
+  font-family: var(--font-body);
 }
 
 .cart-order-btn {

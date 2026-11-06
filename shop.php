@@ -152,7 +152,7 @@ if ($catResult) {
     <span class="overlay"></span>
     <img src="img/shop/shop-hero-gallery-dark.jpg" alt="URTH Studio Shop" class="s-img-switch banner-bg" />
     <div class="content">
-      <h1 class="title">Curated Artifacts, Tools<br>&amp; Design Consultations</h1>
+      <h1 class="title">Curated Artifacts, Tools &amp; Design Consultations</h1>
       <p class="description">
         A deliberate repository curated by URTH Architecture Studio &mdash; bridging physical handcrafted furniture, downloadable architectural toolkits and personalized spatial consultations. Designed to enrich spatial practices and creative environments.
       </p>
