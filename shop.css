@@ -1,9 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
 
-/* ==========================================================================
-   PRAGUE SHOP THEME - EXACT MATCH TO https://prague.foxthemes.me/shop/
-   WITH URTH STANDARD NAVBAR MATCHING OTHER PAGES
-   ========================================================================== */
+
 
 :root {
   --prague-black: #111111;
@@ -2936,62 +2933,6 @@ body {
   line-height: 1.6;
 }
 
-.contact-footer {
-  padding: 22px 4.5%;
-  color: var(--shop-ink);
-  background: var(--shop-paper);
-}
-
-.contact-footer .footer-bg,
-.contact-footer .footer-overlay,
-.contact-footer .footer-top,
-.contact-footer .footer-divider,
-.contact-footer .footer-socials {
-  display: none !important;
-}
-
-.contact-footer .footer-inner {
-  max-width: 1180px;
-}
-
-.contact-footer .footer-bottom {
-  align-items: center;
-}
-
-.contact-footer .footer-copyright p,
-.contact-footer .footer-copyright a {
-  color: #77766f !important;
-  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.contact-footer .footer-copyright p {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  align-items: center;
-}
-
-.contact-footer .footer-copyright a {
-  text-decoration: none !important;
-}
-
-.contact-footer .footer-copyright a:hover {
-  color: var(--shop-ink) !important;
-}
-
-.contact-footer .footer-back-top {
-  color: #77766f;
-  font-size: 11px;
-  text-decoration: none;
-}
-
-.contact-footer .footer-back-top:hover {
-  color: var(--shop-ink);
-}
 
 @media (max-width: 768px) {
   .top-banner {
@@ -3227,10 +3168,6 @@ body {
 
   .guide-note {
     min-height: 0;
-  }
-
-  .contact-footer .footer-copyright p {
-    white-space: normal !important;
   }
 }
 
