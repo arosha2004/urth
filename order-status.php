@@ -40,7 +40,11 @@ if (preg_match('/^[A-Za-z0-9_-]{43}$/D', $token)) {
     }
 }
 
-$currency = htmlspecialchars($order['currency'] ?? '£', ENT_QUOTES, 'UTF-8');
+$rawCurrency = $order['currency'] ?? 'LKR';
+if ($rawCurrency === '£' || $rawCurrency === 'GBP' || empty($rawCurrency)) {
+    $rawCurrency = 'LKR';
+}
+$currency = htmlspecialchars((in_array($rawCurrency, ['£', '$', '€'], true) ? $rawCurrency : $rawCurrency . ' '), ENT_QUOTES, 'UTF-8');
 $canSubmitPaymentEvidence = $order
     && in_array($order['payment_status'] ?? 'pending_payment', ['pending_payment', 'deposit_paid', 'balance_pending'], true)
     && (($order['order_type'] ?? 'order') !== 'quote_request'

@@ -229,7 +229,7 @@ try {
             exit;
         }
         $productType = $product['product_type'] ?? 'furniture_object';
-        $productCurrency = $product['currency'] ?? '£';
+        $productCurrency = (!empty($product['currency']) && $product['currency'] !== '£' && $product['currency'] !== 'GBP') ? $product['currency'] : 'LKR';
         $lockedProducts[(int)$product['id']] = $product;
         $requestedQuantities[(int)$product['id']] = ($requestedQuantities[(int)$product['id']] ?? 0) + $qty;
         if ($currency !== null && $currency !== $productCurrency) {
@@ -351,7 +351,7 @@ try {
     }
 
     $total = $subtotal + $shipping_cost;
-    $currency = $currency ?? '£';
+    $currency = $currency ?? 'LKR';
     $statusToken = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
     $statusTokenHash = hash('sha256', $statusToken);
     $statusTokenExpiresAt = date('Y-m-d H:i:s', time() + (30 * 86400));

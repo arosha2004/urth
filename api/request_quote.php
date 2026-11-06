@@ -194,7 +194,7 @@ try {
     $statusTokenHash = hash('sha256', $statusToken);
     $expiresAt = date('Y-m-d H:i:s', time() + (30 * 86400));
     $uploadsJson = json_encode($storedFiles, JSON_UNESCAPED_SLASHES);
-    $currency = $product['currency'] ?: '£';
+    $currency = (!empty($product['currency']) && $product['currency'] !== '£' && $product['currency'] !== 'GBP') ? $product['currency'] : 'LKR';
     $paymentMethod = null;
 
     $conn->begin_transaction();

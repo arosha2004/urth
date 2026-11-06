@@ -270,12 +270,12 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (p.sale_price) {
         priceHtml = `
           <span class="price">
-            <del style="opacity: 0.5; margin-right: 5px;">${p.formattedPrice || ('£' + parseFloat(p.price).toFixed(2))}</del>
+            <del style="opacity: 0.5; margin-right: 5px;">${p.formattedPrice || ('LKR ' + parseFloat(p.price).toFixed(2))}</del>
             <ins style="text-decoration: none; font-weight: 700;">${p.formattedSalePrice}</ins>
           </span>
         `;
       } else {
-        priceHtml = `<span class="price">${p.formattedPrice || ('£' + parseFloat(p.price).toFixed(2))}</span>`;
+        priceHtml = `<span class="price">${p.formattedPrice || ('LKR ' + parseFloat(p.price).toFixed(2))}</span>`;
       }
 
       let btnHtml = '';
@@ -514,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (prod.sale_price) {
         modalProductPrice.innerHTML = `<del style="opacity: 0.5; font-size: 16px; margin-right: 8px;">${prod.formattedPrice}</del>${prod.formattedSalePrice}`;
       } else {
-        modalProductPrice.textContent = prod.formattedPrice || ('£' + parseFloat(prod.price).toFixed(2));
+        modalProductPrice.textContent = prod.formattedPrice || ('LKR ' + parseFloat(prod.price).toFixed(2));
       }
     }
     if (modalProductSku) {
@@ -529,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Direct WhatsApp link
     if (modalWhatsAppBtn) {
-      const pText = prod.price_on_request ? 'Price on request' : (prod.formattedPrice || ('£' + prod.price));
+      const pText = prod.price_on_request ? 'Price on request' : (prod.formattedPrice || ('LKR ' + prod.price));
       const msg = encodeURIComponent(`Hello URTH Studio,\n\nI would like to inquire about the following product:\n- Product: ${prod.name} (SKU: ${prod.sku || 'N/A'})\n- Price: ${pText}\n- Availability: ${availText}\n\nCould you please share acquisition and delivery details?`);
       modalWhatsAppBtn.href = `https://wa.me/94768008687?text=${msg}`;
     }
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
               <div class="cart-item-info">
                 <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-price">${item.qty} &times; ${item.formattedPrice || ('£' + itemPrice.toFixed(2))}</div>
+                <div class="cart-item-price">${item.qty} &times; ${item.formattedPrice || ('LKR ' + itemPrice.toFixed(2))}</div>
                 <div class="cart-item-qty">
                   <button type="button" class="qty-btn qty-minus" data-id="${item.id}">&minus;</button>
                   <span class="qty-count">${item.qty}</span>
@@ -671,13 +671,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (cartSubtotalAmount) {
-        cartSubtotalAmount.textContent = `£${subtotal.toFixed(2)}`;
+        cartSubtotalAmount.textContent = `LKR ${subtotal.toFixed(2)}`;
       }
 
       // WhatsApp Enquiry Link
       if (cartCheckoutBtn) {
-        const orderSummary = cart.map(i => `${i.name} (Qty: ${i.qty}) - £${((parseFloat(i.price) || 0) * i.qty).toFixed(2)}`).join('%0A');
-        const whatsappMsg = `Hello URTH Studio,%0A%0AI would like to inquire about ordering the following furniture pieces:%0A${orderSummary}%0A%0ATotal: £${subtotal.toFixed(2)}`;
+        const orderSummary = cart.map(i => `${i.name} (Qty: ${i.qty}) - LKR ${((parseFloat(i.price) || 0) * i.qty).toFixed(2)}`).join('%0A');
+        const whatsappMsg = `Hello URTH Studio,%0A%0AI would like to inquire about ordering the following furniture pieces:%0A${orderSummary}%0A%0ATotal: LKR ${subtotal.toFixed(2)}`;
         cartCheckoutBtn.href = `https://wa.me/94768008687?text=${whatsappMsg}`;
       }
     }

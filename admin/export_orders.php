@@ -64,7 +64,7 @@ $itemsRes = $conn->query("SELECT order_id, product_name, quantity, total FROM or
 $itemsMap = [];
 if ($itemsRes) {
     while ($it = $itemsRes->fetch_assoc()) {
-        $itemsMap[$it['order_id']][] = $it['quantity'] . "x " . $it['product_name'] . " (£" . number_format((float)$it['total'], 2) . ")";
+        $itemsMap[$it['order_id']][] = $it['quantity'] . "x " . $it['product_name'] . " (LKR " . number_format((float)$it['total'], 2) . ")";
     }
 }
 
@@ -154,7 +154,7 @@ if ($result) {
             number_format((float)$row['subtotal'], 2),
             number_format((float)($row['shipping_cost'] ?? 0), 2),
             number_format((float)$row['total'], 2),
-            $row['currency'] ?? '£',
+            (!empty($row['currency']) && $row['currency'] !== '£' && $row['currency'] !== 'GBP') ? $row['currency'] : 'LKR',
             $row['payment_status'] ?? 'pending_payment',
             number_format((float)($row['deposit_required'] ?? 0), 2),
             number_format((float)($row['deposit_paid'] ?? 0), 2),

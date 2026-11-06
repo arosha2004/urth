@@ -49,7 +49,7 @@ if (!$product) {
 
 // Price calculations
 $priceFloat = (float)$product['price'];
-$curr = !empty($product['currency']) ? $product['currency'] : '£';
+$curr = (!empty($product['currency']) && $product['currency'] !== '£' && $product['currency'] !== 'GBP') ? $product['currency'] : 'LKR';
 $currencyDetails = [
     '£' => ['symbol' => '£', 'code' => 'GBP'],
     'GBP' => ['symbol' => '£', 'code' => 'GBP'],
@@ -67,8 +67,10 @@ $salePriceFloat = $product['sale_price'] !== null ? (float)$product['sale_price'
 $priceOnRequest = (int)($product['price_on_request'] ?? 0) === 1 || ($priceFloat <= 0 && $product['price_on_request'] !== null);
 $availability = !empty($product['availability']) ? strtolower($product['availability']) : 'available';
 
-$formattedPrice = $priceOnRequest ? 'Price on request' : ($currency['symbol'] . number_format($priceFloat, 2) . ' ' . $currency['code']);
-$formattedSalePrice = ($priceOnRequest || $salePriceFloat === null) ? null : ($currency['symbol'] . number_format($salePriceFloat, 2) . ' ' . $currency['code']);
+$currSymbol = $currency['symbol'] . (strlen($currency['symbol']) > 1 ? ' ' : '');
+$currIsoDisplay = ($currency['code'] !== $currency['symbol']) ? ' ' . $currency['code'] : '';
+$formattedPrice = $priceOnRequest ? 'Price on request' : ($currSymbol . number_format($priceFloat, 2) . $currIsoDisplay);
+$formattedSalePrice = ($priceOnRequest || $salePriceFloat === null) ? null : ($currSymbol . number_format($salePriceFloat, 2) . $currIsoDisplay);
 
 // Calculate discount percentage
 $discountPct = 0;
@@ -374,16 +376,20 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
             <?php elseif ($salePriceFloat): ?>
               <div class="product-current-price">
                 <span class="currency-symbol"><?= htmlspecialchars($currency['symbol']) ?></span><?= number_format($salePriceFloat, 2) ?>
-                <span class="currency-iso"><?= htmlspecialchars($currency['code']) ?></span>
+                <?php if ($currency['code'] !== $currency['symbol']): ?>
+                  <span class="currency-iso"><?= htmlspecialchars($currency['code']) ?></span>
+                <?php endif; ?>
               </div>
-              <span class="product-del-price"><?= htmlspecialchars($currency['symbol'] . number_format($priceFloat, 2) . ' ' . $currency['code']) ?></span>
+              <span class="product-del-price"><?= htmlspecialchars($currSymbol . number_format($priceFloat, 2) . $currIsoDisplay) ?></span>
               <?php if ($discountPct > 0): ?>
                 <span class="product-discount-pill">Save <?= $discountPct ?>%</span>
               <?php endif; ?>
             <?php else: ?>
               <div class="product-current-price">
                 <span class="currency-symbol"><?= htmlspecialchars($currency['symbol']) ?></span><?= number_format($priceFloat, 2) ?>
-                <span class="currency-iso"><?= htmlspecialchars($currency['code']) ?></span>
+                <?php if ($currency['code'] !== $currency['symbol']): ?>
+                  <span class="currency-iso"><?= htmlspecialchars($currency['code']) ?></span>
+                <?php endif; ?>
               </div>
             <?php endif; ?>
           </div>
@@ -744,7 +750,8 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
             <?php foreach ($relatedProducts as $relP): ?>
               <?php
                 $rPrice = (float)$relP['price'];
-                $rCurr = !empty($relP['currency']) ? $relP['currency'] : '£';
+                $rCurr = (!empty($relP['currency']) && $relP['currency'] !== '£' && $relP['currency'] !== 'GBP') ? $relP['currency'] : 'LKR';
+                $rPrefix = in_array($rCurr, ['£', '$', '€'], true) ? $rCurr : $rCurr . ' ';
                 $rSale = $relP['sale_price'] !== null ? (float)$relP['sale_price'] : null;
                 $rPor = (int)($relP['price_on_request'] ?? 0) === 1 || ($rPrice <= 0 && $relP['price_on_request'] !== null);
               ?>
@@ -759,11 +766,11 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
                     <span class="price-on-request">Price on request</span>
                   <?php elseif ($rSale): ?>
                     <span class="price">
-                      <del style="opacity: 0.5; margin-right: 5px;"><?= $rCurr . number_format($rPrice, 2) ?></del>
-                      <ins style="text-decoration: none; font-weight: 700;"><?= $rCurr . number_format($rSale, 2) ?></ins>
+                      <del style="opacity: 0.5; margin-right: 5px;"><?= $rPrefix . number_format($rPrice, 2) ?></del>
+                      <ins style="text-decoration: none; font-weight: 700;"><?= $rPrefix . number_format($rSale, 2) ?></ins>
                     </span>
                   <?php else: ?>
-                    <span class="price"><?= $rCurr . number_format($rPrice, 2) ?></span>
+                    <span class="price"><?= $rPrefix . number_format($rPrice, 2) ?></span>
                   <?php endif; ?>
                 </a>
                 <a href="product.php?id=<?= $relP['id'] ?>" class="button" style="text-align: center; text-decoration: none;">
@@ -841,7 +848,7 @@ $shareImage = !empty($product['image']) ? (preg_match('/^https?:\/\//i', $produc
     <div class="cart-drawer-footer" id="cartDrawerFooter" hidden>
       <div class="cart-subtotal">
         <span>Subtotal:</span>
-        <span class="subtotal-amount" id="cartSubtotalAmount">£0.00</span>
+        <span class="subtotal-amount" id="cartSubtotalAmount">LKR 0.00</span>
       </div>
       <div class="cart-drawer-actions">
         <a href="cart.php" class="cart-view-full-btn">

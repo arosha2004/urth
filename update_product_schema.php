@@ -184,7 +184,7 @@ if (!$checkDigital || $checkDigital->num_rows === 0) {
         $sku = 'DG-PRO-01';
         $price = 39.00;
         $sale_price = 29.00;
-        $curr = '£';
+        $curr = 'LKR';
         $cat = 'Digital Tools';
         $desc = 'A complete architectural visualization toolkit crafted by URTH Studio architects. Features over 180 vector CAD blocks, seamless PBR material textures, and pressure-sensitive Procreate sketch brushes designed specifically for architectural ideation, elevation details, and presentation drawings.';
         $img = 'img/shop/prod-1.jpg';
@@ -219,7 +219,7 @@ if (!$checkBook || $checkBook->num_rows === 0) {
         $sku = 'BK-PLN-02';
         $price = 45.00;
         $sale_price = null;
-        $curr = '£';
+        $curr = 'LKR';
         $cat = 'Books & Planners';
         $desc = 'An indispensable 210-page tactile workbook and planning handbook for homeowners, interior designers, and architects. Guides you through the complete residential design journey: from spatial programming and budget estimation to lighting plans, joinery specifications, and contractor tender checklists.';
         $img = 'img/shop/prod-8.jpg';
@@ -253,7 +253,7 @@ if (!$checkWorkshop || $checkWorkshop->num_rows === 0) {
         $sku = 'WS-MIN-03';
         $price = 149.00;
         $sale_price = 119.00;
-        $curr = '£';
+        $curr = 'LKR';
         $cat = 'Learn';
         $desc = 'An intensive, live masterclass series led by URTH Studio founder and lead architects. Discover how to transform everyday spaces into serene, light-filled sanctuaries using proportion, intentional sightlines, hidden storage joinery, and honest material palettes.';
         $img = 'img/shop/prod-6.jpg';
@@ -291,7 +291,7 @@ if (!$checkSession || $checkSession->num_rows === 0) {
         $sku = 'DS-REV-04';
         $price = 280.00;
         $sale_price = null;
-        $curr = '£';
+        $curr = 'LKR';
         $cat = 'Design Sessions';
         $desc = 'Collaborate directly with a senior URTH architect to evaluate your floor plan, renovation concept, or interior living space. We analyze flow, daylighting, furniture layouts, and structural potential to unlock your home\'s maximum architectural value.';
         $img = 'img/shop/prod-7.jpg';

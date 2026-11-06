@@ -284,7 +284,7 @@ switch ($msg) {
             <div class="stat-card">
                 <div class="stat-info">
                     <div class="stat-label">Outstanding</div>
-                    <div class="stat-value" style="color: #f59e0b;">£<?= number_format($totalOutstanding, 2) ?> <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">(<?= $pendingPayments ?>)</span></div>
+                    <div class="stat-value" style="color: #f59e0b;">LKR <?= number_format($totalOutstanding, 2) ?> <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">(<?= $pendingPayments ?>)</span></div>
                 </div>
                 <div class="stat-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -294,7 +294,7 @@ switch ($msg) {
             <div class="stat-card">
                 <div class="stat-info">
                     <div class="stat-label">Total Revenue</div>
-                    <div class="stat-value" style="color: var(--success);">£<?= number_format($totalRevenue, 2) ?></div>
+                    <div class="stat-value" style="color: var(--success);">LKR <?= number_format($totalRevenue, 2) ?></div>
                 </div>
                 <div class="stat-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
@@ -497,10 +497,14 @@ switch ($msg) {
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Total: £<?= number_format($tot, 2) ?></div>
-                                        <div style="font-size: 11px; color: #059669;">Paid: £<?= number_format($paid, 2) ?></div>
+                                        <?php
+                                            $rowCurr = (!empty($ord['currency']) && $ord['currency'] !== '£' && $ord['currency'] !== 'GBP') ? $ord['currency'] : 'LKR';
+                                            $rowPrefix = (in_array($rowCurr, ['£', '$', '€'], true) ? $rowCurr : $rowCurr . ' ');
+                                        ?>
+                                        <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Total: <?= $rowPrefix . number_format($tot, 2) ?></div>
+                                        <div style="font-size: 11px; color: #059669;">Paid: <?= $rowPrefix . number_format($paid, 2) ?></div>
                                         <?php if ($due > 0.01): ?>
-                                            <div style="font-size: 11px; color: #d97706; font-weight: 600;">Due: £<?= number_format($due, 2) ?></div>
+                                            <div style="font-size: 11px; color: #d97706; font-weight: 600;">Due: <?= $rowPrefix . number_format($due, 2) ?></div>
                                         <?php endif; ?>
                                     </td>
                                     <td>
@@ -643,19 +647,19 @@ switch ($msg) {
                 <div class="financial-grid" style="margin-bottom: 16px;">
                     <div class="financial-box">
                         <div class="financial-box-label">Total</div>
-                        <div class="financial-box-value highlight-gold" id="m_fin_total">£0.00</div>
+                        <div class="financial-box-value highlight-gold" id="m_fin_total">LKR 0.00</div>
                     </div>
                     <div class="financial-box">
                         <div class="financial-box-label">Deposit</div>
-                        <div class="financial-box-value" id="m_fin_dep_req">£0.00</div>
+                        <div class="financial-box-value" id="m_fin_dep_req">LKR 0.00</div>
                     </div>
                     <div class="financial-box">
                         <div class="financial-box-label">Paid</div>
-                        <div class="financial-box-value highlight-green" id="m_fin_paid">£0.00</div>
+                        <div class="financial-box-value highlight-green" id="m_fin_paid">LKR 0.00</div>
                     </div>
                     <div class="financial-box">
                         <div class="financial-box-label">Balance</div>
-                        <div class="financial-box-value" id="m_fin_balance">£0.00</div>
+                        <div class="financial-box-value" id="m_fin_balance">LKR 0.00</div>
                     </div>
                 </div>
 
@@ -715,7 +719,7 @@ switch ($msg) {
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Amount (£) *</label>
+                            <label class="form-label" style="font-size: 11px;">Amount (LKR) *</label>
                             <input type="number" step="0.01" min="0.01" name="payment_amount" id="m_pay_amount_input" class="form-control" required>
                         </div>
                         <div class="form-group">
@@ -775,14 +779,14 @@ switch ($msg) {
                             <input type="text" name="quote_item_title" id="m_quote_title" class="form-control" placeholder="e.g. Custom Oak Dining Table (2400 x 1000mm)" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Price (£) *</label>
+                            <label class="form-label" style="font-size: 11px;">Price (LKR) *</label>
                             <input type="number" step="0.01" min="0" name="quote_item_rate" id="m_quote_rate" class="form-control" placeholder="2400.00" required>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Shipping (£)</label>
+                            <label class="form-label" style="font-size: 11px;">Shipping (LKR)</label>
                             <input type="number" step="0.01" min="0" name="quote_shipping_cost" id="m_quote_shipping" class="form-control" value="0.00">
                         </div>
                         <div class="form-group">
@@ -993,7 +997,7 @@ switch ($msg) {
                         <div id="m_refund_fields_wrap" style="display: none; margin-top: 10px;">
                             <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px;">
                                 <div class="form-group">
-                                    <label class="form-label" style="font-size: 11px;">Refund Amount (£) *</label>
+                                    <label class="form-label" style="font-size: 11px;">Refund Amount (LKR) *</label>
                                     <input type="number" step="0.01" min="0" name="refund_amount" id="m_refund_amount_req" class="form-control">
                                 </div>
                                 <div class="form-group">
@@ -1018,7 +1022,7 @@ switch ($msg) {
                     <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: #7c3aed; margin-bottom: 10px;">Record Processed Refund</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
                         <div class="form-group">
-                            <label class="form-label" style="font-size: 11px;">Refund Amount (£) *</label>
+                            <label class="form-label" style="font-size: 11px;">Refund Amount (LKR) *</label>
                             <input type="number" step="0.01" min="0.01" name="processed_refund_amount" id="m_refund_processed_amount" class="form-control" required>
                         </div>
                         <div class="form-group">
@@ -1155,7 +1159,7 @@ switch ($msg) {
                         <input type="text" name="item_name" class="form-control" placeholder="e.g. Custom Dining Table" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Price (£) *</label>
+                        <label class="form-label">Price (LKR) *</label>
                         <input type="number" step="0.01" min="0" name="item_price" class="form-control" placeholder="2400.00" required>
                     </div>
                     <div class="form-group">
@@ -1267,7 +1271,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!row) return;
 
             const ord = JSON.parse(row.getAttribute('data-raw'));
-            const curr = ord.currency || '£';
+            const rawCurr = (!ord.currency || ord.currency === '£' || ord.currency === 'GBP') ? 'LKR' : ord.currency;
+            const curr = ['£', '$', '€'].includes(rawCurr) ? rawCurr : rawCurr + ' ';
             const tot = parseFloat(ord.total || 0);
             const paid = parseFloat(ord.amount_paid || 0);
             const due = parseFloat(ord.balance_due || (tot - paid));

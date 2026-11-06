@@ -849,7 +849,7 @@ switch ($action) {
 
         $subtotal = $item_price * $item_qty;
         $total = $subtotal + $shipping_cost;
-        $currency = '£';
+        $currency = 'LKR';
 
         $prefix = $order_type === 'custom_enquiry' ? 'ENQ' : 'URTH';
         $order_number = $prefix . '-' . date('ymd') . '-' . strtoupper(substr(md5(uniqid('', true)), 0, 4));
@@ -886,7 +886,7 @@ switch ($action) {
                 $iStmt->close();
             }
 
-            log_order_activity($conn, $newOrderId, $staff_username, 'order_created', null, $fulfilment_status, "Staff {$staff_username} created manual {$order_type} for {$customer_name}. Total: £" . number_format($total, 2));
+            log_order_activity($conn, $newOrderId, $staff_username, 'order_created', null, $fulfilment_status, "Staff {$staff_username} created manual {$order_type} for {$customer_name}. Total: LKR " . number_format($total, 2));
 
             header('Location: orders.php?msg=order_created');
             exit;

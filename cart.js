@@ -50,14 +50,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getCurrencyCode(currency) {
-    const codes = { '£': 'GBP', GBP: 'GBP', '$': 'USD', USD: 'USD', '€': 'EUR', EUR: 'EUR', LKR: 'LKR' };
-    return codes[currency] || String(currency || 'GBP').toUpperCase();
+    if (!currency || currency === '£' || currency === 'GBP') return 'LKR';
+    const codes = { '£': 'GBP', GBP: 'GBP', '$': 'USD', USD: 'USD', '€': 'EUR', EUR: 'EUR', LKR: 'LKR', 'Rs': 'LKR', 'Rs.': 'LKR' };
+    return codes[currency] || String(currency).toUpperCase();
   }
 
   function formatMoney(amount, currency) {
     const symbols = { GBP: '£', USD: '$', EUR: '€', LKR: 'LKR' };
     const code = getCurrencyCode(currency);
-    return `${symbols[code] || currency || '£'}${Number(amount).toFixed(2)} ${code}`;
+    if (code === 'LKR') {
+      return `LKR ${Number(amount).toFixed(2)}`;
+    }
+    return `${symbols[code] || currency || ''}${Number(amount).toFixed(2)} ${code}`;
   }
 
   function requiresDeliveryAddress() {
@@ -254,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let orderRef = '';
       let totalFormatted = grandTotal.toFixed(2);
-      let orderCurrency = cart[0].currency || '£';
+      let orderCurrency = (cart[0] && cart[0].currency && cart[0].currency !== '£' && cart[0].currency !== 'GBP') ? cart[0].currency : 'LKR';
       let emailStatus = 'pending';
 
       if (checkoutError) {

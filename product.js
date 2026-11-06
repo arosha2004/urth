@@ -169,6 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const itemQty = parseInt(item.qty, 10) || 1;
         subtotal += itemPrice * itemQty;
         const optText = item.option ? `<span style="font-size: 11px; color: #888; display: block; margin-top: 2px;">Option: ${item.option}</span>` : '';
+        const itemCurr = (!item.currency || item.currency === '£' || item.currency === 'GBP') ? 'LKR' : item.currency;
+        const itemPrefix = ['£', '$', '€'].includes(itemCurr) ? itemCurr : itemCurr + ' ';
 
         return `
           <li class="cart-item" data-id="${item.id}" data-opt="${encodeURIComponent(item.option || '')}">
@@ -178,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="cart-item-details">
               <h4 class="cart-item-title"><a href="product.php?id=${item.id}" style="color:inherit; text-decoration:none;">${item.name}</a></h4>
               ${optText}
-              <div class="cart-item-price">${item.currency || '£'}${itemPrice.toFixed(2)}</div>
+              <div class="cart-item-price">${itemPrefix}${itemPrice.toFixed(2)}</div>
               <div class="cart-item-qty-row">
                 <button type="button" class="drawer-qty-btn drawer-qty-minus" data-id="${item.id}" data-opt="${encodeURIComponent(item.option || '')}">&minus;</button>
                 <span class="drawer-qty-val">${itemQty}</span>
@@ -233,8 +235,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (cartSubtotalAmount) {
-      const curr = (cart[0] && cart[0].currency) ? cart[0].currency : '£';
-      cartSubtotalAmount.textContent = `${curr}${subtotal.toFixed(2)}`;
+      let curr = (cart[0] && cart[0].currency) ? cart[0].currency : 'LKR';
+      if (curr === '£' || curr === 'GBP') curr = 'LKR';
+      const prefix = ['£', '$', '€'].includes(curr) ? curr : curr + ' ';
+      cartSubtotalAmount.textContent = `${prefix}${subtotal.toFixed(2)}`;
     }
   }
 
@@ -256,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
           name: currentProduct.name,
           sku: currentProduct.sku,
           price: parseFloat(currentProduct.price) || 0,
-          currency: currentProduct.currency || '£',
+          currency: (currentProduct.currency && currentProduct.currency !== '£' && currentProduct.currency !== 'GBP') ? currentProduct.currency : 'LKR',
           image: currentProduct.image,
           product_type: currentProduct.product_type || 'furniture_object',
           book_format: currentProduct.book_format || '',

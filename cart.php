@@ -136,7 +136,7 @@ require_once __DIR__ . '/config.php';
 
         <div class="cart-totals-row">
           <span>Items Subtotal:</span>
-          <strong id="cartSubtotalVal">£0.00</strong>
+          <strong id="cartSubtotalVal">LKR 0.00</strong>
         </div>
 
         <div class="cart-shipping-options">
@@ -145,7 +145,7 @@ require_once __DIR__ . '/config.php';
 
         <div class="cart-totals-row total-row">
           <span>Grand Total:</span>
-          <span id="cartGrandTotalVal" style="color: var(--urth-gold);">£0.00 (provisional)</span>
+          <span id="cartGrandTotalVal" style="color: var(--urth-gold);">LKR 0.00 (provisional)</span>
         </div>
 
         <!-- Direct Checkout Form -->
@@ -224,7 +224,7 @@ require_once __DIR__ . '/config.php';
       <div class="order-number-badge" id="modalOrderNumber">URTH-261017-0000</div>
       
       <div style="font-size: 13px; color: #555555; margin-bottom: 25px;" id="modalOrderSummaryText">
-        Total: £0.00
+        Total: LKR 0.00
       </div>
 
       <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">

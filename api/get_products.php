@@ -57,7 +57,7 @@ try {
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $priceFloat = (float)$row['price'];
-            $curr = !empty($row['currency']) ? $row['currency'] : '£';
+            $curr = (!empty($row['currency']) && $row['currency'] !== '£' && $row['currency'] !== 'GBP') ? $row['currency'] : 'LKR';
             $salePriceFloat = $row['sale_price'] !== null ? (float)$row['sale_price'] : null;
             $priceOnRequest = (int)($row['price_on_request'] ?? 0) === 1 || ($priceFloat <= 0 && $row['price_on_request'] !== null);
             $availability = !empty($row['availability']) ? strtolower($row['availability']) : 'available';
@@ -74,6 +74,7 @@ try {
                 $gallery = [$row['image']];
             }
 
+            $prefix = (in_array($curr, ['£', '$', '€'], true) ? $curr : $curr . ' ');
             $products[] = [
                 'id' => (string)$row['id'],
                 'slug' => $row['slug'],
@@ -81,8 +82,8 @@ try {
                 'sku' => $row['sku'] ?? ('PR' . str_pad($row['id'], 3, '0', STR_PAD_LEFT)),
                 'price' => $priceFloat,
                 'sale_price' => $salePriceFloat,
-                'formattedPrice' => $priceOnRequest ? 'Price on request' : ($curr . number_format($priceFloat, 2)),
-                'formattedSalePrice' => ($priceOnRequest || $salePriceFloat === null) ? null : ($curr . number_format($salePriceFloat, 2)),
+                'formattedPrice' => $priceOnRequest ? 'Price on request' : ($prefix . number_format($priceFloat, 2)),
+                'formattedSalePrice' => ($priceOnRequest || $salePriceFloat === null) ? null : ($prefix . number_format($salePriceFloat, 2)),
                 'currency' => $curr,
                 'category' => $row['category'] ?? 'Furniture & Objects',
                 'description' => $row['description'] ?? '',

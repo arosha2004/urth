@@ -356,8 +356,9 @@ switch ($msg) {
                                     if (!preg_match('/^https?:\/\//i', $imgSrc)) {
                                         $imgSrc = '../' . ltrim($imgSrc, '/');
                                     }
-                                    $curr = !empty($prod['currency']) ? $prod['currency'] : '£';
-                                    $displayPrice = $curr . number_format((float)$prod['price'], 2);
+                                    $curr = (!empty($prod['currency']) && $prod['currency'] !== '£' && $prod['currency'] !== 'GBP') ? $prod['currency'] : 'LKR';
+                                    $prefix = (in_array($curr, ['£', '$', '€'], true) ? $curr : $curr . ' ');
+                                    $displayPrice = $prefix . number_format((float)$prod['price'], 2);
 
                                     $stockQty = isset($prod['stock_quantity']) ? (int)$prod['stock_quantity'] : 10;
                                     $lowThresh = isset($prod['low_stock_threshold']) ? (int)$prod['low_stock_threshold'] : 2;
@@ -677,11 +678,11 @@ switch ($msg) {
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px;">
                         <div class="form-group">
-                            <label for="add_product_price" class="form-label">Price (£) *</label>
+                            <label for="add_product_price" class="form-label">Price (LKR) *</label>
                             <input type="number" step="0.01" min="0" id="add_product_price" name="price" class="form-control" placeholder="0.00" required>
                         </div>
                         <div class="form-group">
-                            <label for="add_product_sale_price" class="form-label">Sale Price (£)</label>
+                            <label for="add_product_sale_price" class="form-label">Sale Price (LKR)</label>
                             <input type="number" step="0.01" min="0" id="add_product_sale_price" name="sale_price" class="form-control">
                         </div>
                         <div class="form-group">
@@ -1056,11 +1057,11 @@ switch ($msg) {
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px;">
                         <div class="form-group">
-                            <label for="edit_product_price" class="form-label">Price (£) *</label>
+                            <label for="edit_product_price" class="form-label">Price (LKR) *</label>
                             <input type="number" step="0.01" min="0" id="edit_product_price" name="price" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="edit_product_sale_price" class="form-label">Sale Price (£)</label>
+                            <label for="edit_product_sale_price" class="form-label">Sale Price (LKR)</label>
                             <input type="number" step="0.01" min="0" id="edit_product_sale_price" name="sale_price" class="form-control">
                         </div>
                         <div class="form-group">

@@ -102,8 +102,8 @@ switch ($action) {
         $price = filter_var($_POST['price'] ?? 0, FILTER_VALIDATE_FLOAT);
         $sale_price_raw = trim($_POST['sale_price'] ?? '');
         $sale_price = ($sale_price_raw !== '' && is_numeric($sale_price_raw)) ? (float)$sale_price_raw : null;
-        $currency = trim($_POST['currency'] ?? '£');
-        if (empty($currency)) $currency = '£';
+        $currency = trim($_POST['currency'] ?? 'LKR');
+        if (empty($currency) || $currency === '£' || $currency === 'GBP') $currency = 'LKR';
 
         $category = ensure_category_exists($conn, $_POST['category'] ?? '', $_POST['custom_category'] ?? '');
 
@@ -333,8 +333,8 @@ switch ($action) {
         $price = filter_var($_POST['price'] ?? 0, FILTER_VALIDATE_FLOAT);
         $sale_price_raw = trim($_POST['sale_price'] ?? '');
         $sale_price = ($sale_price_raw !== '' && is_numeric($sale_price_raw)) ? (float)$sale_price_raw : null;
-        $currency = trim($_POST['currency'] ?? '£');
-        if (empty($currency)) $currency = '£';
+        $currency = trim($_POST['currency'] ?? 'LKR');
+        if (empty($currency) || $currency === '£' || $currency === 'GBP') $currency = 'LKR';
 
         $category = ensure_category_exists($conn, $_POST['category'] ?? '', $_POST['custom_category'] ?? '');
 
