@@ -82,6 +82,14 @@ $tableSql = "CREATE TABLE IF NOT EXISTS products (
     deliverables TEXT DEFAULT NULL,
     included_revisions VARCHAR(255) DEFAULT NULL,
     type_details LONGTEXT DEFAULT NULL,
+    stock_quantity INT(11) DEFAULT 10,
+    low_stock_threshold INT(11) DEFAULT 2,
+    booking_capacity INT(11) DEFAULT 0,
+    booked_count INT(11) DEFAULT 0,
+    allow_backorder TINYINT(1) DEFAULT 0,
+    lead_time VARCHAR(100) DEFAULT NULL,
+    digital_deliverable_file VARCHAR(255) DEFAULT NULL,
+    digital_access_link TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
@@ -90,6 +98,36 @@ if ($conn->query($tableSql) === TRUE) {
     echo "Table 'products' created or verified successfully.\n";
 } else {
     die("Error creating products table: " . $conn->error . "\n");
+}
+
+// Ensure all newer columns exist even if products table was created in an older schema
+$productColsToAdd = [
+    'stock_quantity' => "INT(11) DEFAULT 10",
+    'low_stock_threshold' => "INT(11) DEFAULT 2",
+    'booking_capacity' => "INT(11) DEFAULT 0",
+    'booked_count' => "INT(11) DEFAULT 0",
+    'allow_backorder' => "TINYINT(1) DEFAULT 0",
+    'lead_time' => "VARCHAR(100) DEFAULT NULL",
+    'digital_deliverable_file' => "VARCHAR(255) DEFAULT NULL",
+    'digital_access_link' => "TEXT DEFAULT NULL"
+];
+$existingProductCols = [];
+$cRes = $conn->query("SHOW COLUMNS FROM products");
+if ($cRes) {
+    while ($crow = $cRes->fetch_assoc()) {
+        $existingProductCols[] = $crow['Field'];
+    }
+}
+foreach ($productColsToAdd as $col => $def) {
+    if (!in_array($col, $existingProductCols, true)) {
+        $conn->query("ALTER TABLE products ADD COLUMN {$col} {$def}");
+    }
+}
+
+// Ensure upload directory exists
+$uploadDir = __DIR__ . '/img/shop/uploads';
+if (!is_dir($uploadDir)) {
+    @mkdir($uploadDir, 0755, true);
 }
 
 // Check if products already exist

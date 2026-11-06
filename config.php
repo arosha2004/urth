@@ -1,13 +1,47 @@
 <?php
 // config.php
-// Credentials are loaded from environment variables (set in the server / hosting control panel).
-// NEVER commit real credentials to source control.
-// For local XAMPP development, the fallback values below are used automatically.
+
+// 1. Try to load variables from .env file if it exists
+$envFile = __DIR__ . '/.env';
+if (file_exists($envFile) && is_readable($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || strpos($line, '#') === 0) continue;
+        if (strpos($line, '=') !== false) {
+            list($key, $val) = explode('=', $line, 2);
+            $key = trim($key);
+            $val = trim(trim($val), "\"'");
+            if (!getenv($key)) {
+                putenv("$key=$val");
+                $_ENV[$key] = $val;
+            }
+        }
+    }
+}
+
+// 2. Detect environment (local XAMPP vs Hostinger production)
+$is_local = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)
+         || php_sapi_name() === 'cli'
+         || (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false);
 
 $db_host = getenv('DB_HOST') ?: 'localhost';
-$db_user = getenv('DB_USER') ?: 'root';
-$db_pass = getenv('DB_PASS') ?: '';
-$db_name = getenv('DB_NAME') ?: 'urth_db';
+$db_user = getenv('DB_USER');
+$db_pass = getenv('DB_PASS');
+$db_name = getenv('DB_NAME');
+
+if (!$db_user) {
+    if ($is_local) {
+        $db_user = 'root';
+        $db_pass = '';
+        $db_name = 'urth_db';
+    } else {
+        // Hostinger production database credentials
+        $db_user = 'u828029692_urthadmin';
+        $db_pass = 'RootFh@21$';
+        $db_name = 'u828029692_urth_db';
+    }
+}
 
 // Create connection
 try {
@@ -15,16 +49,15 @@ try {
     // Set charset to ensure proper encoding
     $conn->set_charset("utf8mb4");
 } catch (Throwable $e) {
-    // FIX #13: Never expose raw DB error details to the browser in production.
-    // Log the real error server-side; show a safe message to the user.
+    
+    // If production credentials fail or local fails, log and display appropriate message
     error_log('DB connection failed: ' . $e->getMessage());
-    $is_local = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true);
     if ($is_local) {
         // Detailed output only for local/developer access
         echo "<div style='border: 1px solid red; padding: 20px; font-family: sans-serif;'>";
         echo "<h3>Database Connection Failed</h3>";
         echo "<p><strong>Error:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
-        echo "<p>Check DB_HOST, DB_USER, DB_PASS, DB_NAME environment variables.</p>";
+        echo "<p>Check DB_HOST, DB_USER, DB_PASS, DB_NAME environment variables or .env file.</p>";
         echo "</div>";
     } else {
         echo "<div style='border: 1px solid red; padding: 20px; font-family: sans-serif;'>";

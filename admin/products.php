@@ -8,10 +8,15 @@ require_once __DIR__ . '/auth.php';
 require_admin_auth();
 require_once '../config.php';
 
-// Auto-check tables
+// Auto-check tables and ensure complete schema
 $tblCheck = $conn->query("SHOW TABLES LIKE 'products'");
 if (!$tblCheck || $tblCheck->num_rows === 0) {
     require_once __DIR__ . '/../setup_shop.php';
+} else {
+    $colCheck = $conn->query("SHOW COLUMNS FROM products LIKE 'stock_quantity'");
+    if (!$colCheck || $colCheck->num_rows === 0) {
+        require_once __DIR__ . '/../setup_shop.php';
+    }
 }
 
 // Fetch all categories from product_categories
@@ -1456,6 +1461,27 @@ document.addEventListener('DOMContentLoaded', () => {
             openModal(editCatModal);
         });
     });
+
+    // Price On Request Toggle for Add & Edit
+    const setupPorToggle = (porId, priceId) => {
+        const porEl = document.querySelector(porId);
+        const priceEl = document.querySelector(priceId);
+        if (!porEl || !priceEl) return;
+        const update = () => {
+            if (porEl.checked) {
+                priceEl.removeAttribute('required');
+                if (!priceEl.value || parseFloat(priceEl.value) <= 0) {
+                    priceEl.value = '0.00';
+                }
+            } else {
+                priceEl.setAttribute('required', 'required');
+            }
+        };
+        porEl.addEventListener('change', update);
+        update();
+    };
+    setupPorToggle('#add_product_price_on_request', '#add_product_price');
+    setupPorToggle('#edit_product_price_on_request', '#edit_product_price');
 
     // Add Product Modal
     const addModal = document.querySelector('#addProductModal');

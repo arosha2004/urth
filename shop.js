@@ -75,13 +75,46 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalWhatsAppBtn = document.querySelector('#modalWhatsAppBtn');
   let activeModalProduct = null;
 
-  // Helper: Normalize category strings into URL/slug format
+  // Helper: Normalize category strings into URL/slug format (matching PHP slugify)
   function slugify(text) {
     return (text || '').toString().toLowerCase()
       .trim()
-      .replace(/&/g, 'and')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
+  }
+
+  // Category matching helper: matches by slug, name, or normalized slug (with or without 'and')
+  function matchesCategory(prodCategory, targetCategory) {
+    if (!targetCategory || targetCategory === 'all') return true;
+    if (!prodCategory) return false;
+
+    const pCatLower = prodCategory.toLowerCase().trim();
+    const tCatLower = targetCategory.toLowerCase().trim();
+    if (pCatLower === tCatLower) return true;
+
+    const pSlug = slugify(prodCategory);
+    const tSlug = slugify(targetCategory);
+    if (pSlug === tSlug) return true;
+
+    // Handle variations with or without "-and-" vs "-"
+    const pNorm = pSlug.replace(/-and-/g, '-');
+    const tNorm = tSlug.replace(/-and-/g, '-');
+    if (pNorm === tNorm) return true;
+
+    // Match against categories list if available
+    const catList = Array.isArray(window.INITIAL_CATEGORIES) ? window.INITIAL_CATEGORIES : [];
+    for (const c of catList) {
+      if (!c) continue;
+      const cSlug = (c.slug || '').toLowerCase();
+      const cName = (c.name || '').toLowerCase();
+      if (cSlug === tSlug || cSlug === targetCategory.toLowerCase() || cName === tCatLower) {
+        if (pCatLower === cName || pSlug === cSlug || pNorm === cSlug.replace(/-and-/g, '-')) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   // Sorting & Filtering (Category, Search, Availability, Format Label)
@@ -103,11 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Filter by category
     if (currentCategory && currentCategory !== 'all') {
-      const targetSlug = slugify(currentCategory);
-      list = list.filter(p => {
-        const catSlug = slugify(p.category);
-        return catSlug === targetSlug || (p.category && p.category.toLowerCase() === currentCategory.toLowerCase());
-      });
+      list = list.filter(p => matchesCategory(p.category, currentCategory));
     }
 
     // Filter by availability
@@ -151,11 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.category-pill-btn[data-category]').forEach(btn => {
       const catKey = btn.getAttribute('data-category');
       if (catKey === 'all') return;
-      const targetSlug = slugify(catKey);
-      const count = allProducts.filter(p => {
-        const pSlug = slugify(p.category);
-        return pSlug === targetSlug || (p.category && p.category.toLowerCase() === catKey.toLowerCase());
-      }).length;
+      const catName = btn.getAttribute('data-name') || btn.querySelector('.cat-name')?.textContent || '';
+      const count = allProducts.filter(p => matchesCategory(p.category, catKey) || (catName && matchesCategory(p.category, catName))).length;
       const badge = btn.querySelector('.cat-badge');
       if (badge) badge.textContent = String(count);
     });
@@ -168,10 +194,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.category-pill-btn').forEach(btn => {
       const bCat = btn.getAttribute('data-category');
-      if (slugify(bCat) === slugify(currentCategory)) {
-        btn.classList.add('active');
+      const bName = btn.getAttribute('data-name') || btn.querySelector('.cat-name')?.textContent || '';
+      if (currentCategory === 'all') {
+        if (bCat === 'all') {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
       } else {
-        btn.classList.remove('active');
+        if (bCat === currentCategory || matchesCategory(bName, currentCategory) || matchesCategory(bCat, currentCategory)) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
       }
     });
 

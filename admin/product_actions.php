@@ -11,10 +11,15 @@ require_admin_auth();
 require_once '../config.php';
 require_once __DIR__ . '/../app/Core/private_storage.php';
 
-// Ensure tables exist
+// Ensure tables exist and have complete schema
 $tableCheck = $conn->query("SHOW TABLES LIKE 'products'");
 if (!$tableCheck || $tableCheck->num_rows === 0) {
     require_once __DIR__ . '/../setup_shop.php';
+} else {
+    $colCheck = $conn->query("SHOW COLUMNS FROM products LIKE 'stock_quantity'");
+    if (!$colCheck || $colCheck->num_rows === 0) {
+        require_once __DIR__ . '/../setup_shop.php';
+    }
 }
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
