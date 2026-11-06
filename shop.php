@@ -10,7 +10,6 @@ if (!$tblCheck || $tblCheck->num_rows === 0) {
 // Fetch active products from MySQL database
 $result = $conn->query("SELECT * FROM products WHERE is_active = 1 ORDER BY display_order ASC, id ASC");
 $products = [];
-$featuredProducts = [];
 $allProductsData = [];
 
 if ($result) {
@@ -49,14 +48,7 @@ if ($result) {
         ];
         $products[] = $p;
         $allProductsData[] = $p;
-        if ($p['is_featured'] === 1) {
-            $featuredProducts[] = $p;
-        }
     }
-}
-// Fallback if no products are explicitly marked featured
-if (empty($featuredProducts) && !empty($products)) {
-    $featuredProducts = array_slice($products, 0, 4);
 }
 $totalProducts = count($products);
 $initialCount = min(8, $totalProducts);
@@ -105,16 +97,14 @@ if ($catResult) {
   <div class="hero-top-nav">
     <div class="logo">
       <a href="index.php" style="text-decoration: none;">
-        <img src="img/URTH (1).png" alt="Urth Logo" class="navbar-brand-image" style="height: 22px; margin: 0; padding: 0; object-fit: contain; vertical-align: middle; transform: translateY(-2px);">
+        <img src="img/URTH (1).png" alt="URTH home" class="navbar-brand-image">
       </a>
     </div>
 
     <nav class="center-nav">
-      <a href="index.php">HOME</a>
-      <a href="about.html">ABOUT</a>
-      <a href="projects.php">PROJECTS</a>
-      <a href="contact.html">CONTACT</a>
-      <a href="shop.php" class="active">SHOP</a>
+      <a href="about.html">Studio</a>
+      <a href="projects.php">Projects</a>
+      <a href="shop.php" class="active">Shop</a>
     </nav>
 
     <div class="right-nav">
@@ -124,6 +114,7 @@ if ($catResult) {
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <path d="M16 10a4 4 0 0 1-8 0"></path>
         </svg>
+        <span class="bag-label">Bag</span>
         <span class="cart-badge" id="cartBadge">0</span>
       </button>
 
@@ -137,13 +128,13 @@ if ($catResult) {
 
   <div class="mobile-nav-overlay">
     <nav class="mobile-nav-links">
-      <a href="index.php">HOME</a>
-      <a href="about.html">ABOUT</a>
-      <a href="projects.php">PROJECTS</a>
-      <a href="contact.html">CONTACT</a>
-      <a href="shop.php" class="active">SHOP</a>
+      <a href="about.html">Studio</a>
+      <a href="projects.php">Projects</a>
+      <a href="shop.php" class="active">Shop</a>
     </nav>
   </div>
+
+  <a class="shop-skip-link" href="#catalogHeading">Skip to catalogue</a>
 
   <!-- ==========================================================================
        HERO BANNER
@@ -152,155 +143,23 @@ if ($catResult) {
     <span class="overlay"></span>
     <img src="img/shop/shop-hero-gallery-dark.jpg" alt="URTH Studio Shop" class="s-img-switch banner-bg" />
     <div class="content">
-      <h1 class="title">Curated Artifacts, Tools &amp; Design Consultations</h1>
-      <p class="description">
-        A deliberate repository curated by URTH Architecture Studio &mdash; bridging physical handcrafted furniture, downloadable architectural toolkits and personalized spatial consultations. Designed to enrich spatial practices and creative environments.
-      </p>
+      <span class="hero-eyebrow">URTH <span aria-hidden="true">/</span> ARCHITECTURE STUDIO</span>
+      <h1 class="title">The studio shop.</h1>
+      <p class="description">Furniture and objects, tools for design, and time with the studio.</p>
+      <a class="hero-cta" href="#catalogHeading">Explore the collection <span aria-hidden="true">&darr;</span></a>
     </div>
+    <span class="hero-note">FIG. 01 &nbsp; STUDIO GALLERY</span>
   </section>
 
   
   <main class="shop-container" id="shopMain">
-    <nav class="woocommerce-breadcrumb" aria-label="Breadcrumb">
-      <a href="index.php">Home</a> <span class="sep">/</span> <span class="current">Shop</span>
-    </nav>
-
-    <section class="shop-categories-showcase" aria-label="Five Core Categories">
-      <div class="categories-showcase-header">
-        <span class="showcase-eyebrow">EXPLORE BY DISCIPLINE</span>
-        <h3 class="showcase-title">Five Curated Categories</h3>
-      </div>
-      <div class="categories-showcase-grid">
-        <?php
-          $categoryDetails = [
-            'digital-tools' => ['num' => '01', 'name' => 'Digital Tools', 'desc' => 'Procreate brushes, presentation templates, CAD blocks, Revit families & 3D textures.'],
-            'books-planners' => ['num' => '02', 'name' => 'Books & Planners', 'desc' => 'Design booklets, home planning workbooks, renovation trackers & architectural publications.'],
-            'furniture-objects' => ['num' => '03', 'name' => 'Furniture & Objects', 'desc' => 'Signature bespoke timber furniture, custom homeware, architectural art & prints.'],
-            'learn' => ['num' => '04', 'name' => 'Learn', 'desc' => 'Recorded courses, live workshops, architectural webinars & studio masterclasses.'],
-            'design-sessions' => ['num' => '05', 'name' => 'Design Sessions', 'desc' => 'Space reviews, room refresh consultations & fixed-scope design packages.']
-          ];
-          
-          foreach ($categoryDetails as $slug => $meta):
-            $cnt = 0;
-            foreach ($categoriesList as $cl) {
-              if ($cl['slug'] === $slug || strtolower($cl['name']) === strtolower($meta['name'])) {
-                $cnt = (int)$cl['product_count'];
-                break;
-              }
-            }
-        ?>
-          <a href="#catalogHeading" class="category-card-link" onclick="window.setCategory('<?= htmlspecialchars($slug) ?>'); return true;">
-            <div class="category-card-top">
-              <span class="category-card-num"><?= $meta['num'] ?></span>
-              <span class="category-card-count"><?= $cnt ?> <?= $cnt === 1 ? 'Item' : 'Items' ?></span>
-            </div>
-            <h4 class="category-card-title"><?= htmlspecialchars($meta['name']) ?></h4>
-            <p class="category-card-desc"><?= htmlspecialchars($meta['desc']) ?></p>
-            <div class="category-card-action">
-              <span>View Collection</span>
-              <span aria-hidden="true">&rarr;</span>
-            </div>
-          </a>
-        <?php endforeach; ?>
-      </div>
-    </section>
-
-    <!-- Featured Products Area (Studio Selection) -->
-    <?php if (!empty($featuredProducts)): ?>
-      <section class="featured-products-section" id="featuredProductsSection">
-        <div class="section-heading-wrap">
-          <div>
-            <span class="section-eyebrow">STUDIO SELECTION</span>
-            <h2 class="section-title">Featured Products</h2>
-          </div>
-          <p class="section-subtext">Signature items and master resources hand-selected by our principal designers.</p>
-        </div>
-        <div class="featured-products-grid">
-          <?php foreach ($featuredProducts as $fp): ?>
-            <?php
-              $fAvail = strtolower($fp['availability'] ?? 'available');
-              $fAvailClass = 'avail-' . str_replace('_', '-', $fAvail);
-              $fAvailText = 'Available';
-              if ($fAvail === 'made_to_order') $fAvailText = 'Made to Order';
-              elseif ($fAvail === 'coming_soon') $fAvailText = 'Coming Soon';
-              elseif ($fAvail === 'unavailable') $fAvailText = 'Unavailable';
-            ?>
-            <div class="product-item" data-id="<?= htmlspecialchars($fp['id']) ?>">
-              <a href="product.php?id=<?= htmlspecialchars($fp['id']) ?>" class="product-thumb-link">
-                <div class="product-image-box">
-                  <img src="<?= htmlspecialchars($fp['image']) ?>" alt="<?= htmlspecialchars($fp['name']) ?>" loading="lazy" width="300" height="300">
-                </div>
-                <span class="product-cat-tag"><?= htmlspecialchars($fp['category']) ?></span>
-                <h3 class="woocommerce-loop-product__title"><?= htmlspecialchars($fp['name']) ?></h3>
-                <?php if (!empty($fp['price_on_request'])): ?>
-                  <span class="price-on-request">Price on request</span>
-                <?php elseif (!empty($fp['sale_price'])): ?>
-                  <span class="price">
-                    <del style="opacity: 0.5; margin-right: 5px;"><?= htmlspecialchars($fp['formattedPrice']) ?></del>
-                    <ins style="text-decoration: none; font-weight: 700;"><?= htmlspecialchars($fp['formattedSalePrice']) ?></ins>
-                  </span>
-                <?php else: ?>
-                  <span class="price"><?= htmlspecialchars($fp['formattedPrice']) ?></span>
-                <?php endif; ?>
-              </a>
-              <?php if ($fAvail === 'coming_soon'): ?>
-                <button type="button" class="button btn-coming-soon" disabled aria-disabled="true" title="Coming soon — payment not accepted for upcoming items">
-                  COMING SOON
-                </button>
-              <?php elseif ($fAvail === 'unavailable'): ?>
-                <button type="button" class="button btn-unavailable" disabled aria-disabled="true">
-                  UNAVAILABLE
-                </button>
-              <?php elseif (!empty($fp['price_on_request'])): ?>
-                <button type="button" class="button btn-inquire" onclick="window.inquireProduct('<?= htmlspecialchars($fp['id']) ?>')">
-                  INQUIRE ON WHATSAPP
-                </button>
-              <?php else: ?>
-                <button type="button" class="button add_to_cart_button" data-id="<?= htmlspecialchars($fp['id']) ?>">
-                  ADD TO CART
-                </button>
-              <?php endif; ?>
-            </div>
-          <?php endforeach; ?>
-        </div>
-      </section>
-    <?php endif; ?>
-
-    <!-- Short Explanation of the Ordering Process -->
-    <section class="ordering-process-section" id="orderingProcess">
-      <div class="section-heading-wrap centered">
-        <span class="section-eyebrow">ORDERING DIRECT WITH THE STUDIO</span>
-        <h2 class="section-title">How To Order With URTH</h2>
-        <p class="section-subtext">A tailored, direct experience designed for collectors, creative professionals, and private clients.</p>
-      </div>
-      <div class="process-steps-grid">
-        <div class="process-step-card">
-          <div class="step-num">01</div>
-          <h3 class="step-title">Select &amp; Curate</h3>
-          <p class="step-desc">Browse our downloadable digital toolkits, bespoke timber furniture, published research workbooks, or private consultation sessions.</p>
-        </div>
-        <div class="process-step-card">
-          <div class="step-num">02</div>
-          <h3 class="step-title">Submit WhatsApp Cart</h3>
-          <p class="step-desc">Review your selected items in the cart and submit your order inquiry directly to our studio team on WhatsApp with project notes.</p>
-        </div>
-        <div class="process-step-card">
-          <div class="step-num">03</div>
-          <h3 class="step-title">Studio Confirmation</h3>
-          <p class="step-desc">Our architects review your requirements, confirm bespoke timber finishes or production lead times, and issue your formal invoice.</p>
-        </div>
-        <div class="process-step-card">
-          <div class="step-num">04</div>
-          <h3 class="step-title">Seamless Delivery</h3>
-          <p class="step-desc">Instant file access dispatched for digital items, white-glove shipping for furniture, or scheduled video consultations.</p>
-        </div>
-      </div>
-    </section>
-
     <!-- Main Catalog Section -->
-    <div id="catalogHeading" style="padding-top: 30px;"></div>
-    <header class="woocommerce-products-header" style="margin-bottom: 25px;">
-      <h2 class="woocommerce-products-header__title page-title">Complete Catalog</h2>
+    <header class="woocommerce-products-header" id="catalogHeading">
+      <div>
+        <span class="catalog-eyebrow">01 &nbsp;/&nbsp; CATALOGUE</span>
+        <h2 class="woocommerce-products-header__title page-title">The collection</h2>
+      </div>
+      <a class="catalog-guide-link" href="#orderingProcess">How to order <span aria-hidden="true">&darr;</span></a>
     </header>
 
     <!-- Product Search and Toolbar -->
@@ -310,14 +169,14 @@ if ($catResult) {
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input type="text" id="shopSearchInput" placeholder="Search products by title, format label, SKU, or description...">
+        <input type="text" id="shopSearchInput" placeholder="Find a piece or SKU" aria-label="Find a piece or SKU">
         <button type="button" class="shop-search-clear" id="shopSearchClear" aria-label="Clear search">&times;</button>
       </div>
 
       <!-- Dynamic Category Filter Bar -->
       <nav class="shop-category-bar" aria-label="Shop categories" id="categoryNav">
         <button type="button" class="category-pill-btn active" data-category="all">
-          <span class="cat-name">All</span>
+          <span class="cat-name">All pieces</span>
           <span class="cat-badge" id="catCountAll"><?= $totalProducts ?></span>
         </button>
         <?php foreach ($categoriesList as $catItem): ?>
@@ -329,39 +188,45 @@ if ($catResult) {
       </nav>
 
       <div class="shop-controls-bar">
-        <div class="shop-filters-left">
-          <select id="availabilityFilter" class="shop-select-filter" aria-label="Filter by availability">
-            <option value="all">All Availability</option>
-            <option value="available">Available Now</option>
-            <option value="made_to_order">Made to Order</option>
-            <option value="coming_soon">Coming Soon</option>
-            <option value="unavailable">Unavailable</option>
-          </select>
-
-          <select id="labelFilter" class="shop-select-filter" aria-label="Filter by format label">
-            <option value="all">All Formats</option>
-            <option value="Digital">Digital</option>
-            <option value="Printed">Printed</option>
-            <option value="Made to order">Made to order</option>
-            <option value="Online course">Online course</option>
-            <option value="Consultation">Consultation</option>
-          </select>
-        </div>
-
-        <div style="display: flex; align-items: center; gap: 16px;">
-          <p class="woocommerce-result-count" id="resultCount" style="margin: 0;">
+        <div class="shop-search-tools">
+          <p class="woocommerce-result-count" id="resultCount" aria-live="polite">
             <?= $totalProducts > 0 ? "Showing 1–{$initialCount} of {$totalProducts} results" : "No products available" ?>
           </p>
           <div class="select-wrap">
             <select name="orderby" class="orderby" id="orderBySelect" aria-label="Shop order">
-              <option value="menu_order" selected="selected">Default sorting</option>
-              <option value="popularity">Sort by popularity</option>
-              <option value="date">Sort by latest</option>
-              <option value="price-asc">Sort by price: low to high</option>
-              <option value="price-desc">Sort by price: high to low</option>
+              <option value="menu_order" selected="selected">Studio order</option>
+              <option value="price-asc">Price · low to high</option>
+              <option value="price-desc">Price · high to low</option>
+              <option value="name">Name · A–Z</option>
             </select>
             <span class="select-arrow" aria-hidden="true">&#9662;</span>
           </div>
+          <details class="advanced-filters">
+            <summary>More filters</summary>
+            <div class="advanced-filters-panel">
+              <label>
+                Availability
+                <select id="availabilityFilter" class="shop-select-filter">
+                  <option value="all">All availability</option>
+                  <option value="available">Available now</option>
+                  <option value="made_to_order">Made to order</option>
+                  <option value="coming_soon">Coming soon</option>
+                  <option value="unavailable">Unavailable</option>
+                </select>
+              </label>
+              <label>
+                Format
+                <select id="labelFilter" class="shop-select-filter">
+                  <option value="all">All formats</option>
+                  <option value="Digital">Digital</option>
+                  <option value="Printed">Printed</option>
+                  <option value="Made to order">Made to order</option>
+                  <option value="Online course">Online course</option>
+                  <option value="Consultation">Consultation</option>
+                </select>
+              </label>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -391,12 +256,35 @@ if ($catResult) {
             elseif ($avail === 'unavailable') $availText = 'Unavailable';
           ?>
           <li class="product-item" data-id="<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>">
-            <a href="product.php?id=<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" class="product-thumb-link">
-              <div class="product-image-box">
+            <div class="product-image-box">
+              <a href="product.php?id=<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" class="product-thumb-link">
                 <img src="<?= htmlspecialchars($p['image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($p['name'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy" width="300" height="300">
-              </div>
+              </a>
+              <span class="product-ref"><?= htmlspecialchars($p['sku'], ENT_QUOTES, 'UTF-8') ?></span>
+              <button type="button" class="product-quick-view" onclick="window.openProductModal('<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>')">Quick view</button>
+              <?php if ($avail === 'coming_soon'): ?>
+                <button type="button" class="button btn-coming-soon product-add" disabled aria-disabled="true" title="Coming soon — payment not accepted for upcoming items">
+                  +
+                </button>
+              <?php elseif ($avail === 'unavailable'): ?>
+                <button type="button" class="button btn-unavailable product-add" disabled aria-disabled="true">
+                  +
+                </button>
+              <?php elseif (!empty($p['price_on_request'])): ?>
+                <button type="button" class="button btn-inquire product-add" onclick="window.inquireProduct('<?= htmlspecialchars($p['id']) ?>')">
+                  +
+                </button>
+              <?php else: ?>
+                <button type="button" class="button add_to_cart_button product-add" data-id="<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" aria-label="Add &ldquo;<?= htmlspecialchars($p['name'], ENT_QUOTES, 'UTF-8') ?>&rdquo; to your bag">
+                  +
+                </button>
+              <?php endif; ?>
+            </div>
+            <div class="product-card-caption">
               <span class="product-cat-tag"><?= htmlspecialchars($p['category'] ?? 'Furniture & Objects', ENT_QUOTES, 'UTF-8') ?></span>
-              <h3 class="woocommerce-loop-product__title"><?= htmlspecialchars($p['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+              <a href="product.php?id=<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>">
+                <h3 class="woocommerce-loop-product__title"><?= htmlspecialchars($p['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+              </a>
               <?php if (!empty($p['price_on_request'])): ?>
                 <span class="price-on-request">Price on request</span>
               <?php elseif (!empty($p['sale_price'])): ?>
@@ -407,24 +295,7 @@ if ($catResult) {
               <?php else: ?>
                 <span class="price"><?= htmlspecialchars($p['formattedPrice'], ENT_QUOTES, 'UTF-8') ?></span>
               <?php endif; ?>
-            </a>
-            <?php if ($avail === 'coming_soon'): ?>
-              <button type="button" class="button btn-coming-soon" disabled aria-disabled="true" title="Coming soon — payment not accepted for upcoming items">
-                COMING SOON
-              </button>
-            <?php elseif ($avail === 'unavailable'): ?>
-              <button type="button" class="button btn-unavailable" disabled aria-disabled="true">
-                UNAVAILABLE
-              </button>
-            <?php elseif (!empty($p['price_on_request'])): ?>
-              <button type="button" class="button btn-inquire" onclick="window.inquireProduct('<?= htmlspecialchars($p['id']) ?>')">
-                INQUIRE ON WHATSAPP
-              </button>
-            <?php else: ?>
-              <button type="button" class="button add_to_cart_button" data-id="<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" aria-label="Add &ldquo;<?= htmlspecialchars($p['name'], ENT_QUOTES, 'UTF-8') ?>&rdquo; to your cart">
-                ADD TO CART
-              </button>
-            <?php endif; ?>
+            </div>
           </li>
         <?php endforeach; ?>
       <?php else: ?>
@@ -445,6 +316,51 @@ if ($catResult) {
       </ul>
     </nav>
     <p class="shop-information-link"><a href="shop-info.php">How to order · Payment and delivery · Returns · Digital licence · Privacy · FAQs &amp; contact</a></p>
+
+    <section class="ordering-process-section" id="orderingProcess" aria-labelledby="orderGuideTitle">
+      <div class="guide-heading">
+        <span class="catalog-eyebrow">02 &nbsp;/&nbsp; HOW TO ORDER</span>
+        <h2 class="section-title" id="orderGuideTitle">Order with the studio.</h2>
+        <p>Ask about a finish, a size or delivery to your door. URTH confirms the details and price before you pay.</p>
+      </div>
+      <div class="order-guide-content">
+        <div class="order-steps">
+          <article class="order-step"><span>01</span><h3>Choose your pieces</h3></article>
+          <article class="order-step"><span>02</span><h3>Ask on WhatsApp</h3></article>
+          <article class="order-step"><span>03</span><h3>Confirm and pay</h3></article>
+          <article class="order-step"><span>04</span><h3>Receive your order</h3></article>
+          <a class="guide-browse" href="#catalogHeading">Browse the collection <span aria-hidden="true">&uarr;</span></a>
+        </div>
+        <aside class="guide-notes" aria-label="Order details">
+          <article class="guide-note guide-example">
+            <span class="catalog-eyebrow">01 / EXAMPLE BAG</span>
+            <?php if (!empty($products)): ?>
+              <p class="guide-example-sku"><?= htmlspecialchars($products[0]['sku'], ENT_QUOTES, 'UTF-8') ?> &middot; QTY 1</p>
+              <h3><?= htmlspecialchars($products[0]['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+              <p class="guide-example-price"><?= htmlspecialchars($products[0]['formattedSalePrice'] ?: $products[0]['formattedPrice'], ENT_QUOTES, 'UTF-8') ?></p>
+            <?php else: ?>
+              <h3>Choose what you love.</h3>
+            <?php endif; ?>
+            <p>Open Quick view for a closer look, then add the pieces you like to your bag.</p>
+          </article>
+          <article class="guide-note">
+            <span class="catalog-eyebrow">02 / EXAMPLE ENQUIRY</span>
+            <h3>A question for the studio.</h3>
+            <p>Ask about a finish, size or delivery. URTH will confirm availability, details and the final total.</p>
+          </article>
+          <article class="guide-note">
+            <span class="catalog-eyebrow">03 / BEFORE PAYMENT</span>
+            <h3>Know what you’re agreeing to.</h3>
+            <p>Piece, quantity and finish. Final price and delivery cost. Payment instructions from URTH.</p>
+          </article>
+          <article class="guide-note">
+            <span class="catalog-eyebrow">04 / AFTER PAYMENT VERIFICATION</span>
+            <h3>How it reaches you.</h3>
+            <p>Digital files arrive by email. Furniture and objects are delivered as agreed with the studio.</p>
+          </article>
+        </aside>
+      </div>
+    </section>
   </main>
 
   <!-- ==========================================================================
@@ -521,8 +437,9 @@ if ($catResult) {
 
       <div class="footer-bottom">
         <div class="footer-copyright">
-          <p style="color: rgba(255,255,255,0.7);">URTH. &copy; 2026 ALL RIGHTS RESERVED &nbsp;&bull;&nbsp; <span style="white-space: nowrap;">MADE BY <a href="https://engagelanka.com" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: none; font-weight: 300;">ENGAGELANKA</a></span></p>
+          <p><a href="shop-info.php">Shop information</a><span aria-hidden="true">&nbsp; ↗ &nbsp;·&nbsp; </span><a href="contact.html">Contact</a><span aria-hidden="true">&nbsp; · &nbsp; </span>URTH. &copy; 2026 ALL RIGHTS RESERVED</p>
         </div>
+        <a class="footer-back-top" href="#topBanner">Back to top <span aria-hidden="true">&uarr;</span></a>
         <div class="footer-socials">
           <a href="https://www.instagram.com/urth.spaces/" target="_blank" class="footer-social__link" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
           <a href="https://wa.me/94768008687" target="_blank" class="footer-social__link" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
@@ -572,7 +489,6 @@ if ($catResult) {
   <!-- Pass dynamic products & categories from MySQL to Frontend -->
   <script>
     window.INITIAL_PRODUCTS = <?= json_encode($allProductsData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
-    window.FEATURED_PRODUCTS = <?= json_encode($featuredProducts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
     window.INITIAL_CATEGORIES = <?= json_encode($categoriesList, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
   </script>
   <script src="mobile-nav.js"></script>

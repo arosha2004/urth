@@ -134,6 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return list.sort((a, b) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0));
       case 'price-desc':
         return list.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
+      case 'name':
+        return list.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
       case 'menu_order':
       default:
         return list.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
@@ -215,13 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update Result Count text
     if (resultCount) {
-      const activeBtn = document.querySelector(`.category-pill-btn.active`);
-      const catName = (activeBtn && currentCategory !== 'all') ? ` in ${activeBtn.querySelector('.cat-name').textContent}` : '';
-      if (startIndex + 1 === endIndex) {
-        resultCount.textContent = `Showing ${endIndex} of ${totalItems} results${catName}`;
-      } else {
-        resultCount.textContent = `Showing ${startIndex + 1}–${endIndex} of ${totalItems} results${catName}`;
-      }
+      resultCount.textContent = `${totalItems} ${totalItems === 1 ? 'piece' : 'pieces'}`;
     }
 
     // Render Grid
@@ -249,26 +245,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let btnHtml = '';
       if (avail === 'coming_soon') {
-        btnHtml = `<button type="button" class="button btn-coming-soon" disabled aria-disabled="true" title="Coming soon — payments are not accepted for upcoming items">COMING SOON</button>`;
+        btnHtml = `<button type="button" class="button btn-coming-soon product-add" disabled aria-disabled="true" title="Coming soon — payments are not accepted for upcoming items">+</button>`;
       } else if (avail === 'unavailable') {
-        btnHtml = `<button type="button" class="button btn-unavailable" disabled aria-disabled="true">UNAVAILABLE</button>`;
+        btnHtml = `<button type="button" class="button btn-unavailable product-add" disabled aria-disabled="true">+</button>`;
       } else if (p.price_on_request) {
-        btnHtml = `<button type="button" class="button btn-inquire" onclick="window.inquireProduct('${p.id}')">INQUIRE ON WHATSAPP</button>`;
+        btnHtml = `<button type="button" class="button btn-inquire product-add" onclick="window.inquireProduct('${p.id}')" aria-label="Inquire about ${p.name}">+</button>`;
       } else {
-        btnHtml = `<button type="button" class="button add_to_cart_button" data-id="${p.id}" aria-label="Add &ldquo;${p.name}&rdquo; to your cart">ADD TO CART</button>`;
+        btnHtml = `<button type="button" class="button add_to_cart_button product-add" data-id="${p.id}" aria-label="Add &ldquo;${p.name}&rdquo; to your bag">+</button>`;
       }
 
       return `
         <li class="product-item" data-id="${p.id}">
-          <a href="product.php?id=${encodeURIComponent(p.id)}" class="product-thumb-link">
-            <div class="product-image-box">
+          <div class="product-image-box">
+            <a href="product.php?id=${encodeURIComponent(p.id)}" class="product-thumb-link">
               <img src="${p.image}" alt="${p.name}" loading="lazy" width="300" height="300">
-            </div>
+            </a>
+            <span class="product-ref">${p.sku || ('PR' + p.id)}</span>
+            <button type="button" class="product-quick-view" onclick="window.openProductModal('${p.id}')">Quick view</button>
+            ${btnHtml}
+          </div>
+          <div class="product-card-caption">
             <span class="product-cat-tag">${p.category || 'Furniture & Objects'}</span>
-            <h3 class="woocommerce-loop-product__title">${p.name}</h3>
+            <a href="product.php?id=${encodeURIComponent(p.id)}">
+              <h3 class="woocommerce-loop-product__title">${p.name}</h3>
+            </a>
             ${priceHtml}
-          </a>
-          ${btnHtml}
+          </div>
         </li>
       `;
     }).join('');
@@ -431,6 +433,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Availability check & warning
     const avail = (prod.availability || 'available').toLowerCase();
+    const availText = avail === 'made_to_order' ? 'Made to Order'
+      : avail === 'coming_soon' ? 'Coming Soon'
+        : avail === 'unavailable' ? 'Unavailable'
+          : 'Available';
 
     if (modalAvailWarning) {
       modalAvailWarning.className = 'modal-avail-warning';
