@@ -8,37 +8,61 @@ require_once __DIR__ . '/auth.php';
 require_admin_auth();
 require_once '../config.php';
 
-// Auto-check tables
-$tblCheck = $conn->query("SHOW TABLES LIKE 'orders'");
-if (!$tblCheck || $tblCheck->num_rows === 0) {
-    require_once __DIR__ . '/../setup.php';
+// Auto-check and ensure required tables exist
+try {
+    $conn->query("CREATE TABLE IF NOT EXISTS order_activity_logs (
+        id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        order_id INT(11) NOT NULL,
+        staff_username VARCHAR(100) NOT NULL,
+        action_type VARCHAR(100) NOT NULL,
+        previous_value TEXT DEFAULT NULL,
+        new_value TEXT DEFAULT NULL,
+        note TEXT DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX (order_id),
+        INDEX (staff_username)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+} catch (Throwable $e) {
+    // Ignore if table creation fails
 }
 
 // Fetch all orders and enquiries
-$result = $conn->query("SELECT * FROM orders ORDER BY id DESC");
 $orders = [];
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $orders[] = $row;
+try {
+    $result = $conn->query("SELECT * FROM orders ORDER BY id DESC");
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $orders[] = $row;
+        }
     }
+} catch (Throwable $e) {
+    $orders = [];
 }
 
 // Fetch order items grouped by order_id
-$itemsResult = $conn->query("SELECT * FROM order_items ORDER BY id ASC");
 $orderItems = [];
-if ($itemsResult) {
-    while ($it = $itemsResult->fetch_assoc()) {
-        $orderItems[$it['order_id']][] = $it;
+try {
+    $itemsResult = $conn->query("SELECT * FROM order_items ORDER BY id ASC");
+    if ($itemsResult) {
+        while ($it = $itemsResult->fetch_assoc()) {
+            $orderItems[$it['order_id']][] = $it;
+        }
     }
+} catch (Throwable $e) {
+    $orderItems = [];
 }
 
 // Fetch audit activity logs grouped by order_id
-$logsResult = $conn->query("SELECT * FROM order_activity_logs ORDER BY id DESC");
 $orderLogs = [];
-if ($logsResult) {
-    while ($lg = $logsResult->fetch_assoc()) {
-        $orderLogs[$lg['order_id']][] = $lg;
+try {
+    $logsResult = $conn->query("SELECT * FROM order_activity_logs ORDER BY id DESC");
+    if ($logsResult) {
+        while ($lg = $logsResult->fetch_assoc()) {
+            $orderLogs[$lg['order_id']][] = $lg;
+        }
     }
+} catch (Throwable $e) {
+    $orderLogs = [];
 }
 
 foreach ($orders as &$ord) {
@@ -168,53 +192,11 @@ switch ($msg) {
 <div class="admin-layout">
 
     <!-- Header Navigation Bar -->
-    <header class="admin-header">
-        <a href="index.php" class="header-brand">
-            <img src="../urth_clone/images/6a1c3ef3f96cad36ed74d8cd_favicon.jpg" alt="URTH Logo" style="width: 38px; height: 38px; border-radius: var(--radius-sm); object-fit: cover;">
-            <div class="brand-text">
-                <span class="brand-name">URTH</span>
-                <span class="brand-sub">Admin</span>
-            </div>
-        </a>
-
-        <!-- Navigation Tabs -->
-        <nav class="admin-nav-tabs">
-            <a href="index.php" class="admin-nav-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Projects
-            </a>
-            <a href="products.php" class="admin-nav-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                Products
-            </a>
-            <a href="orders.php" class="admin-nav-link active">
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                Orders <?php if ($pendingRefundsCount > 0): ?><span style="background: var(--danger); color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: 4px;" title="<?= $pendingRefundsCount ?> refund actions pending"><?= $pendingRefundsCount ?></span><?php endif; ?>
-            </a>
-            <a href="partners.php" class="admin-nav-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
-                Partners
-            </a>
-            <a href="emails.php" class="admin-nav-link">Failed Emails</a>
-        </nav>
-
-        <div class="header-actions">
-            <div class="user-badge">
-                <span class="user-avatar"><?= strtoupper(substr($_SESSION['admin_username'] ?? 'A', 0, 1)) ?></span>
-                <span><?= htmlspecialchars($_SESSION['admin_username'] ?? 'Admin') ?></span>
-            </div>
-
-            <a href="../cart.php" target="_blank" class="btn btn-outline btn-sm" title="Preview checkout">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                View Cart
-            </a>
-
-            <a href="logout.php" class="btn btn-danger btn-sm" title="Log out">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Logout
-            </a>
-        </div>
-    </header>
+    <?php 
+    if (file_exists(__DIR__ . '/navbar.php')) {
+        require_once __DIR__ . '/navbar.php'; 
+    }
+    ?>
 
     <!-- Main Container -->
     <main class="admin-container">
@@ -278,26 +260,6 @@ switch ($msg) {
                 </div>
                 <div class="stat-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-info">
-                    <div class="stat-label">Outstanding</div>
-                    <div class="stat-value" style="color: #f59e0b;">LKR <?= number_format($totalOutstanding, 2) ?> <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">(<?= $pendingPayments ?>)</span></div>
-                </div>
-                <div class="stat-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-info">
-                    <div class="stat-label">Total Revenue</div>
-                    <div class="stat-value" style="color: var(--success);">LKR <?= number_format($totalRevenue, 2) ?></div>
-                </div>
-                <div class="stat-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
                 </div>
             </div>
         </div>

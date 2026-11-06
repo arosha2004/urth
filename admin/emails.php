@@ -63,25 +63,11 @@ $csrfToken = generate_csrf_token();
 </head>
 <body>
 <div class="admin-layout">
-    <header class="admin-header">
-        <a href="index.php" class="header-brand">
-            <img src="../urth_clone/images/6a1c3ef3f96cad36ed74d8cd_favicon.jpg" alt="URTH Logo" style="width: 38px; height: 38px; border-radius: var(--radius-sm); object-fit: cover;">
-            <div class="brand-text">
-                <span class="brand-name">URTH</span>
-                <span class="brand-sub">Admin</span>
-            </div>
-        </a>
-        <nav class="admin-nav-tabs">
-            <a href="index.php" class="admin-nav-link">Projects</a>
-            <a href="products.php" class="admin-nav-link">Products</a>
-            <a href="orders.php" class="admin-nav-link">Orders</a>
-            <a href="partners.php" class="admin-nav-link">Partners</a>
-            <a href="emails.php" class="admin-nav-link active">Failed Emails</a>
-        </nav>
-        <div class="header-actions">
-            <a href="logout.php" class="btn btn-danger btn-sm" title="Log out">Logout</a>
-        </div>
-    </header>
+    <?php 
+    if (file_exists(__DIR__ . '/navbar.php')) {
+        require_once __DIR__ . '/navbar.php'; 
+    }
+    ?>
     <main class="email-log-wrap">
         <h1>Failed Emails</h1>
         <?php if ($message !== ''): ?>
