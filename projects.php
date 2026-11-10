@@ -505,6 +505,18 @@ if($projects_query) {
   <link rel="stylesheet" href="projects.css" />
   <link rel="stylesheet" href="mobile-nav.css" />
   <style>
+    /* Services image strip: positioned by the scroll-sync script below so each
+       image lines up with its title (replaces the fixed Webflow slide). */
+    .service-image-track {
+      grid-column-gap: var(--_spacing---extra-small);
+      grid-row-gap: var(--_spacing---extra-small);
+      justify-content: flex-start;
+      align-items: flex-start;
+      display: flex;
+      will-change: transform;
+      transition: transform 1.1s cubic-bezier(.45, 0, .2, 1);
+    }
+
     /* Override projects.css black background for this specific page */
     body {
       background-color: #ffffff !important;
@@ -1091,7 +1103,7 @@ if($projects_query) {
           </div>
         </div>
         <div fade-in-up-2="" class="service-image-wrapper">
-          <div class="service-image-inner">
+          <div class="service-image-track">
             <div class="service-image-collection w-dyn-list">
               <div role="list" class="service-image-list w-dyn-items">
                 <div role="listitem" class="service-image-item w-dyn-item">
@@ -1331,6 +1343,60 @@ if($projects_query) {
         if (subtitleEl) subtitleEl.textContent = 'Project Detail';
       }
     });
+  </script>
+
+  <script>
+    // Keep the services image strip in sync with the titles: whichever title is
+    // closest to the middle of the viewport gets its image at the strip's left edge.
+    (function () {
+      const track = document.querySelector('#service .service-image-track');
+      if (!track) return;
+      const titles = Array.from(document.querySelectorAll('#service .service-headline .service-headline-item'));
+      const images = Array.from(track.querySelectorAll(':scope > .service-image-collection'));
+      const count = Math.min(titles.length, images.length);
+      if (!count) return;
+
+      let ticking = false;
+
+      function update() {
+        ticking = false;
+        const mid = window.innerHeight / 2;
+        // Fractional index of the title nearest the viewport centre.
+        const centers = titles.slice(0, count).map(function (el) {
+          const r = el.getBoundingClientRect();
+          return r.top + r.height / 2;
+        });
+        let pos = 0;
+        if (mid <= centers[0]) {
+          pos = 0;
+        } else if (mid >= centers[count - 1]) {
+          pos = count - 1;
+        } else {
+          for (let i = 0; i < count - 1; i++) {
+            if (mid >= centers[i] && mid < centers[i + 1]) {
+              pos = i + (mid - centers[i]) / (centers[i + 1] - centers[i]);
+              break;
+            }
+          }
+        }
+        const i = Math.floor(pos);
+        const t = pos - i;
+        const target = t < 0.5 ? i : Math.min(i + 1, count - 1);
+        track.style.transform = 'translate3d(' + (images[0].offsetLeft - images[target].offsetLeft) + 'px, 0, 0)';
+      }
+
+      function onScroll() {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      window.addEventListener('load', update);
+      update();
+    })();
   </script>
 
   <script src="mobile-nav.js"></script>
