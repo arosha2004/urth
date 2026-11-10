@@ -514,7 +514,7 @@ if($projects_query) {
       align-items: flex-start;
       display: flex;
       will-change: transform;
-      transition: transform 1.1s cubic-bezier(.45, 0, .2, 1);
+      transition: transform 1.5s cubic-bezier(.5, 0, .5, .5);
     }
 
     /* Override projects.css black background for this specific page */
@@ -1354,33 +1354,26 @@ if($projects_query) {
       const images = Array.from(track.querySelectorAll(':scope > .service-image-collection'));
       const count = Math.min(titles.length, images.length);
       if (!count) return;
+      // Measure the un-animated heading wrapper (its children have fade-in transforms).
+      const headings = titles.map(function (el) {
+        return el.querySelector('.vertical-headline.small-left') || el;
+      });
 
       let ticking = false;
+      let current = -1;
 
       function update() {
         ticking = false;
-        const mid = window.innerHeight / 2;
-        // Fractional index of the title nearest the viewport centre.
-        const centers = titles.slice(0, count).map(function (el) {
-          const r = el.getBoundingClientRect();
-          return r.top + r.height / 2;
-        });
-        let pos = 0;
-        if (mid <= centers[0]) {
-          pos = 0;
-        } else if (mid >= centers[count - 1]) {
-          pos = count - 1;
-        } else {
-          for (let i = 0; i < count - 1; i++) {
-            if (mid >= centers[i] && mid < centers[i + 1]) {
-              pos = i + (mid - centers[i]) / (centers[i + 1] - centers[i]);
-              break;
-            }
-          }
+        // Slide to the next image as soon as that service's "OUR SERVICE"
+        // heading rises into the lower part of the viewport, so the image
+        // changes together with the new title appearing.
+        const trigger = window.innerHeight * 0.88;
+        let target = 0;
+        for (let i = 1; i < count; i++) {
+          if (headings[i].getBoundingClientRect().top < trigger) target = i;
         }
-        const i = Math.floor(pos);
-        const t = pos - i;
-        const target = t < 0.5 ? i : Math.min(i + 1, count - 1);
+        if (target === current) return;
+        current = target;
         track.style.transform = 'translate3d(' + (images[0].offsetLeft - images[target].offsetLeft) + 'px, 0, 0)';
       }
 
@@ -1392,8 +1385,8 @@ if($projects_query) {
       }
 
       window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onScroll);
-      window.addEventListener('load', update);
+      window.addEventListener('resize', function () { current = -1; onScroll(); });
+      window.addEventListener('load', function () { current = -1; update(); });
       update();
     })();
   </script>
