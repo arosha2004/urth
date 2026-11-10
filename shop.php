@@ -323,46 +323,84 @@ if ($catResult) {
 
     <section class="ordering-process-section" id="orderingProcess" aria-labelledby="orderGuideTitle">
       <div class="guide-heading">
-        <span class="catalog-eyebrow">02 &nbsp;/&nbsp; HOW TO ORDER</span>
-        <h2 class="section-title" id="orderGuideTitle">Order with the studio.</h2>
+        <div class="guide-heading-main">
+          <span class="catalog-eyebrow">02 &nbsp;/&nbsp; HOW TO ORDER</span>
+          <h2 class="section-title" id="orderGuideTitle">Order with the studio.</h2>
+        </div>
         <p>Ask about a finish, a size or delivery to your door. URTH confirms the details and price before you pay.</p>
       </div>
       <div class="order-guide-content">
-        <div class="order-steps">
-          <article class="order-step"><span>01</span><h3>Choose your pieces</h3></article>
-          <article class="order-step"><span>02</span><h3>Ask on WhatsApp</h3></article>
-          <article class="order-step"><span>03</span><h3>Confirm and pay</h3></article>
-          <article class="order-step"><span>04</span><h3>Receive your order</h3></article>
+        <div class="order-steps-wrap">
+          <div class="order-steps" role="tablist" aria-label="Ordering steps">
+            <?php
+              $orderSteps = ['Choose your pieces', 'Ask on WhatsApp', 'Confirm and pay', 'Receive your order'];
+              foreach ($orderSteps as $stepIndex => $stepTitle):
+                $stepNum = $stepIndex + 1;
+                $isActive = $stepIndex === 0;
+            ?>
+              <button type="button" class="order-step<?= $isActive ? ' is-active' : '' ?>" role="tab"
+                      id="orderStepTab<?= $stepNum ?>" aria-controls="orderStepPanel<?= $stepNum ?>"
+                      aria-selected="<?= $isActive ? 'true' : 'false' ?>" tabindex="<?= $isActive ? '0' : '-1' ?>">
+                <span class="order-step-num">0<?= $stepNum ?></span>
+                <span class="order-step-title"><?= htmlspecialchars($stepTitle, ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="order-step-arrow" aria-hidden="true">&#8599;</span>
+              </button>
+            <?php endforeach; ?>
+          </div>
           <a class="guide-browse" href="#catalogHeading">Browse the collection <span aria-hidden="true">&uarr;</span></a>
         </div>
-        <aside class="guide-notes" aria-label="Order details">
-          <article class="guide-note guide-example">
+        <div class="guide-panels">
+          <article class="guide-note guide-example is-active" role="tabpanel" id="orderStepPanel1" aria-labelledby="orderStepTab1">
             <span class="catalog-eyebrow">01 / EXAMPLE BAG</span>
             <?php if (!empty($products)): ?>
-              <p class="guide-example-sku"><?= htmlspecialchars($products[0]['sku'], ENT_QUOTES, 'UTF-8') ?> &middot; QTY 1</p>
-              <h3><?= htmlspecialchars($products[0]['name'], ENT_QUOTES, 'UTF-8') ?></h3>
-              <p class="guide-example-price"><?= htmlspecialchars($products[0]['formattedSalePrice'] ?: $products[0]['formattedPrice'], ENT_QUOTES, 'UTF-8') ?></p>
+              <div class="guide-example-item">
+                <?php if (!empty($products[0]['image'])): ?>
+                  <div class="guide-example-thumb">
+                    <img src="<?= htmlspecialchars($products[0]['image'], ENT_QUOTES, 'UTF-8') ?>" alt="" loading="lazy" width="157" height="157">
+                  </div>
+                <?php endif; ?>
+                <div class="guide-example-info">
+                  <p class="guide-example-sku"><?= htmlspecialchars($products[0]['sku'], ENT_QUOTES, 'UTF-8') ?> &middot; QTY 1</p>
+                  <h3><?= htmlspecialchars($products[0]['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+                  <p class="guide-example-price"><?= htmlspecialchars($products[0]['formattedSalePrice'] ?: $products[0]['formattedPrice'], ENT_QUOTES, 'UTF-8') ?></p>
+                </div>
+              </div>
             <?php else: ?>
               <h3>Choose what you love.</h3>
             <?php endif; ?>
-            <p>Open Quick view for a closer look, then add the pieces you like to your bag.</p>
+            <p class="guide-note-text">Open Quick view for a closer look, then add the pieces you like to your bag.</p>
           </article>
-          <article class="guide-note">
+          <article class="guide-note" role="tabpanel" id="orderStepPanel2" aria-labelledby="orderStepTab2" hidden>
             <span class="catalog-eyebrow">02 / EXAMPLE ENQUIRY</span>
-            <h3>A question for the studio.</h3>
-            <p>Ask about a finish, size or delivery. URTH will confirm availability, details and the final total.</p>
+            <h3>A question for the studio</h3>
+            <?php
+              $enquiryName = !empty($products) ? $products[0]['name'] : 'Wooden Chair';
+              $enquirySku = !empty($products) ? $products[0]['sku'] : 'PR108';
+            ?>
+            <blockquote class="guide-quote">&ldquo;I&rsquo;m interested in the <?= htmlspecialchars($enquiryName, ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars($enquirySku, ENT_QUOTES, 'UTF-8') ?>. Could you confirm the seat height and delivery cost to Kandy?&rdquo;</blockquote>
+            <p class="guide-note-text">Your bag fills in the items and quantities. Add your question, then review and send the message in WhatsApp.</p>
           </article>
-          <article class="guide-note">
+          <article class="guide-note" role="tabpanel" id="orderStepPanel3" aria-labelledby="orderStepTab3" hidden>
             <span class="catalog-eyebrow">03 / BEFORE PAYMENT</span>
-            <h3>Know what you’re agreeing to.</h3>
-            <p>Piece, quantity and finish. Final price and delivery cost. Payment instructions from URTH.</p>
+            <h3>Know what you&rsquo;re agreeing to.</h3>
+            <ul class="guide-list">
+              <li>Piece, quantity and finish</li>
+              <li>Final price and delivery charges</li>
+              <li>Availability and expected timing</li>
+            </ul>
+            <p class="guide-note-text">Once you agree, use the payment details URTH sends you and share your receipt.</p>
           </article>
-          <article class="guide-note">
+          <article class="guide-note" role="tabpanel" id="orderStepPanel4" aria-labelledby="orderStepTab4" hidden>
             <span class="catalog-eyebrow">04 / AFTER PAYMENT VERIFICATION</span>
-            <h3>How it reaches you.</h3>
-            <p>Digital files arrive by email. Furniture and objects are delivered as agreed with the studio.</p>
+            <h3>How it reaches you</h3>
+            <dl class="guide-delivery">
+              <dt>Digital files</dt><dd>Sent to your email</dd>
+              <dt>Furniture &amp; objects</dt><dd>Delivery arranged with you</dd>
+              <dt>Design sessions</dt><dd>Booking details confirmed</dd>
+            </dl>
+            <p class="guide-note-text">The studio follows the arrangements agreed for your order.</p>
           </article>
-        </aside>
+        </div>
       </div>
     </section>
   </main>

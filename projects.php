@@ -1346,8 +1346,7 @@ if($projects_query) {
   </script>
 
   <script>
-    // Keep the services image strip in sync with the titles: whichever title is
-    // closest to the middle of the viewport gets its image at the strip's left edge.
+    
     (function () {
       const track = document.querySelector('#service .service-image-track');
       if (!track) return;
