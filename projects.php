@@ -514,7 +514,6 @@ if($projects_query) {
       align-items: flex-start;
       display: flex;
       will-change: transform;
-      transition: transform 1.5s cubic-bezier(.5, 0, .5, .5);
     }
 
     /* Override projects.css black background for this specific page */
@@ -1354,39 +1353,56 @@ if($projects_query) {
       const images = Array.from(track.querySelectorAll(':scope > .service-image-collection'));
       const count = Math.min(titles.length, images.length);
       if (!count) return;
-      // Measure the un-animated heading wrapper (its children have fade-in transforms).
-      const headings = titles.map(function (el) {
-        return el.querySelector('.vertical-headline.small-left') || el;
-      });
+      let shown = null;  // translateX currently applied
+      let goal = 0;      // translateX the scroll position asks for
+      let raf = 0;
 
-      let ticking = false;
-      let current = -1;
+      // Scroll-scrubbed: the strip moves continuously with the page.
+      // When service i's block is centred in the viewport, image i is
+      // centred in place; between two services the strip is part-way across,
+      // so the next image glides in as its title rises to the centre.
+      function measure() {
+        const mid = window.innerHeight / 2;
+        const centers = titles.slice(0, count).map(function (el) {
+          const r = el.getBoundingClientRect();
+          return r.top + r.height / 2;
+        });
+        let pos = 0;
+        if (mid >= centers[count - 1]) {
+          pos = count - 1;
+        } else if (mid > centers[0]) {
+          for (let i = 0; i < count - 1; i++) {
+            if (mid >= centers[i] && mid < centers[i + 1]) {
+              pos = i + (mid - centers[i]) / (centers[i + 1] - centers[i]);
+              break;
+            }
+          }
+        }
+        const i = Math.min(Math.floor(pos), count - 1);
+        const t = pos - i;
+        // Read offsets live: Webflow resizes the images while scrolling.
+        const x0 = images[i].offsetLeft;
+        const x1 = images[Math.min(i + 1, count - 1)].offsetLeft;
+        goal = images[0].offsetLeft - (x0 + (x1 - x0) * t);
+      }
+
+      function frame() {
+        raf = 0;
+        if (shown === null) shown = goal;
+        shown += (goal - shown) * 0.2; // light smoothing for wheel steps
+        if (Math.abs(goal - shown) < 0.3) shown = goal;
+        track.style.transform = 'translate3d(' + shown.toFixed(2) + 'px, 0, 0)';
+        if (shown !== goal) raf = requestAnimationFrame(frame);
+      }
 
       function update() {
-        ticking = false;
-        // Slide to the next image as soon as that service's "OUR SERVICE"
-        // heading rises into the lower part of the viewport, so the image
-        // changes together with the new title appearing.
-        const trigger = window.innerHeight * 0.88;
-        let target = 0;
-        for (let i = 1; i < count; i++) {
-          if (headings[i].getBoundingClientRect().top < trigger) target = i;
-        }
-        if (target === current) return;
-        current = target;
-        track.style.transform = 'translate3d(' + (images[0].offsetLeft - images[target].offsetLeft) + 'px, 0, 0)';
+        measure();
+        if (!raf) raf = requestAnimationFrame(frame);
       }
 
-      function onScroll() {
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(update);
-        }
-      }
-
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', function () { current = -1; onScroll(); });
-      window.addEventListener('load', function () { current = -1; update(); });
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', function () { shown = null; update(); });
+      window.addEventListener('load', function () { shown = null; update(); });
       update();
     })();
   </script>
