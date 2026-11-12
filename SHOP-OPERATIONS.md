@@ -38,7 +38,7 @@ Checkout and quote submissions use a honeypot, a per-session limit of 5 attempts
 
 ## Checkout, quote requests and payment configuration
 
-Set `URTH_PUBLIC_BASE_URL` to the canonical public site URL and `URTH_ORDER_EMAIL` to the mailbox that should receive order, quote and payment-evidence alerts. Configure `URTH_MAIL_FROM` and the host's PHP mail transport for outbound email. Check the email outbox after launch; transport acceptance is not proof of mailbox delivery.
+Set `URTH_PUBLIC_BASE_URL` to the canonical public site URL and `URTH_ORDER_EMAIL` to the mailbox that should receive order, quote and payment-evidence alerts. New checkout orders go to `URTH_SHOP_ORDER_EMAIL` (default `sales@shop.urthspaces.com`), with Reply-To set to the customer; the customer's confirmation email has Reply-To set to the same orders mailbox. Configure `URTH_MAIL_FROM` and the host's PHP mail transport for outbound email. Check the email outbox after launch; transport acceptance is not proof of mailbox delivery.
 
 Bank instructions are shown to staff only when all of these server environment values are configured: `URTH_BANK_NAME`, `URTH_BANK_ACCOUNT_NAME`, `URTH_BANK_SORT_CODE`, `URTH_BANK_ACCOUNT_NUMBER`, and `URTH_BANK_IBAN`. Enter verified URTH banking details only. Do not add credentials or payment instructions to source code. Card and PayPal payment are not enabled by these changes.
 

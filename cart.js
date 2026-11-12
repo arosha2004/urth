@@ -260,6 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let totalFormatted = grandTotal.toFixed(2);
       let orderCurrency = (cart[0] && cart[0].currency && cart[0].currency !== '£' && cart[0].currency !== 'GBP') ? cart[0].currency : 'LKR';
       let emailStatus = 'pending';
+      let ordersEmail = 'sales@shop.urthspaces.com';
 
       if (checkoutError) {
         checkoutError.hidden = true;
@@ -298,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
         orderRef = result.order_number;
         orderCurrency = result.currency || orderCurrency;
         emailStatus = result.email_status || emailStatus;
+        if (result.orders_email) ordersEmail = result.orders_email;
         if (result.subtotal) subtotal = Number(result.subtotal);
         if (result.total) {
           totalFormatted = result.total;
@@ -329,12 +331,18 @@ document.addEventListener('DOMContentLoaded', () => {
       // Show confirmation modal
       if (modalOrderNumber) modalOrderNumber.textContent = orderRef;
       if (modalOrderSummaryText) {
-        modalOrderSummaryText.textContent = `Order Reference: ${orderRef} • Provisional item total: ${formatMoney(grandTotal, orderCurrency)} • Payment pending. ${emailStatus === 'sent' ? 'A confirmation email has been sent.' : 'The confirmation email could not be sent yet; URTH will follow up.'}`;
+        modalOrderSummaryText.textContent = `Provisional item total: ${formatMoney(grandTotal, orderCurrency)} • Payment pending. ${emailStatus === 'sent' ? `A confirmation email has been sent to ${custEmail}.` : 'The confirmation email could not be sent yet; URTH will follow up.'}`;
       }
+      const whatsAppText = `Hello URTH, I'd like to talk about my order ${orderRef}.`;
       const modalWhatsAppChatBtn = document.querySelector('#modalWhatsAppChatBtn');
       if (modalWhatsAppChatBtn) {
-        modalWhatsAppChatBtn.href = `mailto:info@urthspaces.com?subject=${encodeURIComponent('Order ' + orderRef)}`;
-        modalWhatsAppChatBtn.textContent = 'Contact URTH';
+        modalWhatsAppChatBtn.href = `https://wa.me/94768008687?text=${encodeURIComponent(whatsAppText)}`;
+      }
+      const modalEmailOrderBtn = document.querySelector('#modalEmailOrderBtn');
+      if (modalEmailOrderBtn) {
+        const emailSubject = `Order ${orderRef}`;
+        const emailBody = `Hello URTH,\n\nI'd like to talk about my order ${orderRef}.\n\n\n${custName}\n${custPhone}`;
+        modalEmailOrderBtn.href = `mailto:${ordersEmail}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
       }
       if (orderSuccessModal) {
         orderSuccessModal.classList.add('is-visible');

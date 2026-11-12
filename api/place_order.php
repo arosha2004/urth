@@ -397,24 +397,59 @@ try {
     $statusUrl = $baseUrl . '/order-status.php?token=' . rawurlencode($statusToken);
     $itemSummary = implode("\n", array_map(static function ($item) {
         $option = $item['option'] !== '' ? ' (' . $item['option'] . ')' : '';
-        return $item['qty'] . ' x ' . $item['name'] . $option . ' — ' . $item['currency'] . number_format($item['price'] * $item['qty'], 2);
+        $sku = $item['sku'] !== '' ? ' [SKU ' . $item['sku'] . ']' : '';
+        return '- ' . $item['qty'] . ' x ' . $item['name'] . $option . $sku . ' — ' . $item['currency'] . ' ' . number_format($item['price'] * $item['qty'], 2);
     }, $items));
+    $subtotalFormatted = $currency . ' ' . number_format($subtotal, 2);
+    $ordersMailbox = trim((string)(getenv('URTH_SHOP_ORDER_EMAIL') ?: 'sales@shop.urthspaces.com'));
+    $whatsAppNumber = '94768008687';
+    $whatsAppUrl = 'https://wa.me/' . $whatsAppNumber . '?text=' . rawurlencode("Hello URTH, I'd like to talk about my order {$order_number}.");
     $customerEmailSent = false;
     $studioEmailSent = false;
-    $emailBody = "Hello {$customer_name},\n\nWe received your URTH order request {$order_number}. Payment is pending while URTH reviews availability, delivery arrangements and the final total.\n\nItems:\n{$itemSummary}\n\nProvisional item subtotal: {$currency}" . number_format($subtotal, 2) . "\nPreferred payment method: {$payment_method}\n\nTrack your order securely for 30 days: {$statusUrl}\n\nPlease wait for URTH to confirm the final total and payment instructions before paying.\n\nURTH Architecture Studio";
+
+    $customerBody = "Hello {$customer_name},\n\n"
+        . "Thank you for your order. We've received order request {$order_number}.\n\n"
+        . "Payment is pending while URTH reviews availability, delivery arrangements and the final total. "
+        . "Please wait for us to confirm the final total and payment instructions before paying.\n\n"
+        . "ORDER SUMMARY\n"
+        . "Order number: {$order_number}\n"
+        . "Date: " . date('j M Y, g:i a') . "\n\n"
+        . "Items:\n{$itemSummary}\n\n"
+        . "Provisional item subtotal: {$subtotalFormatted}\n"
+        . "Delivery: {$shipping_method}\n"
+        . "Preferred payment method: {$payment_method}\n"
+        . ($delivery_address !== '' ? "\nDelivery address:\n{$delivery_address}\n" : '')
+        . ($order_notes !== '' ? "\nYour notes:\n{$order_notes}\n" : '')
+        . "\nTrack your order securely (link valid for 30 days):\n{$statusUrl}\n\n"
+        . "QUESTIONS ABOUT YOUR ORDER?\n"
+        . "Reply to this email or write to {$ordersMailbox}, quoting {$order_number}.\n"
+        . "WhatsApp: {$whatsAppUrl}\n\n"
+        . "URTH Architecture Studio";
     try {
-        $customerEmailSent = send_shop_email($conn, $customer_email, "URTH order request received — {$order_number}", $emailBody);
+        $customerEmailSent = send_shop_email($conn, $customer_email, "Your URTH order confirmation — {$order_number}", $customerBody, null, $ordersMailbox);
     } catch (Throwable $emailError) {
-        error_log('URTH customer order acknowledgement could not be queued: ' . $emailError->getMessage());
+        error_log('URTH customer order confirmation could not be queued: ' . $emailError->getMessage());
     }
+
+    $studioBody = "A new order request is awaiting review.\n\n"
+        . "Order: {$order_number} (ID {$order_id})\n"
+        . "Placed: " . date('Y-m-d H:i:s') . "\n\n"
+        . "CUSTOMER\n"
+        . "Name: {$customer_name}\n"
+        . "Email: {$customer_email}\n"
+        . "Phone / WhatsApp: {$customer_phone}\n"
+        . "Delivery address: " . ($delivery_address !== '' ? "\n{$delivery_address}" : 'Not required') . "\n\n"
+        . "ORDER\n"
+        . "Items:\n{$itemSummary}\n\n"
+        . "Provisional subtotal: {$subtotalFormatted}\n"
+        . "Delivery: {$shipping_method}\n"
+        . "Payment method: {$payment_method} (pending)\n"
+        . (count($storedCustomerUploads) > 0 ? "Reference files uploaded: " . count($storedCustomerUploads) . " (view in admin)\n" : '')
+        . ($order_notes !== '' ? "\nCustomer notes:\n{$order_notes}\n" : '')
+        . "\nReply to this email to contact the customer directly.\n"
+        . "Manage orders: {$baseUrl}/admin/orders.php";
     try {
-        $studioRecipient = trim((string)(getenv('URTH_ORDER_EMAIL') ?: 'info@urthspaces.com'));
-        $studioEmailSent = send_shop_email(
-            $conn,
-            $studioRecipient,
-            "New URTH order request — {$order_number}",
-            "A new order request is awaiting review.\n\nOrder: {$order_number}\nCustomer: {$customer_name}\nEmail: {$customer_email}\nPhone: {$customer_phone}\nProvisional subtotal: {$currency}" . number_format($subtotal, 2) . "\nPayment pending.\n\nItems:\n{$itemSummary}\n\nManage orders: {$baseUrl}/admin/orders.php"
-        );
+        $studioEmailSent = send_shop_email($conn, $ordersMailbox, "New URTH order — {$order_number} — {$customer_name}", $studioBody, null, $customer_email);
     } catch (Throwable $emailError) {
         error_log('URTH studio order notification could not be queued: ' . $emailError->getMessage());
     }
@@ -428,7 +463,9 @@ try {
         'subtotal' => number_format($subtotal, 2),
         'total' => number_format($total, 2),
         'currency' => $currency,
-        'email_status' => ($customerEmailSent && $studioEmailSent) ? 'sent' : 'pending',
+        'email_status' => $customerEmailSent ? 'sent' : 'pending',
+        'studio_email_status' => $studioEmailSent ? 'sent' : 'pending',
+        'orders_email' => $ordersMailbox,
         'items_count' => count($items),
         'items' => $items
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
